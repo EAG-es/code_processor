@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 public class Scanner_rules extends innui.code_processor.Scanner_rules {
     // Properties file for translactions
     private static final long serialVersionUID;
-    public static @Fenum("file_path_name") String k_in_route;
+    public static @Fenum("file_path") String k_in_route;
     static {
         serialVersionUID = getSerial_version_uid();
         String paquete_tex = ((@NonNull Package) Scanner_rules.class.getPackage()).getName();
@@ -24,7 +24,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         } else {
             paquete_tex = paquete_tex.replace(".", File.separator);
         }
-        Scanner_rules.k_in_route = (@Fenum("file_path_name") String) ("in/" + paquete_tex + "/in");
+        Scanner_rules.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
     }
 
     public enum States {
@@ -52,7 +52,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         , token_try, token_catch, token_finally, token_throw, token_throws
         , token_class, token_interface, token_enum, token_extends, token_implements
         , token_public, token_private, token_protected
-        , token_static, token_final, token_volatile
+        , token_static, token_final, token_volatile, token_transient
         , token_synchronized
         , integer, integer_long, decimal
         , operator_plus_plus, operator_minus_minus, operator_plus, operator_minus, operator_divide, operator_multiply, operator_module
@@ -101,12 +101,14 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return ok;
         ResourceBundle in = null;
         try {
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '\n') {
                 line_num = line_num + 1;
-                col_num = 0;
+                col_num = 1;
             }
             switch (state) {
                 case initial -> {
+                    init_token(pos, ok, extras_array);
                     process_character_initial(character, pos, ok, extras_array);
                 }
                 case keyword_or_identifier -> {
@@ -152,7 +154,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     process_character_space(character, pos, ok, extras_array);
                 }
                 default -> {
-                    ok.setTex(Tr.in(in, "Unexpected state before ") + character);
+                    ok.setTex(Tr.in(ok.valid(in), "Unexpected state before ") + character);
                 }
             }
         } catch (Exception e) {
@@ -160,13 +162,29 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         }
         col_num = col_num + 1;
         if (ok.is == false) {
-            if (ok.id.equals(k_end_of_toker_out)) {
+            if (ok.equals(ok.id, k_end_of_toker_out)) {
                 col_num = col_num - 1;
             }
         }
         return ok;
     }
 
+    @Nullable
+    public Oks init_token(Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return ok;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            token = new Tokens();
+            token.start_pos = pos;
+            token.col_num = col_num;
+            token.line_num = line_num;
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
     /**
      *
      * @param character
@@ -182,13 +200,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return ok;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             String char_tex = character.toString();
-            token_tex = char_tex;
-            token = new Tokens();
-            token.start_pos = pos;
-            token.col_num = col_num;
-            token.line_num = line_num;
+            token.token_tex = token.token_tex + char_tex;
             if (character.compareTo('0') >= 0
                     && character.compareTo('9') <= 0) {
                 state = States.number;
@@ -198,93 +212,81 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 state = States.compare_operator_or_asignment;
             } else if ("~^".contains(char_tex)) {
                 state = States.bitwise_operator_or_asignment;
-            } else if ("\"".contains(char_tex)) {
-                state = States.string;
-            } else if ("\'".contains(char_tex)) {
-                state = States.character;
             } else if ("&|".contains(char_tex)) {
                 state = States.logic_bitwise_operator_or_asignment;
+            } else if (character == '"') {
+                state = States.string;
+            } else if (character == '\'') {
+                state = States.character;
             } else if ("=".contains(char_tex)) {
                 state = States.equal_operator_or_asignment;
-            } else if ("@".contains(char_tex)) {
+            } else if (character == '@') {
                 state = States.anotation;
-            } else if ("!".contains(char_tex)) {
+            } else if (character == '!') {
                 state = States.not_or_not_equal;
-                return null;
-            } else if (char_tex.isEmpty()) {
+            } else if (char_tex.isBlank()) {
                 state = States.space;
-            } else if ("(".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == '(') {
                 token.token_type = Token_types.open_parenthesis.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if (")".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == ')') {
                 token.token_type = Token_types.close_parenthesis.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if ("{".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == '{') {
                 token.token_type = Token_types.open_brace.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if ("}".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == '}') {
                 token.token_type = Token_types.close_brace.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if ("[".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == '[') {
                 token.token_type = Token_types.open_bracket.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if ("]".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == ']') {
                 token.token_type = Token_types.close_bracket.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if (".".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == '.') {
                 token.token_type = Token_types.dot.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if (",".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == ',') {
                 token.token_type = Token_types.comma.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if (";".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == ';') {
                 token.token_type = Token_types.semi_colon.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if (":".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == ':') {
                 token.token_type = Token_types.colon.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
                 return null;
-            } else if ("?".contains(char_tex)) {
-                token_tex = token_tex + character;
+            } else if (character == '?') {
                 token.token_type = Token_types.question.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
@@ -314,16 +316,15 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             States old_state = state;
             States new_state;
             process_character_initial(character, pos, ok, extras_array);
             if (ok.is == false) return null;
             new_state = state;
             state = old_state;
-            if (new_state == States.keyword_or_identifier || new_state == States.number) {
-                token_tex = token_tex + character;
-            } else {
+            if (new_state != States.keyword_or_identifier && new_state != States.number) {
+                token.token_tex = token.token_tex.substring(0, token.token_tex.length()-1);
                 identify_keyword(ok, extras_array);
                 if (ok.is == false) return null;
                 token.end_pos = pos - 1;
@@ -349,8 +350,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
-            switch (token_tex) {
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            switch (token.token_tex) {
                 case "package" -> {
                     token.token_type = Token_types.token_package.name();
                 }
@@ -429,6 +430,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 case "volatile" -> {
                     token.token_type = Token_types.token_volatile.name();
                 }
+                case "transient" -> {
+                    token.token_type = Token_types.token_transient.name();
+                }
                 case "synchronized" -> {
                     token.token_type = Token_types.token_synchronized.name();
                 }
@@ -457,27 +461,28 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             String char_tex = character.toString();
-            if ("1234567890.-eElL".contains(char_tex)) {
-                token_tex = token_tex + character;
-            }
-            token.end_pos = pos - 1;
-            state = States.initial;
-            @Regex String integer_reg = "^[+-]?\\d+$";
-            @Regex String long_reg = "^[+-]?\\d+[Ll]$";
-            @Regex String decimal_reg = "^[+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$";
-            if (token_tex.matches(integer_reg)) {
-                token.token_type = Token_types.integer.name();
-            } else if (token_tex.matches(long_reg)) {
-                token.token_type = Token_types.integer_long.name();
-            } else if (token_tex.matches(decimal_reg)) {
-                token.token_type = Token_types.decimal.name();
+            if ("1234567890.+-eElL".contains(char_tex)) {
+                token.token_tex = token.token_tex + character;
             } else {
-                ok.setTex(Tr.in(in, "Number format not valid. "));
-                return null;
+                token.end_pos = pos - 1;
+                state = States.initial;
+                @Regex String integer_reg = "^[+-]?\\d+$";
+                @Regex String long_reg = "^[+-]?\\d+[Ll]$";
+                @Regex String decimal_reg = "^[+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$";
+                if (token.token_tex.matches(integer_reg)) {
+                    token.token_type = Token_types.integer.name();
+                } else if (token.token_tex.matches(long_reg)) {
+                    token.token_type = Token_types.integer_long.name();
+                } else if (token.token_tex.matches(decimal_reg)) {
+                    token.token_type = Token_types.decimal.name();
+                } else {
+                    ok.setTex(Tr.in(in, "Number format not valid. "));
+                    return null;
+                }
+                ok.id = k_end_of_toker_out;
             }
-            ok.id = k_end_of_toker_out;
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -499,10 +504,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '+') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("++")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("++")) {
                     token.token_type = Token_types.operator_plus_plus.name();
                     token.end_pos = pos;
                     ok.id = k_end_of_toker_in;
@@ -512,8 +517,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     return null;
                 }
             } else if (character == '-') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("--")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("--")) {
                     token.token_type = Token_types.operator_minus_minus.name();
                     token.end_pos = pos;
                     ok.id = k_end_of_toker_in;
@@ -523,8 +528,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     return null;
                 }
             } else if (character == '*') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("/*")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("/*")) {
                     token.token_type = Token_types.comment_block_begin.name();
                     state = States.comment_block;
                 } else {
@@ -532,8 +537,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     return null;
                 }
             } else if (character == '/') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("//")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("//")) {
                     token.token_type = Token_types.comment_line_begin.name();
                     state = States.comment_line;
                 } else {
@@ -541,8 +546,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     return null;
                 }
             } else if (character == '>') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("->")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("->")) {
                     token.token_type = Token_types.operator_lambda.name();
                     token.end_pos = pos;
                     ok.id = k_end_of_toker_in;
@@ -552,16 +557,16 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     return null;
                 }
             } else if (character == '=') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("+=")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("+=")) {
                     token.token_type = Token_types.assignment_plus.name();
-                } else if (token_tex.equals("-=")) {
+                } else if (token.token_tex.equals("-=")) {
                     token.token_type = Token_types.assignment_minus.name();
-                } else if (token_tex.equals("*=")) {
+                } else if (token.token_tex.equals("*=")) {
                     token.token_type = Token_types.assignment_multiply.name();
-                } else if (token_tex.equals("/=")) {
+                } else if (token.token_tex.equals("/=")) {
                     token.token_type = Token_types.assignment_divided.name();
-                } else if (token_tex.equals("%=")) {
+                } else if (token.token_tex.equals("%=")) {
                     token.token_type = Token_types.assignment_module.name();
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
@@ -571,13 +576,13 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
             } else {
-                if (token_tex.equals("+")) {
+                if (token.token_tex.equals("+")) {
                     token.token_type = Token_types.operator_plus.name();
-                } else if (token_tex.equals("-")) {
+                } else if (token.token_tex.equals("-")) {
                     token.token_type = Token_types.operator_minus.name();
-                } else if (token_tex.equals("*")) {
+                } else if (token.token_tex.equals("*")) {
                     token.token_type = Token_types.operator_multiply.name();
-                } else if (token_tex.equals("%")) {
+                } else if (token.token_tex.equals("%")) {
                     token.token_type = Token_types.operator_module.name();
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
@@ -608,8 +613,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
-            token_tex = token_tex + character;
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            token.token_tex = token.token_tex + character;
             if (character == '\n') {
                 token.token_type = Token_types.comment_line.name();
                 token.end_pos = pos;
@@ -637,10 +642,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
-            token_tex = token_tex + character;
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            token.token_tex = token.token_tex + character;
             if (character == '/') {
-                if (token_tex.endsWith("*/")) {
+                if (token.token_tex.endsWith("*/")) {
                     token.token_type = Token_types.comment_block.name();
                     token.end_pos = pos;
                     ok.id = k_end_of_toker_in;
@@ -668,17 +673,15 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
-            token_tex = token_tex + character;
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             States old_state = state;
             States new_state;
             process_character_initial(character, pos, ok, extras_array);
             if (ok.is == false) return null;
             new_state = state;
             state = old_state;
-            if (new_state == States.keyword_or_identifier || new_state == States.number) {
-                token_tex = token_tex + character;
-            } else {
+            if (new_state != States.keyword_or_identifier && new_state != States.number) {
+                token.token_tex = token.token_tex.substring(0, token.token_tex.length()-1);
                 token.token_type = Token_types.anotation.name();
                 token.end_pos = pos - 1;
                 state = States.initial;
@@ -705,10 +708,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
-            token_tex = token_tex + character;
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            token.token_tex = token.token_tex + character;
             if (character == '"') {
-                if (token_tex.endsWith("\\\"") == false) {
+                if (token.token_tex.endsWith("\\\"") == false) {
                     token.token_type = Token_types.string.name();
                     token.end_pos = pos;
                     state = States.initial;
@@ -736,12 +739,12 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
-            token_tex = token_tex + character;
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            token.token_tex = token.token_tex + character;
             if (character == '\'') {
                 @Regex String character_reg = "^'(.|\\\\[tbnrf'\"\\\\]|\\\\u[0-9ABCDEF]{4})'$";
                 token.token_type = Token_types.character.name();
-                if (token_tex.matches(character_reg)) {
+                if (token.token_tex.matches(character_reg)) {
                     token.end_pos = pos;
                     state = States.initial;
                     ok.id = k_end_of_toker_in;
@@ -771,14 +774,14 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
-            if (character.toString().isEmpty() == false) {
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            if (character.toString().isBlank() == false) {
                 token.token_type = Token_types.space.name();
                 token.end_pos = pos - 1;
                 state = States.initial;
                 ok.id = k_end_of_toker_out;
             } else {
-                token_tex = token_tex + character;
+                token.token_tex = token.token_tex + character;
             }
         } catch (Exception e) {
             ok.setTex(e);
@@ -801,11 +804,11 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             String char_tex = character.toString();
-            token_tex = token_tex + character;
+            token.token_tex = token.token_tex + character;
             if ("&|".contains(char_tex)) {
-                if (token_tex.equals("||")) {
+                if (token.token_tex.equals("||")) {
                     token.token_type = Token_types.logic_or.name();
                     token.end_pos = pos;
                     state = States.initial;
@@ -818,12 +821,12 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 }
             } else {
                 if (character == '=') {
-                    if (token_tex.equals("|=")) {
+                    if (token.token_tex.equals("|=")) {
                         token.token_type = Token_types.assignment_or.name();
                         token.end_pos = pos;
                         state = States.initial;
                         ok.id = k_end_of_toker_in;
-                    } else if (token_tex.equals("&=")) {
+                    } else if (token.token_tex.equals("&=")) {
                         token.token_type = Token_types.assignment_and.name();
                         token.end_pos = pos;
                         state = States.initial;
@@ -833,8 +836,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     state = States.initial;
                     ok.id = k_end_of_toker_in;
                 } else {
-                    token_tex = token_tex.substring(0, token_tex.length()-1);
-                    if (token_tex.equals("|")) {
+                    token.token_tex = token.token_tex.substring(0, token.token_tex.length()-1);
+                    if (token.token_tex.equals("|")) {
                         token.token_type = Token_types.bitwise_or.name();
                     } else {
                         token.token_type = Token_types.bitwise_and.name();
@@ -865,15 +868,15 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '=') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("^=")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("^=")) {
                     token.token_type = Token_types.assignment_xor.name();
                     token.end_pos = pos;
                     state = States.initial;
                     ok.id = k_end_of_toker_in;
-                } else if (token_tex.equals("~=")) {
+                } else if (token.token_tex.equals("~=")) {
                     token.token_type = Token_types.assignment_not.name();
                     token.end_pos = pos;
                     state = States.initial;
@@ -883,9 +886,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     return null;
                 }
             } else {
-                if (token_tex.equals("^")) {
+                if (token.token_tex.equals("^")) {
                     token.token_type = Token_types.bitwise_xor.name();
-                } else if (token_tex.equals("~")) {
+                } else if (token.token_tex.equals("~")) {
                     token.token_type = Token_types.bitwise_not.name();
                 } else {
                     ok.setTex(Tr.in(in, "Bitwise format not valid. "));
@@ -916,9 +919,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '=') {
-                token_tex = token_tex + character;
+                token.token_tex = token.token_tex + character;
                 token.token_type = Token_types.not_equal.name();
                 token.end_pos = pos;
                 state = States.initial;
@@ -950,16 +953,16 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '=') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("<<=")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("<<=")) {
                     token.token_type = Token_types.assignment_bitwise_left.name();
-                } else if (token_tex.equals(">>=")) {
+                } else if (token.token_tex.equals(">>=")) {
                     token.token_type = Token_types.assignment_bitwise_right.name();
-                } else if (token_tex.equals(">=")) {
+                } else if (token.token_tex.equals(">=")) {
                     token.token_type = Token_types.compare_bigger_equal.name();
-                } else if (token_tex.equals("<=")) {
+                } else if (token.token_tex.equals("<=")) {
                     token.token_type = Token_types.compare_less_equal.name();
                 } else {
                     ok.setTex(Tr.in(in, "Bitwise asignment or compare format not valid. "));
@@ -970,9 +973,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 ok.id = k_end_of_toker_in;
             } else {
                 if (character != '<' && character != '>') {
-                    if (token_tex.equals(">")) {
+                    if (token.token_tex.equals(">")) {
                         token.token_type = Token_types.compare_bigger.name();
-                    } else if (token_tex.equals("<")) {
+                    } else if (token.token_tex.equals("<")) {
                         token.token_type = Token_types.compare_less.name();
                     }
                     token.end_pos = pos - 1;
@@ -1001,10 +1004,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
-            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '=') {
-                token_tex = token_tex + character;
-                if (token_tex.equals("==")) {
+                token.token_tex = token.token_tex + character;
+                if (token.token_tex.equals("==")) {
                     token.token_type = Token_types.equal.name();
                 } else {
                     ok.setTex(Tr.in(in, "Equal operator or asignment format not valid. "));
