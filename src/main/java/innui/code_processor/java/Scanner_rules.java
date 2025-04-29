@@ -1,0 +1,1030 @@
+package innui.code_processor.java;
+
+import innui.modelos.configurations.ResourceBundles;
+import innui.modelos.errors.Oks;
+import innui.modelos.internacionalization.Tr;
+import innui.modelos.tests.Test_methods;
+import org.checkerframework.checker.fenum.qual.Fenum;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.regex.qual.Regex;
+
+import java.io.File;
+import java.util.ResourceBundle;
+
+public class Scanner_rules extends innui.code_processor.Scanner_rules {
+    // Properties file for translactions
+    private static final long serialVersionUID;
+    public static @Fenum("file_path_name") String k_in_route;
+    static {
+        serialVersionUID = getSerial_version_uid();
+        String paquete_tex = ((@NonNull Package) Scanner_rules.class.getPackage()).getName();
+        if (paquete_tex == null) {
+            paquete_tex = "..";
+        } else {
+            paquete_tex = paquete_tex.replace(".", File.separator);
+        }
+        Scanner_rules.k_in_route = (@Fenum("file_path_name") String) ("in/" + paquete_tex + "/in");
+    }
+
+    public enum States {
+        initial,
+        keyword_or_identifier,
+        number,
+        number_operator_or_asignment_or_comment,
+        comment_block,
+        comment_line,
+        compare_operator_or_asignment,
+        bitwise_operator_or_asignment,
+        anotation,
+        not_or_not_equal,
+        string,
+        character,
+        logic_bitwise_operator_or_asignment,
+        equal_operator_or_asignment,
+        space,
+    }
+
+    public enum Token_types {
+        token_package, token_import
+        , token_if, token_else, token_while, token_do, token_for
+        , token_switch, token_case, token_default
+        , token_try, token_catch, token_finally, token_throw, token_throws
+        , token_class, token_interface, token_enum, token_extends, token_implements
+        , token_public, token_private, token_protected
+        , token_static, token_final, token_volatile
+        , token_synchronized
+        , integer, integer_long, decimal
+        , operator_plus_plus, operator_minus_minus, operator_plus, operator_minus, operator_divide, operator_multiply, operator_module
+        , operator_lambda
+        , comment_block_begin, comment_block, comment_line_begin, comment_line
+        , open_parenthesis, close_parenthesis, open_brace, close_brace, open_bracket, close_bracket
+        , dot, comma, semi_colon, colon, question
+        , identifier, anotation
+        , string, character, space
+        , logic_or, logic_and, logic_not
+        , bitwise_or, bitwise_and, bitwise_xor, bitwise_not
+        , assignment
+        , assignment_xor, assignment_not, assignment_and, assignment_or
+        , assignment_bitwise_left, assignment_bitwise_right
+        , assignment_plus, assignment_minus, assignment_multiply, assignment_divided, assignment_module
+        , compare_less, compare_less_equal, compare_bigger, compare_bigger_equal
+        , equal, not_equal
+    }
+
+    public States state = States.initial;
+
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks reset_state(Oks ok, Object ... extras_array) throws Exception {
+        state = States.initial;
+        return ok;
+    }
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return ok;
+        ResourceBundle in = null;
+        try {
+            if (character == '\n') {
+                line_num = line_num + 1;
+                col_num = 0;
+            }
+            switch (state) {
+                case initial -> {
+                    process_character_initial(character, pos, ok, extras_array);
+                }
+                case keyword_or_identifier -> {
+                    process_character_keyword_or_identifier(character, pos, ok, extras_array);
+                }
+                case number -> {
+                    process_character_number(character, pos, ok, extras_array);
+                }
+                case number_operator_or_asignment_or_comment -> {
+                    process_character_number_operator_or_asignment_or_comment(character, pos, ok, extras_array);
+                }
+                case comment_line -> {
+                    process_character_comment_line(character, pos, ok, extras_array);
+                }
+                case comment_block -> {
+                    process_character_comment_block(character, pos, ok, extras_array);
+                }
+                case anotation -> {
+                    process_character_anotation(character, pos, ok, extras_array);
+                }
+                case not_or_not_equal -> {
+                    process_character_not_or_not_equal(character, pos, ok, extras_array);
+                }
+                case string -> {
+                    process_character_string(character, pos, ok, extras_array);
+                }
+                case character -> {
+                    process_character_character(character, pos, ok, extras_array);
+                }
+                case logic_bitwise_operator_or_asignment -> {
+                    process_character_logic_bitwise_operator_or_asignment(character, pos, ok, extras_array);
+                }
+                case bitwise_operator_or_asignment -> {
+                    process_character_bitwise_operator_or_asignment(character, pos, ok, extras_array);
+                }
+                case compare_operator_or_asignment -> {
+                    process_character_compare_operator_or_asignment(character, pos, ok, extras_array);
+                }
+                case equal_operator_or_asignment -> {
+                    process_character_equal_operator_or_asignment(character, pos, ok, extras_array);
+                }
+                case space -> {
+                    process_character_space(character, pos, ok, extras_array);
+                }
+                default -> {
+                    ok.setTex(Tr.in(in, "Unexpected state before ") + character);
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        col_num = col_num + 1;
+        if (ok.is == false) {
+            if (ok.id.equals(k_end_of_toker_out)) {
+                col_num = col_num - 1;
+            }
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_initial(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return ok;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            String char_tex = character.toString();
+            token_tex = char_tex;
+            token = new Tokens();
+            token.start_pos = pos;
+            token.col_num = col_num;
+            token.line_num = line_num;
+            if (character.compareTo('0') >= 0
+                    && character.compareTo('9') <= 0) {
+                state = States.number;
+            } else if ("+-*/%".contains(char_tex)) {
+                state = States.number_operator_or_asignment_or_comment;
+            } else if ("<>".contains(char_tex)) {
+                state = States.compare_operator_or_asignment;
+            } else if ("~^".contains(char_tex)) {
+                state = States.bitwise_operator_or_asignment;
+            } else if ("\"".contains(char_tex)) {
+                state = States.string;
+            } else if ("\'".contains(char_tex)) {
+                state = States.character;
+            } else if ("&|".contains(char_tex)) {
+                state = States.logic_bitwise_operator_or_asignment;
+            } else if ("=".contains(char_tex)) {
+                state = States.equal_operator_or_asignment;
+            } else if ("@".contains(char_tex)) {
+                state = States.anotation;
+            } else if ("!".contains(char_tex)) {
+                state = States.not_or_not_equal;
+                return null;
+            } else if (char_tex.isEmpty()) {
+                state = States.space;
+            } else if ("(".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.open_parenthesis.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if (")".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.close_parenthesis.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if ("{".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.open_brace.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if ("}".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.close_brace.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if ("[".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.open_bracket.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if ("]".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.close_bracket.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if (".".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.dot.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if (",".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.comma.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if (";".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.semi_colon.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if (":".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.colon.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else if ("?".contains(char_tex)) {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.question.name();
+                token.end_pos = pos + 1;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+                return null;
+            } else {
+                state = States.keyword_or_identifier;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_keyword_or_identifier(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            States old_state = state;
+            States new_state;
+            process_character_initial(character, pos, ok, extras_array);
+            if (ok.is == false) return null;
+            new_state = state;
+            state = old_state;
+            if (new_state == States.keyword_or_identifier || new_state == States.number) {
+                token_tex = token_tex + character;
+            } else {
+                identify_keyword(ok, extras_array);
+                if (ok.is == false) return null;
+                token.end_pos = pos - 1;
+                state = States.initial;
+                ok.id = k_end_of_toker_out;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks identify_keyword(Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            switch (token_tex) {
+                case "package" -> {
+                    token.token_type = Token_types.token_package.name();
+                }
+                case "import" -> {
+                    token.token_type = Token_types.token_import.name();
+                }
+                case "if" -> {
+                    token.token_type = Token_types.token_if.name();
+                }
+                case "else" -> {
+                    token.token_type = Token_types.token_else.name();
+                }
+                case "while" -> {
+                    token.token_type = Token_types.token_while.name();
+                }
+                case "do" -> {
+                    token.token_type = Token_types.token_do.name();
+                }
+                case "for" -> {
+                    token.token_type = Token_types.token_for.name();
+                }
+                case "switch" -> {
+                    token.token_type = Token_types.token_switch.name();
+                }
+                case "case" -> {
+                    token.token_type = Token_types.token_case.name();
+                }
+                case "default" -> {
+                    token.token_type = Token_types.token_default.name();
+                }
+                case "try" -> {
+                    token.token_type = Token_types.token_try.name();
+                }
+                case "catch" -> {
+                    token.token_type = Token_types.token_catch.name();
+                }
+                case "finally" -> {
+                    token.token_type = Token_types.token_finally.name();
+                }
+                case "throw" -> {
+                    token.token_type = Token_types.token_throw.name();
+                }
+                case "throes" -> {
+                    token.token_type = Token_types.token_throws.name();
+                }
+                case "class" -> {
+                    token.token_type = Token_types.token_class.name();
+                }
+                case "interface" -> {
+                    token.token_type = Token_types.token_interface.name();
+                }
+                case "enum" -> {
+                    token.token_type = Token_types.token_enum.name();
+                }
+                case "extends" -> {
+                    token.token_type = Token_types.token_extends.name();
+                }
+                case "implements" -> {
+                    token.token_type = Token_types.token_implements.name();
+                }
+                case "public" -> {
+                    token.token_type = Token_types.token_public.name();
+                }
+                case "private" -> {
+                    token.token_type = Token_types.token_private.name();
+                }
+                case "protected" -> {
+                    token.token_type = Token_types.token_protected.name();
+                }
+                case "static" -> {
+                    token.token_type = Token_types.token_static.name();
+                }
+                case "final" -> {
+                    token.token_type = Token_types.token_final.name();
+                }
+                case "volatile" -> {
+                    token.token_type = Token_types.token_volatile.name();
+                }
+                case "synchronized" -> {
+                    token.token_type = Token_types.token_synchronized.name();
+                }
+                default -> {
+                    token.token_type = Token_types.identifier.name();
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_number(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            String char_tex = character.toString();
+            if ("1234567890.-eElL".contains(char_tex)) {
+                token_tex = token_tex + character;
+            }
+            token.end_pos = pos - 1;
+            state = States.initial;
+            @Regex String integer_reg = "^[+-]?\\d+$";
+            @Regex String long_reg = "^[+-]?\\d+[Ll]$";
+            @Regex String decimal_reg = "^[+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$";
+            if (token_tex.matches(integer_reg)) {
+                token.token_type = Token_types.integer.name();
+            } else if (token_tex.matches(long_reg)) {
+                token.token_type = Token_types.integer_long.name();
+            } else if (token_tex.matches(decimal_reg)) {
+                token.token_type = Token_types.decimal.name();
+            } else {
+                ok.setTex(Tr.in(in, "Number format not valid. "));
+                return null;
+            }
+            ok.id = k_end_of_toker_out;
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_number_operator_or_asignment_or_comment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            if (character == '+') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("++")) {
+                    token.token_type = Token_types.operator_plus_plus.name();
+                    token.end_pos = pos;
+                    ok.id = k_end_of_toker_in;
+                    state = States.initial;
+                } else {
+                    ok.setTex(Tr.in(in, "Operator format not valid. "));
+                    return null;
+                }
+            } else if (character == '-') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("--")) {
+                    token.token_type = Token_types.operator_minus_minus.name();
+                    token.end_pos = pos;
+                    ok.id = k_end_of_toker_in;
+                    state = States.initial;
+                } else {
+                    ok.setTex(Tr.in(in, "Operator format not valid. "));
+                    return null;
+                }
+            } else if (character == '*') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("/*")) {
+                    token.token_type = Token_types.comment_block_begin.name();
+                    state = States.comment_block;
+                } else {
+                    ok.setTex(Tr.in(in, "Operator format not valid. "));
+                    return null;
+                }
+            } else if (character == '/') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("//")) {
+                    token.token_type = Token_types.comment_line_begin.name();
+                    state = States.comment_line;
+                } else {
+                    ok.setTex(Tr.in(in, "Operator format not valid. "));
+                    return null;
+                }
+            } else if (character == '>') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("->")) {
+                    token.token_type = Token_types.operator_lambda.name();
+                    token.end_pos = pos;
+                    ok.id = k_end_of_toker_in;
+                    state = States.initial;
+                } else {
+                    ok.setTex(Tr.in(in, "Operator format not valid. "));
+                    return null;
+                }
+            } else if (character == '=') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("+=")) {
+                    token.token_type = Token_types.assignment_plus.name();
+                } else if (token_tex.equals("-=")) {
+                    token.token_type = Token_types.assignment_minus.name();
+                } else if (token_tex.equals("*=")) {
+                    token.token_type = Token_types.assignment_multiply.name();
+                } else if (token_tex.equals("/=")) {
+                    token.token_type = Token_types.assignment_divided.name();
+                } else if (token_tex.equals("%=")) {
+                    token.token_type = Token_types.assignment_module.name();
+                } else {
+                    ok.setTex(Tr.in(in, "Operator format not valid. "));
+                    return null;
+                }
+                token.end_pos = pos;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+            } else {
+                if (token_tex.equals("+")) {
+                    token.token_type = Token_types.operator_plus.name();
+                } else if (token_tex.equals("-")) {
+                    token.token_type = Token_types.operator_minus.name();
+                } else if (token_tex.equals("*")) {
+                    token.token_type = Token_types.operator_multiply.name();
+                } else if (token_tex.equals("%")) {
+                    token.token_type = Token_types.operator_module.name();
+                } else {
+                    ok.setTex(Tr.in(in, "Operator format not valid. "));
+                    return null;
+                }
+                token.end_pos = pos - 1;
+                ok.id = k_end_of_toker_out;
+                state = States.initial;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_comment_line(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            token_tex = token_tex + character;
+            if (character == '\n') {
+                token.token_type = Token_types.comment_line.name();
+                token.end_pos = pos;
+                ok.id = k_end_of_toker_in;
+                state = States.initial;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_comment_block(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            token_tex = token_tex + character;
+            if (character == '/') {
+                if (token_tex.endsWith("*/")) {
+                    token.token_type = Token_types.comment_block.name();
+                    token.end_pos = pos;
+                    ok.id = k_end_of_toker_in;
+                    state = States.initial;
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_anotation(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            token_tex = token_tex + character;
+            States old_state = state;
+            States new_state;
+            process_character_initial(character, pos, ok, extras_array);
+            if (ok.is == false) return null;
+            new_state = state;
+            state = old_state;
+            if (new_state == States.keyword_or_identifier || new_state == States.number) {
+                token_tex = token_tex + character;
+            } else {
+                token.token_type = Token_types.anotation.name();
+                token.end_pos = pos - 1;
+                state = States.initial;
+                ok.id = k_end_of_toker_out;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_string(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            token_tex = token_tex + character;
+            if (character == '"') {
+                if (token_tex.endsWith("\\\"") == false) {
+                    token.token_type = Token_types.string.name();
+                    token.end_pos = pos;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_in;
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            token_tex = token_tex + character;
+            if (character == '\'') {
+                @Regex String character_reg = "^'(.|\\\\[tbnrf'\"\\\\]|\\\\u[0-9ABCDEF]{4})'$";
+                token.token_type = Token_types.character.name();
+                if (token_tex.matches(character_reg)) {
+                    token.end_pos = pos;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_in;
+                } else {
+                    ok.setTex(Tr.in(in, "Character format not valid. "));
+                    return null;
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_space(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            if (character.toString().isEmpty() == false) {
+                token.token_type = Token_types.space.name();
+                token.end_pos = pos - 1;
+                state = States.initial;
+                ok.id = k_end_of_toker_out;
+            } else {
+                token_tex = token_tex + character;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_logic_bitwise_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            String char_tex = character.toString();
+            token_tex = token_tex + character;
+            if ("&|".contains(char_tex)) {
+                if (token_tex.equals("||")) {
+                    token.token_type = Token_types.logic_or.name();
+                    token.end_pos = pos;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_in;
+                } else {
+                    token.token_type = Token_types.logic_and.name();
+                    token.end_pos = pos;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_in;
+                }
+            } else {
+                if (character == '=') {
+                    if (token_tex.equals("|=")) {
+                        token.token_type = Token_types.assignment_or.name();
+                        token.end_pos = pos;
+                        state = States.initial;
+                        ok.id = k_end_of_toker_in;
+                    } else if (token_tex.equals("&=")) {
+                        token.token_type = Token_types.assignment_and.name();
+                        token.end_pos = pos;
+                        state = States.initial;
+                        ok.id = k_end_of_toker_in;
+                    }
+                    token.end_pos = pos;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_in;
+                } else {
+                    token_tex = token_tex.substring(0, token_tex.length()-1);
+                    if (token_tex.equals("|")) {
+                        token.token_type = Token_types.bitwise_or.name();
+                    } else {
+                        token.token_type = Token_types.bitwise_and.name();
+                    }
+                    token.end_pos = pos - 1;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_out;
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_bitwise_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            if (character == '=') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("^=")) {
+                    token.token_type = Token_types.assignment_xor.name();
+                    token.end_pos = pos;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_in;
+                } else if (token_tex.equals("~=")) {
+                    token.token_type = Token_types.assignment_not.name();
+                    token.end_pos = pos;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_in;
+                } else {
+                    ok.setTex(Tr.in(in, "Bitwise format not valid. "));
+                    return null;
+                }
+            } else {
+                if (token_tex.equals("^")) {
+                    token.token_type = Token_types.bitwise_xor.name();
+                } else if (token_tex.equals("~")) {
+                    token.token_type = Token_types.bitwise_not.name();
+                } else {
+                    ok.setTex(Tr.in(in, "Bitwise format not valid. "));
+                    return null;
+                }
+                token.end_pos = pos - 1;
+                state = States.initial;
+                ok.id = k_end_of_toker_out;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_not_or_not_equal(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            if (character == '=') {
+                token_tex = token_tex + character;
+                token.token_type = Token_types.not_equal.name();
+                token.end_pos = pos;
+                state = States.initial;
+                ok.id = k_end_of_toker_in;
+            } else {
+                token.token_type = Token_types.logic_not.name();
+                token.end_pos = pos - 1;
+                state = States.initial;
+                ok.id = k_end_of_toker_out;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_compare_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            if (character == '=') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("<<=")) {
+                    token.token_type = Token_types.assignment_bitwise_left.name();
+                } else if (token_tex.equals(">>=")) {
+                    token.token_type = Token_types.assignment_bitwise_right.name();
+                } else if (token_tex.equals(">=")) {
+                    token.token_type = Token_types.compare_bigger_equal.name();
+                } else if (token_tex.equals("<=")) {
+                    token.token_type = Token_types.compare_less_equal.name();
+                } else {
+                    ok.setTex(Tr.in(in, "Bitwise asignment or compare format not valid. "));
+                    return null;
+                }
+                token.end_pos = pos;
+                state = States.initial;
+                ok.id = k_end_of_toker_in;
+            } else {
+                if (character != '<' && character != '>') {
+                    if (token_tex.equals(">")) {
+                        token.token_type = Token_types.compare_bigger.name();
+                    } else if (token_tex.equals("<")) {
+                        token.token_type = Token_types.compare_less.name();
+                    }
+                    token.end_pos = pos - 1;
+                    state = States.initial;
+                    ok.id = k_end_of_toker_out;
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    @Nullable
+    public Oks process_character_equal_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ok.valid(ResourceBundles.getBundle(Oks.no_fenum_cast(k_in_route))));
+            if (character == '=') {
+                token_tex = token_tex + character;
+                if (token_tex.equals("==")) {
+                    token.token_type = Token_types.equal.name();
+                } else {
+                    ok.setTex(Tr.in(in, "Equal operator or asignment format not valid. "));
+                    return null;
+                }
+                token.end_pos = pos;
+                state = States.initial;
+                ok.id = k_end_of_toker_in;
+            } else {
+                token.token_type = Token_types.assignment.name();
+                token.end_pos = pos - 1;
+                state = States.initial;
+                ok.id = k_end_of_toker_out;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return ok;
+    }
+
+}
+
+
