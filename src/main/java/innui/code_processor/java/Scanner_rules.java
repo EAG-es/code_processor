@@ -54,14 +54,14 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         , token_public, token_private, token_protected
         , token_static, token_final, token_volatile, token_transient
         , token_synchronized
-        , integer, integer_long, decimal
+        , type_boolean, type_char, type_byte, type_short, type_int, type_long, type_float, type_double
         , operator_plus_plus, operator_minus_minus, operator_plus, operator_minus, operator_divide, operator_multiply, operator_module
         , operator_lambda
         , comment_block_begin, comment_block, comment_line_begin, comment_line
         , open_parenthesis, close_parenthesis, open_brace, close_brace, open_bracket, close_bracket
-        , dot, comma, semi_colon, colon, question
-        , identifier, anotation
-        , string, character, space
+        , dot, comma, semi_colon, colon, question, space
+        , constant_integer, constant_integer_long, constant_decimal
+        , constant_string, constant_character
         , logic_or, logic_and, logic_not
         , bitwise_or, bitwise_and, bitwise_xor, bitwise_not
         , assignment
@@ -70,6 +70,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         , assignment_plus, assignment_minus, assignment_multiply, assignment_divided, assignment_module
         , compare_less, compare_less_equal, compare_bigger, compare_bigger_equal
         , equal, not_equal
+        , identifier, anotation
     }
 
     public States state = States.initial;
@@ -436,6 +437,30 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 case "synchronized" -> {
                     token.token_type = Token_types.token_synchronized.name();
                 }
+                case "boolean" -> {
+                    token.token_type = Token_types.type_boolean.name();
+                }
+                case "byte" -> {
+                    token.token_type = Token_types.type_byte.name();
+                }
+                case "char" -> {
+                    token.token_type = Token_types.type_char.name();
+                }
+                case "short" -> {
+                    token.token_type = Token_types.type_short.name();
+                }
+                case "int" -> {
+                    token.token_type = Token_types.type_int.name();
+                }
+                case "long" -> {
+                    token.token_type = Token_types.type_long.name();
+                }
+                case "float" -> {
+                    token.token_type = Token_types.type_float.name();
+                }
+                case "double" -> {
+                    token.token_type = Token_types.type_double.name();
+                }
                 default -> {
                     token.token_type = Token_types.identifier.name();
                 }
@@ -472,11 +497,11 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 @Regex String long_reg = "^[+-]?\\d+[Ll]$";
                 @Regex String decimal_reg = "^[+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$";
                 if (token.token_tex.matches(integer_reg)) {
-                    token.token_type = Token_types.integer.name();
+                    token.token_type = Token_types.constant_integer.name();
                 } else if (token.token_tex.matches(long_reg)) {
-                    token.token_type = Token_types.integer_long.name();
+                    token.token_type = Token_types.constant_integer_long.name();
                 } else if (token.token_tex.matches(decimal_reg)) {
-                    token.token_type = Token_types.decimal.name();
+                    token.token_type = Token_types.constant_decimal.name();
                 } else {
                     ok.setTex(Tr.in(in, "Number format not valid. "));
                     return null;
@@ -582,6 +607,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     token.token_type = Token_types.operator_minus.name();
                 } else if (token.token_tex.equals("*")) {
                     token.token_type = Token_types.operator_multiply.name();
+                } else if (token.token_tex.equals("/")) {
+                    token.token_type = Token_types.operator_divide.name();
                 } else if (token.token_tex.equals("%")) {
                     token.token_type = Token_types.operator_module.name();
                 } else {
@@ -712,7 +739,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             token.token_tex = token.token_tex + character;
             if (character == '"') {
                 if (token.token_tex.endsWith("\\\"") == false) {
-                    token.token_type = Token_types.string.name();
+                    token.token_type = Token_types.constant_string.name();
                     token.end_pos = pos;
                     state = States.initial;
                     ok.id = k_end_of_toker_in;
@@ -743,7 +770,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             token.token_tex = token.token_tex + character;
             if (character == '\'') {
                 @Regex String character_reg = "^'(.|\\\\[tbnrf'\"\\\\]|\\\\u[0-9ABCDEF]{4})'$";
-                token.token_type = Token_types.character.name();
+                token.token_type = Token_types.constant_character.name();
                 if (token.token_tex.matches(character_reg)) {
                     token.end_pos = pos;
                     state = States.initial;

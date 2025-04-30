@@ -30,6 +30,11 @@ public class Code_scanners extends Bases {
         }
         Code_scanners.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
     }
+    public interface Analizers {
+        public Boolean analize(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
+    }
+
+    public Code_scanners.@Nullable Analizers analizer = null;
     @Nullable
     public String code_tex = null;
     public int pos = 0;
@@ -58,14 +63,14 @@ public class Code_scanners extends Bases {
     }
 
     @Nullable
-    public Oks scan_start(Oks ok, Object ... extras_array) throws Exception {
+    public Oks scanner_start(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
             pos = 0;
-            return scan(ok , extras_array);
+            return scanner(ok , extras_array);
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -80,7 +85,7 @@ public class Code_scanners extends Bases {
      * @throws Exception
      */
     @Nullable
-    public Oks scan(Oks ok, Object ... extras_array) throws Exception {
+    public Oks scanner(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         Oks noted_ok = ok.create_new(extras_array);
@@ -123,6 +128,14 @@ public class Code_scanners extends Bases {
         return ok;
     }
 
+    /**
+     *
+     * @param scanner_rules
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
     @Nullable
     public Oks analize_token(Scanner_rules scanner_rules, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
@@ -130,7 +143,11 @@ public class Code_scanners extends Bases {
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            tokens_list.add(scanner_rules.token);
+            if (analizer == null) {
+                tokens_list.add(scanner_rules.token);
+            } else {
+                analizer.analize(scanner_rules.token, ok, extras_array);
+            }
         } catch (Exception e) {
             ok.setTex(e);
         }
