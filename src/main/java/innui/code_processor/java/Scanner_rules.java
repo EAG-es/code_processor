@@ -27,6 +27,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         Scanner_rules.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
     }
 
+    public Scanner_rules() throws Exception {
+    }
+
     public enum States {
         initial,
         keyword_or_identifier,
@@ -99,7 +102,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
     @Nullable
     public Oks process_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return ok;
+        if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -166,6 +169,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             if (ok.equals(ok.id, k_end_of_toker_out)) {
                 col_num = col_num - 1;
             }
+            return null;
         }
         return ok;
     }
@@ -173,7 +177,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
     @Nullable
     public Oks init_token(Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return ok;
+        if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -183,6 +187,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             token.line_num = line_num;
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -198,7 +203,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
     @Nullable
     public Oks process_character_initial(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return ok;
+        if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -298,6 +303,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -334,6 +340,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -467,6 +474,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -510,6 +518,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -621,6 +630,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -650,6 +660,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -681,6 +692,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -716,6 +728,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -747,6 +760,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -782,6 +796,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -812,6 +827,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -876,6 +892,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -927,6 +944,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -961,6 +979,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -1012,6 +1031,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -1051,6 +1071,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }

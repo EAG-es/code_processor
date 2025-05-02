@@ -197,7 +197,7 @@ public class Code_processor extends Initials {
                 Code_scanners code_scanner = new Code_scanners();
                 code_scanner.load_file(file_tex, ok, extras_array);
                 if (ok.is == false) return false;
-                code_scanner.scanner_start(ok, extras_array);
+                code_scanner.start_scanner(ok, extras_array);
                 if (ok.is == false) return false;
                 this.write_line(Tr.in(in, "Analyse file done. "), ok);
                 if (ok.is == false) return false;

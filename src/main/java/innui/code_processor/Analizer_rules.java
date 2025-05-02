@@ -11,10 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Analizer_rules extends Bases {
     // Properties file for translactions
@@ -30,21 +27,43 @@ public class Analizer_rules extends Bases {
         }
         Analizer_rules.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
     }
+    public static @Fenum("error_id") String k_is_bad_way = (@Fenum("error_id") String) "is_bad_way";
+
+
+    public interface After_success_calls extends Serializable {
+        Oks call(int repetition_num, Oks ok, Object ... extras_array);
+    }
+
+    public static class Rule_success implements Serializable {
+        public int repetition_num;
+        public After_success_calls after_success;
+    }
 
     public static abstract class Basic_rule_nodes implements Serializable {
-        public boolean is_optional = false;
-        public boolean is_repeatable = false;
+        public String defined_name = "";
+        public boolean is_defined_optional = false;
+        public boolean is_defined_repeatable = false;
+        public boolean is_defined_to_process_the_success_rules_list_if_sucess = false;
+        public Analizer_rules defined_analizer_rules = null;
         public boolean is_a_repeat_success_previous_not_now = false;
+        public @Nullable Rule_success to_put_in_list_rule_success = null;
+        public int repetition_num = 0;
         public boolean is_already_evaluated = false;
         public boolean is_bad_way = true;
         public @Nullable boolean is_first_part_evaluated = false;
+        public  Analizer_rules.@Nullable Basic_rule_nodes second_part_basic_rule_node = null;
+        public List<Scanner_rules.Basic_tokens> first_part_tokens_list = new ArrayList<>();
         public @Nullable Boolean is_once_successed = null;
-        public  Analizer_rules.@Nullable Basic_rule_nodes basic_rule_node = null;
 
-        public Basic_rule_nodes() throws Exception {
+        public Basic_rule_nodes(Analizer_rules analizer_rules) throws Exception {
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init(ok);
+                defined_analizer_rules = analizer_rules;
+                defined_name = "";
+                is_defined_optional = false;
+                is_defined_repeatable = false;
+                is_defined_to_process_the_success_rules_list_if_sucess = false;
+                init_to_reuse(ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -53,10 +72,10 @@ public class Analizer_rules extends Bases {
             }
         }
 
-        public Basic_rule_nodes(Basic_rule_nodes basic_rule_node) throws Exception {
+        public Basic_rule_nodes(Basic_rule_nodes second_part_basic_rule_node) throws Exception {
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init(basic_rule_node, ok);
+                init(second_part_basic_rule_node, ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -72,19 +91,38 @@ public class Analizer_rules extends Bases {
          * @return
          * @throws Exception
          */
-        public Oks init(Oks ok, Object ... extras_array) throws Exception {
+        public Oks init_to_reuse(Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
-                is_optional = false;
-                is_repeatable = false;
                 is_a_repeat_success_previous_not_now = false;
+                repetition_num = 0;
+                first_part_tokens_list.clear();
+                return init_for_repeat(ok, extras_array);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            return ok;
+        }
+
+        /**
+         * Allows a repetition in same initial conditions
+         * @param ok
+         * @param extras_array
+         * @return
+         * @throws Exception
+         */
+        public Oks init_for_repeat(Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return null;
+            ResourceBundle in = null;
+            try {
                 is_already_evaluated = false;
                 is_first_part_evaluated = false;
                 is_once_successed = null;
-                if (basic_rule_node != null) {
-                    basic_rule_node.init(ok, extras_array);
+                if (second_part_basic_rule_node != null) {
+                    second_part_basic_rule_node.init_to_reuse(ok, extras_array);
                     if (ok.is == false) return null;
                 }
             } catch (Exception e) {
@@ -92,7 +130,6 @@ public class Analizer_rules extends Bases {
             }
             return ok;
         }
-
         /**
          *
          * @param basic_rule_node
@@ -106,14 +143,17 @@ public class Analizer_rules extends Bases {
             if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
-                this.is_optional = basic_rule_node.is_optional;
-                this.is_repeatable = basic_rule_node.is_repeatable;
+                this.defined_name = basic_rule_node.defined_name;
+                this.defined_analizer_rules = basic_rule_node.defined_analizer_rules;
+                this.is_defined_optional = basic_rule_node.is_defined_optional;
+                this.is_defined_repeatable = basic_rule_node.is_defined_repeatable;
                 this.is_a_repeat_success_previous_not_now = basic_rule_node.is_a_repeat_success_previous_not_now;
+                this.repetition_num = basic_rule_node.repetition_num;
                 this.is_already_evaluated = basic_rule_node.is_already_evaluated;
                 this.is_first_part_evaluated = basic_rule_node.is_first_part_evaluated;
                 this.is_once_successed = basic_rule_node.is_once_successed;
-                if (this.basic_rule_node != null) {
-                    this.basic_rule_node.init(basic_rule_node.basic_rule_node, ok, extras_array);
+                if (this.second_part_basic_rule_node != null) {
+                    this.second_part_basic_rule_node.init(basic_rule_node.second_part_basic_rule_node, ok, extras_array);
                     if (ok.is == false) return null;
                 }
             } catch (Exception e) {
@@ -129,7 +169,7 @@ public class Analizer_rules extends Bases {
          * @return true = success, false = fail, null = not totally evaluated or error
          * @throws Exception
          */
-        public abstract Boolean evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
+        public abstract Boolean _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
 
         /**
          *
@@ -142,19 +182,24 @@ public class Analizer_rules extends Bases {
         @Nullable
         public Boolean evaluate(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return false;
+            if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
                 Boolean is;
                 boolean is_pending = false;
                 in = ok.valid(ResourceBundles.getBundle(k_in_route));
-                if (is_already_evaluated == true && is_repeatable == false) {
-                    ok.setTex(Tr.in(in, "Rule already evaluated. Must do init to reevaluate. "));
-                    return null;
+                if (is_already_evaluated == true) {
+                    if (is_defined_repeatable == false) {
+                        ok.setTex(Tr.in(in, "Rule already evaluated. Must do init to reevaluate. "));
+                        return null;
+                    } else {
+                        init_for_repeat(ok, extras_array);
+                        if (ok.is == false) return null;
+                        repetition_num = repetition_num + 1;
+                    }
                 }
-                is_a_repeat_success_previous_not_now = false;
                 if (is_first_part_evaluated == false) {
-                    is = evaluate_first_part(basic_token, ok, extras_array);
+                    is = _evaluate_first_part(basic_token, ok, extras_array);
                     if (ok.is == false) return false;
                     if (is != null) {
                         if (is == false) {
@@ -166,10 +211,16 @@ public class Analizer_rules extends Bases {
                     } else {
                         is_pending = true;
                     }
-                    if (basic_rule_node == null) {
+                    if (second_part_basic_rule_node == null) {
                         is_first_part_evaluated = false; // for repeating
                         is_already_evaluated = true;
                         is_once_successed = true;
+                        to_put_in_list_rule_success.repetition_num = repetition_num;
+                        defined_analizer_rules.success_rules_list.addFirst(to_put_in_list_rule_success);
+                        if (is_defined_to_process_the_success_rules_list_if_sucess) {
+                            defined_analizer_rules.process(ok, extras_array);
+                            if (ok.is == false) return false;
+                        }
                         return true;
                     } else {
                         if (is_pending == false) {
@@ -178,7 +229,7 @@ public class Analizer_rules extends Bases {
                         return null;
                     }
                 } else {
-                    return evaluate_rule(basic_token, ok, extras_array);
+                    return evaluate_second_part(basic_token, ok, extras_array);
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -194,37 +245,37 @@ public class Analizer_rules extends Bases {
          * @return
          * @throws Exception
          */
-        public Boolean evaluate_rule(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        public Boolean evaluate_second_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return false;
+            if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
                 Boolean is;
                 boolean is_pending = false;
                 in = ok.valid(ResourceBundles.getBundle(k_in_route));
-                if (is_already_evaluated == true && is_repeatable == false) {
+                if (is_already_evaluated == true && is_defined_repeatable == false) {
                     ok.setTex(Tr.in(in, "Rule already evaluated. Must do init to reevaluate. "));
                     return null;
                 }
                 is_a_repeat_success_previous_not_now = false;
-                if (basic_rule_node == null) {
+                if (second_part_basic_rule_node == null) {
                     ok.setTex(Tr.in(in, "Rule is null. "));
                     return null;
                 }
-                if (basic_rule_node.is_once_successed == null
-                 || (basic_rule_node.is_once_successed
-                  && basic_rule_node.is_repeatable)) {
-                    is = basic_rule_node.evaluate(basic_token, ok, extras_array);
+                if (second_part_basic_rule_node.is_once_successed == null
+                 || (second_part_basic_rule_node.is_once_successed
+                  && second_part_basic_rule_node.is_defined_repeatable)) {
+                    is = second_part_basic_rule_node.evaluate(basic_token, ok, extras_array);
                     if (ok.is == false) return false;
                     if (is != null) {
                         if (is == false) {
                             if (is_once_successed == null || is_once_successed == false) {
-                                if (basic_rule_node.is_repeatable) {
-                                    if (basic_rule_node.is_once_successed == null) {
+                                if (second_part_basic_rule_node.is_defined_repeatable) {
+                                    if (second_part_basic_rule_node.is_once_successed == null) {
                                         ok.setTex(Tr.in(in, "Not null return evaluating a node whose success state is null . "));
                                         return null;
                                     }
-                                    if (basic_rule_node.is_once_successed == false) {
+                                    if (second_part_basic_rule_node.is_once_successed == false) {
                                         // Previous repeat was failed (not to consider)
                                         is_once_successed = false;
                                     } else {
@@ -237,10 +288,16 @@ public class Analizer_rules extends Bases {
                             }
                             return false;
                         } else {
-                            if (basic_rule_node.is_already_evaluated) {
+                            if (second_part_basic_rule_node.is_already_evaluated) {
                                 is_first_part_evaluated = false; // for repeating
                                 is_already_evaluated = true;
                                 is_once_successed = true;
+                                to_put_in_list_rule_success.repetition_num = repetition_num;
+                                defined_analizer_rules.success_rules_list.addFirst(to_put_in_list_rule_success);
+                                if (is_defined_to_process_the_success_rules_list_if_sucess) {
+                                    defined_analizer_rules.process(ok, extras_array);
+                                    if (ok.is == false) return false;
+                                }
                                 return true;
                             } else {
                                 ok.setTex(Tr.in(in, "Return true for a not already evaluated rule. "));
@@ -258,13 +315,15 @@ public class Analizer_rules extends Bases {
         }
     }
 
-    public static class Rule_nodes extends Basic_rule_nodes {
-        public  Scanner_rules.@Nullable Basic_tokens token = null;
+    public static class Tokens_or_rule_nodes extends Basic_rule_nodes {
+        public  @Nullable List<Scanner_rules.Basic_tokens> first_part_evaluation_tokens_list = new ArrayList<>();
+        public  boolean is_ignore_not_matched = false;
 
-        public Rule_nodes() throws Exception {
+        public Tokens_or_rule_nodes(Analizer_rules analizer_rules) throws Exception {
+            super(analizer_rules);
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init(ok);
+                init_to_reuse(ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -273,10 +332,11 @@ public class Analizer_rules extends Bases {
             }
         }
 
-        public Rule_nodes(Basic_rule_nodes basic_rule_node) throws Exception {
+        public Tokens_or_rule_nodes(Tokens_or_rule_nodes rule_node_tokens_or) throws Exception {
+            super(rule_node_tokens_or.defined_analizer_rules);
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init(basic_rule_node, ok);
+                init(rule_node_tokens_or, ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -287,16 +347,38 @@ public class Analizer_rules extends Bases {
 
         @Nullable
         @Override
-        public Oks init(Oks ok, Object ... extras_array) throws Exception {
+        public Oks init_to_reuse(Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
-                super.init(ok, extras_array);
+                super.init_to_reuse(ok, extras_array);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            return ok;
+        }
+
+        /**
+         *
+         * @param ok
+         * @param extras_array
+         * @return
+         * @throws Exception
+         */
+        public Oks init_for_repeat(Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return null;
+            ResourceBundle in = null;
+            try {
+                super.init_for_repeat(ok, extras_array);
                 if (ok.is == false) return null;
-                if (token != null) {
-                    token.init(ok, extras_array);
-                    if (ok.is == false) return null;
+                is_ignore_not_matched = false;
+                if (first_part_evaluation_tokens_list != null) {
+                    for (var token: first_part_evaluation_tokens_list) {
+                        token.init(ok, extras_array);
+                        if (ok.is == false) return null;
+                    }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -313,16 +395,19 @@ public class Analizer_rules extends Bases {
          * @throws Exception
          */
         @Nullable
-        public Oks init(Rule_nodes rule_node, Oks ok, Object ... extras_array) throws Exception {
+        public Oks init(Tokens_or_rule_nodes rule_node, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
                 super.init(rule_node, ok, extras_array);
                 if (ok.is == false) return null;
-                if (token != null) {
-                    token.init(rule_node.token, ok);
-                    if (ok.is == false) return null;
+                this.is_ignore_not_matched = rule_node.is_ignore_not_matched;
+                if (first_part_evaluation_tokens_list != null) {
+                    for (var token: first_part_evaluation_tokens_list) {
+                        token.init(token, ok);
+                        if (ok.is == false) return null;
+                    }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -332,37 +417,54 @@ public class Analizer_rules extends Bases {
 
         @Override
         @Nullable
-        public Boolean evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        public Boolean _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return false;
             ResourceBundle in = null;
             try {
                 boolean is;
                 in = ok.valid(ResourceBundles.getBundle(k_in_route));
-                if (is_already_evaluated == true && is_repeatable == false) {
-                    ok.setTex(Tr.in(in, "Rule already evaluated. Must do init to reevaluate. "));
-                    return null;
-                }
-                is_first_part_evaluated = true;
-                if (token != null) {
-                    if (Objects.equals(basic_token.token_type, token.token_type) == false) {
-                        if (basic_rule_node == null || basic_rule_node.is_already_evaluated) {
-                            is_already_evaluated = true;
-                            is_bad_way = true;
-                        }
-                        return false;
-                    }
-                    if (token.token_tex != null) {
-                        if (Objects.equals(basic_token.token_tex, token.token_tex) == false) {
-                            if (basic_rule_node == null || basic_rule_node.is_already_evaluated) {
+                if (first_part_evaluation_tokens_list != null) {
+                    for (var token: first_part_evaluation_tokens_list) {
+                        if (Objects.equals(basic_token.token_type, token.token_type) == false) {
+                            if (second_part_basic_rule_node == null || second_part_basic_rule_node.is_already_evaluated) {
+                                init_to_reuse(ok, extras_array);
+                                if (ok.is == false) return null;
                                 is_already_evaluated = true;
                                 is_bad_way = true;
+                                ok.setTex(k_is_bad_way);
+                                ok.id = k_is_bad_way;
                             }
-                            return false;
+                            if (is_ignore_not_matched) {
+                                is_first_part_evaluated = false;
+                                return null;
+                            }
+                        }
+                        if (token.token_tex != null) {
+                            if (Objects.equals(basic_token.token_tex, token.token_tex) == false) {
+                                if (second_part_basic_rule_node == null || second_part_basic_rule_node.is_already_evaluated) {
+                                    init_to_reuse(ok, extras_array);
+                                    if (ok.is == false) return null;
+                                    is_already_evaluated = true;
+                                    is_bad_way = true;
+                                    ok.setTex(k_is_bad_way);
+                                    ok.id = k_is_bad_way;
+                                }
+                                if (is_ignore_not_matched) {
+                                    is_first_part_evaluated = false;
+                                    return null;
+                                }
+                            } else {
+                                break;
+                            }
+                        } else {
+                            break;
                         }
                     }
+                    first_part_tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
+                    is_first_part_evaluated = true;
                 } else {
-                    if (basic_rule_node == null) {
+                    if (second_part_basic_rule_node == null) {
                         ok.setTex(Tr.in(in, "All content is null in node. "));
                         return null;
                     }
@@ -374,13 +476,14 @@ public class Analizer_rules extends Bases {
         }
     }
 
-    public static class Rule_node_find_ways extends Basic_rule_nodes {
+    public static class Find_way_rule_node extends Basic_rule_nodes {
         public List<Basic_rule_nodes> rule_node_list = new ArrayList<>();
 
-        public Rule_node_find_ways() throws Exception {
+        public Find_way_rule_node(Analizer_rules analizer_rules) throws Exception {
+            super(analizer_rules);
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init(ok);
+                init_to_reuse(ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -389,10 +492,11 @@ public class Analizer_rules extends Bases {
             }
         }
 
-        public Rule_node_find_ways(Rule_node_find_ways rule_node_list) throws Exception {
+        public Find_way_rule_node(Find_way_rule_node rule_node_find_way) throws Exception {
+            super(rule_node_find_way.defined_analizer_rules);
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init(rule_node_list, ok);
+                init(rule_node_find_way, ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -403,16 +507,42 @@ public class Analizer_rules extends Bases {
 
         @Nullable
         @Override
-        public Oks init(Oks ok, Object ... extras_array) throws Exception {
+        public Oks init_to_reuse(Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
-                super.init(ok, extras_array);
+                super.init_for_repeat(ok, extras_array);
                 if (ok.is == false) return null;
                 if (rule_node_list != null) {
                     for (var node : rule_node_list) {
-                        node.init(ok);
+                        node.init_to_reuse(ok);
+                        if (ok.is == false) return null;
+                    }
+                }
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            return ok;
+        }
+
+        /**
+         *
+         * @param ok
+         * @param extras_array
+         * @return
+         * @throws Exception
+         */
+        public Oks init_for_repeat(Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return null;
+            ResourceBundle in = null;
+            try {
+                super.init_for_repeat(ok, extras_array);
+                if (ok.is == false) return null;
+                if (rule_node_list != null) {
+                    for (var node : rule_node_list) {
+                        node.init_for_repeat(ok);
                         if (ok.is == false) return null;
                     }
                 }
@@ -430,7 +560,7 @@ public class Analizer_rules extends Bases {
          * @return
          * @throws Exception
          */
-        public Oks init(Rule_node_find_ways rule_node_list, Oks ok, Object ... extras_array) throws Exception {
+        public Oks init(Find_way_rule_node rule_node_list, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return null;
             ResourceBundle in = null;
@@ -459,43 +589,39 @@ public class Analizer_rules extends Bases {
          */
         @Override
         @Nullable
-        public Boolean evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        public Boolean _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return null;
             ResourceBundle in = null;
             try {
                 Boolean is;
-                boolean is_pending = false;
                 boolean is_evaluated = true;
                 if (rule_node_list != null && rule_node_list.isEmpty() == false) {
                     for (var node : rule_node_list) {
                         if (node.is_already_evaluated == false
                          && (node.is_once_successed == null
-                          || (node.is_once_successed && node.is_repeatable))) {
+                          || (node.is_once_successed && node.is_defined_repeatable))) {
                             is_evaluated = true;
                             is = node.evaluate(basic_token, ok, extras_array);
                             if (ok.is == false) return null;
                             if (is != null) {
                                 if (is == false) {
-                                    if (node.is_repeatable) {
+                                    if (node.is_defined_repeatable) {
                                         if (node.is_a_repeat_success_previous_not_now) {
-                                            if (basic_rule_node != null) {
-                                                Basic_rule_nodes copy_basic_rule_node
-                                                        = basic_rule_node.getClass()
-                                                        .getConstructor(basic_rule_node.getClass())
-                                                        .newInstance(basic_rule_node);
+                                            if (second_part_basic_rule_node != null) {
                                                 is_first_part_evaluated = true;
-                                                is = evaluate_rule(basic_token, ok, extras_array);
+                                                is = evaluate_second_part(basic_token, ok, extras_array);
                                                 if (ok.is == false) return null;
                                                 if (is != null) {
                                                     if (is) {
                                                         is_already_evaluated = true;
                                                         return true;
                                                     } else {
-                                                        basic_rule_node = copy_basic_rule_node;
+                                                        second_part_basic_rule_node.init_to_reuse(ok, extras_array);
+                                                        if (ok.is == false) return null;
                                                     }
                                                 } else {
-                                                    is_pending = true;
+                                                    return null;
                                                 }
                                             } else {
                                                 is_already_evaluated = true;
@@ -503,24 +629,21 @@ public class Analizer_rules extends Bases {
                                             }
                                         }
                                     }
-                                    if (node.is_optional == false) {
-                                        if (basic_rule_node != null) {
-                                            Basic_rule_nodes copy_basic_rule_node
-                                                    = basic_rule_node.getClass()
-                                                    .getConstructor(basic_rule_node.getClass())
-                                                    .newInstance(basic_rule_node);
+                                    if (node.is_defined_optional == false) {
+                                        if (second_part_basic_rule_node != null) {
                                             is_first_part_evaluated = true;
-                                            is = evaluate_rule(basic_token, ok, extras_array);
+                                            is = evaluate_second_part(basic_token, ok, extras_array);
                                             if (ok.is == false) return null;
                                             if (is != null) {
                                                 if (is) {
                                                     is_already_evaluated = true;
                                                     return true;
                                                 } else {
-                                                    basic_rule_node = copy_basic_rule_node;
+                                                    second_part_basic_rule_node.init_to_reuse(ok, extras_array);
+                                                    if (ok.is == false) return null;
                                                 }
                                             } else {
-                                                is_pending = true;
+                                                return null;
                                             }
                                         } else {
                                             is_already_evaluated = true;
@@ -532,24 +655,26 @@ public class Analizer_rules extends Bases {
                                     return true; // A rule has matched
                                 }
                             } else {
-                                is_pending = true;
+                                return null;
                             }
                         }
                     }
                     if (is_evaluated) {
-                        if (is_pending == false) {
-                            is_first_part_evaluated = true;
-                            return false; // No rule matching
-                        }
+                        is_first_part_evaluated = true;
+                        return false; // No rule matching
                     } else {
-                        if (basic_rule_node == null || basic_rule_node.is_already_evaluated) {
+                        if (second_part_basic_rule_node == null || second_part_basic_rule_node.is_already_evaluated) {
+                            init_to_reuse(ok, extras_array);
+                            if (ok.is == false) return null;
                             is_already_evaluated = true;
                             is_bad_way = true;
+                            ok.setTex(k_is_bad_way);
+                            ok.id = k_is_bad_way;
                             return false; // No rule matching
                         }
                     }
                 } else {
-                    if (basic_rule_node == null) {
+                    if (second_part_basic_rule_node == null) {
                         ok.setTex(Tr.in(in, "All the requirements are null in node. "));
                         return null;
                     }
@@ -563,5 +688,36 @@ public class Analizer_rules extends Bases {
 
     @Nullable
     public Basic_rule_nodes start_rule_node = null;
+    public Code_scanners code_scanner;
+    public Deque<Rule_success> success_rules_list = new LinkedList<>();
 
+    public Analizer_rules(Code_scanners code_scanner) {
+        this.code_scanner = code_scanner;
+    }
+
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    public Oks process(Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        Boolean retorno = null;
+        ResourceBundle in = null;
+        try {
+            in = ok.valid(ResourceBundles.getBundle(k_in_route));
+            for(var rule_success: success_rules_list) {
+                rule_success.after_success.call(rule_success.repetition_num, ok, extras_array);
+                if (ok.is == false) return null;
+            }
+            success_rules_list.clear();
+        } catch (Exception e) {
+            ok.setTex(e);
+            return null;
+        }
+        return ok;
+    }
 }

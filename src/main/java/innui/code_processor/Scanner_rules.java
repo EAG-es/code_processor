@@ -25,6 +25,10 @@ public abstract class Scanner_rules extends Bases {
         }
         Scanner_rules.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
     }
+
+    protected Scanner_rules() throws Exception {
+    }
+
     public static class Basic_tokens implements Serializable {
         public String token_tex = "";
         public String token_type = "";
@@ -98,6 +102,78 @@ public abstract class Scanner_rules extends Bases {
         public int end_pos = 0;
         public int line_num = 1;
         public int col_num = 1;
+
+        public Tokens() throws Exception {
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(ok);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.tex);
+            }
+        }
+
+        public Tokens(Tokens token) throws Exception {
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(token, ok);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.tex);
+            }
+        }
+        /**
+         *
+         * @param ok
+         * @param extras_array
+         * @return
+         * @throws Exception
+         */
+        public Oks init(Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return null;
+            ResourceBundle in = null;
+            try {
+                start_pos = 0;
+                end_pos = 0;
+                line_num = 1;
+                col_num = 1;
+                super.init(ok, extras_array);
+                if (ok.is == false) return null;
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            return ok;
+        }
+
+        /**
+         *
+         * @param token
+         * @param ok
+         * @param extras_array
+         * @return
+         * @throws Exception
+         */
+        public Oks init(Tokens token, Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return null;
+            ResourceBundle in = null;
+            try {
+                start_pos = token.start_pos;
+                end_pos = token.end_pos;
+                line_num = token.line_num;
+                col_num = token.col_num;
+                super.init(token, ok, extras_array);
+                if (ok.is == false) return null;
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            return ok;
+        }
     }
     public static @Fenum("error_id") String k_end_of_toker_out = (@Fenum("error_id") String) "end_of_token_out";
     public static @Fenum("error_id") String k_end_of_toker_in = (@Fenum("error_id") String)"end_of_token_in";

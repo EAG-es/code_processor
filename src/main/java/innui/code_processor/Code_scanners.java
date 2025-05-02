@@ -12,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -30,6 +31,11 @@ public class Code_scanners extends Bases {
         }
         Code_scanners.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
     }
+    public static @Fenum("error_id") String k_need_previous_token = (@Fenum("error_id") String) "need_previous_token";
+
+    public Code_scanners() throws Exception {
+    }
+
     public interface Analizers {
         public Boolean analize(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
     }
@@ -39,7 +45,7 @@ public class Code_scanners extends Bases {
     public String code_tex = null;
     public int pos = 0;
     public Scanner_rules scanner_rules = new innui.code_processor.java.Scanner_rules();
-    public List<Scanner_rules.Tokens> tokens_list = new LinkedList<>();
+    public List<Scanner_rules.Tokens> tokens_list = new ArrayList<>();
     /**
      *
      * @param file_tex
@@ -58,23 +64,24 @@ public class Code_scanners extends Bases {
             code_tex = Files.readString(file.toPath(), StandardCharsets.UTF_8);
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
 
     @Nullable
-    public Oks scanner_start(Oks ok, Object ... extras_array) throws Exception {
+    public Oks start_scanner(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
             pos = 0;
-            return scanner(ok , extras_array);
+            return scan_resume(ok , extras_array);
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
-        return ok;
     }
 
     /**
@@ -85,7 +92,7 @@ public class Code_scanners extends Bases {
      * @throws Exception
      */
     @Nullable
-    public Oks scanner(Oks ok, Object ... extras_array) throws Exception {
+    public Oks scan_resume(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         Oks noted_ok = ok.create_new(extras_array);
@@ -124,6 +131,7 @@ public class Code_scanners extends Bases {
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
@@ -143,13 +151,35 @@ public class Code_scanners extends Bases {
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            if (analizer == null) {
-                tokens_list.add(scanner_rules.token);
-            } else {
-                analizer.analize(scanner_rules.token, ok, extras_array);
+            tokens_list.add(scanner_rules.token);
+            if (analizer != null) {
+                int tam = tokens_list.size();
+                int i = tam - 1;
+                Scanner_rules.Tokens token = scanner_rules.token;
+                while (true) {
+                    analizer.analize(token, ok, extras_array);
+                    if (ok.is == false) {
+                        if (ok.equals(ok.id, k_need_previous_token)) {
+                            i = i - 1;
+                            if (i < 0) {
+                                ok.setTex(Tr.in(in, "Reached the previous position to the beginning of the tokens list. "));
+                                return null;
+                            }
+                            token = tokens_list.get(i);
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        i = i + 1;
+                    }
+                    if (i >= tam) {
+                        break;
+                    }
+                }
             }
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }

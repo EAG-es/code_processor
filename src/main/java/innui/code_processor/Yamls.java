@@ -120,7 +120,8 @@ public class Yamls extends Bases {
                 retorno = ok.valid(objectMapper).readValue(inputStream, _class);
             }
         } catch (Exception e) {
-            ok.setTex(e);            
+            ok.setTex(e);
+            return null;
         }
         return retorno;
     }
@@ -187,7 +188,8 @@ public class Yamls extends Bases {
             }
             retorno = ok.valid(objectMapper).writeValueAsString(data);
         } catch (Exception e) {
-            ok.setTex(e);            
+            ok.setTex(e);
+            return null;
         }
         return retorno;
     }
@@ -224,6 +226,7 @@ public class Yamls extends Bases {
             retorno = Files.readAllBytes(file.toPath());
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return retorno;
     }

@@ -2,6 +2,7 @@ package innui.code_processor.java;
 
 import innui.Bases;
 import innui.code_processor.Analizer_rules;
+import innui.code_processor.Code_scanners;
 import innui.code_processor.Scanner_rules;
 import innui.modelos.configurations.ResourceBundles;
 import innui.modelos.errors.Oks;
@@ -28,25 +29,29 @@ public class Identifiers_table_rules extends Bases {
         Identifiers_table_rules.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
     }
 
-    @Nullable
-    public Analizer_rules analizer_rules = null;
+    public Analizer_rules analizer_rules;
 
+    public Identifiers_table_rules(Code_scanners code_scanner) {
+        analizer_rules = new Analizer_rules(code_scanner);
+    }
+
+    @Nullable
     public Oks load(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return ok;
+        if (ok.is == false) return null;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            analizer_rules = new Analizer_rules();
-            analizer_rules.start_rule_node = new Analizer_rules.Rule_node_find_ways();
+            analizer_rules.start_rule_node = new Analizer_rules.Find_way_rule_node(analizer_rules);
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return ok;
     }
 
     @Nullable
-    public Boolean start(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+    public Boolean process(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         Boolean retorno = null;
@@ -57,6 +62,7 @@ public class Identifiers_table_rules extends Bases {
 
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
         return retorno;
     }
