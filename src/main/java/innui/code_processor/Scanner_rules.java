@@ -45,6 +45,44 @@ public abstract class Scanner_rules extends Bases {
             }
         }
 
+        /**
+         *
+         * @param token_type
+         * @throws Exception
+         */
+        public Basic_tokens(String token_type) throws Exception {
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(ok);
+                this.token_type = token_type;
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.tex);
+            }
+        }
+
+        /**
+         *
+         * @param token_type
+         * @param token_tex
+         * @throws Exception
+         */
+        public Basic_tokens(String token_type, String token_tex) throws Exception {
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(ok);
+                this.token_type = token_type;
+                this.token_tex = token_tex;
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.tex);
+            }
+        }
+
         public Basic_tokens(Basic_tokens basic_token) throws Exception {
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {

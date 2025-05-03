@@ -37,7 +37,8 @@ public class Identifiers_tables extends Bases {
 
     }
 
-    public Deque<Map<String, Identifiers>> identifiers_maps_list = new LinkedList<>();
+    public Identifiers new_identifier;
+    public Deque<LinkedHashMap<String, Identifiers>> identifiers_maps_list = new LinkedList<>();
 
     /**
      *
@@ -53,7 +54,7 @@ public class Identifiers_tables extends Bases {
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            identifiers_maps_list.addFirst(new HashMap<>());
+            identifiers_maps_list.addFirst(new LinkedHashMap<>());
         } catch (Exception e) {
             ok.setTex(e);
             return null;

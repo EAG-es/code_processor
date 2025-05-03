@@ -1,6 +1,7 @@
 package innui.code_processor;
 
 import innui.Bases;
+import innui.code_processor.java.Identifiers_table_rules;
 import innui.modelos.Modelos;
 import innui.modelos.configurations.Initials;
 import innui.modelos.configurations.ResourceBundles;
@@ -42,6 +43,7 @@ public class Code_processor extends Initials {
     public OptionGroup wallet_optionGroup = new OptionGroup();
     public transient CommandLineParser parser = new DefaultParser();
     public @Nullable Option analyse_file = null;
+    public @Nullable Option get_identifiers_table = null;
 
     /**
      * Creates the CLUI options
@@ -65,6 +67,15 @@ public class Code_processor extends Initials {
                     .argName(in(in, "File_name"))
                     .build();
             options.addOption(analyse_file);
+            // G
+            get_identifiers_table = Option.builder("git")
+                    .longOpt("get_identifiers_table")
+                    .desc(in(in, "Gets the identifiers table from a java code file"))
+                    .hasArg()
+                    .numberOfArgs(1)
+                    .argName(in(in, "File_name"))
+                    .build();
+            options.addOption(get_identifiers_table);
         } catch (Exception e) {
             throw e;
         }
@@ -195,24 +206,33 @@ public class Code_processor extends Initials {
                 if (ok.is == false) return false;
                 String file_tex = commandLine.getOptionValues(ok.valid(analyse_file))[0];
                 Code_scanners code_scanner = new Code_scanners();
-                code_scanner.load_file(file_tex, ok, extras_array);
-                if (ok.is == false) return false;
-                code_scanner.start_scanner(ok, extras_array);
-                if (ok.is == false) return false;
-                this.write_line(Tr.in(in, "Analyse file done. "), ok);
-                if (ok.is == false) return false;
+                ok.valid(code_scanner.load_file(file_tex, ok, extras_array));
+                ok.valid(code_scanner.start_scanner(ok, extras_array));
+                ok.valid(this.write_line(Tr.in(in, "Analyse file done. "), ok));
                 Yamls yamls = new Yamls();
-                yamls.init(ok, extras_array);
-                if (ok.is == false) return false;
+                ok.valid(yamls.init(ok, extras_array));
                 String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(code_scanner.tokens_list);
-                this.write_line(token_list_yaml, ok);
-                if (ok.is == false) return false;
+                ok.valid(this.write_line(token_list_yaml, ok));
                 String content = "";
-                for (Scanner_rules.Tokens token: code_scanner.tokens_list) {
+                for (Scanner_rules.Tokens token : code_scanner.tokens_list) {
                     content = content + token.token_tex;
                 }
-                this.write_line(content, ok);
+                ok.valid(this.write_line(content, ok));
+            } else if (option.getOpt().equals(ok.valid(get_identifiers_table).getOpt())) {
+                write_line("--" + option.getLongOpt(), ok);
                 if (ok.is == false) return false;
+                String file_tex = commandLine.getOptionValues(ok.valid(get_identifiers_table))[0];
+                Code_scanners code_scanner = new Code_scanners();
+                ok.valid(code_scanner.load_file(file_tex, ok, extras_array));
+                Identifiers_table_rules identifiers_table_rule = new Identifiers_table_rules(code_scanner);
+                Identifiers_table_processors identifiers_table_processor = new Identifiers_table_processors(identifiers_table_rule);
+                ok.valid(identifiers_table_processor.load_identifiers_table_rule(null, ok, extras_array));
+                ok.valid(identifiers_table_processor.start(ok, extras_array));
+                ok.valid(this.write_line(Tr.in(in, "Get identifiers table done. "), ok));
+                Yamls yamls = new Yamls();
+                ok.valid(yamls.init(ok, extras_array));
+                String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(identifiers_table_processor.identifiers_table_rule.identifiers_table);
+                ok.valid(this.write_line(token_list_yaml, ok));
             } else {
                 ok.setTex(in(in, "No options"));
             }

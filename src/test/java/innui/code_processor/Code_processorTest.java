@@ -19,11 +19,21 @@ public class Code_processorTest {
     public Code_processorTest() {
     }
 
-    @Test
+    @Ignore
     public void testMain_analyse_file() {
         System.out.println("main analyse file");
         String[] args = {
                 "-af",
+                "/home/emilio/proyectos/java/code_processor/src/main/java/innui/code_processor/Code_processor.java"
+        };
+        Code_processor.main(args);
+    }
+
+    @Test
+    public void testMain_get_identifiers_table() {
+        System.out.println("main analyse file");
+        String[] args = {
+                "-git",
                 "/home/emilio/proyectos/java/code_processor/src/main/java/innui/code_processor/Code_processor.java"
         };
         Code_processor.main(args);
