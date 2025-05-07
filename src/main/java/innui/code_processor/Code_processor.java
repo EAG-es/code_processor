@@ -1,5 +1,6 @@
 package innui.code_processor;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.Bases;
 import innui.code_processor.java.Identifiers_table_rules;
 import innui.modelos.Modelos;
@@ -10,7 +11,6 @@ import innui.modelos.internacionalization.Tr;
 import innui.modelos.tests.Test_methods;
 import org.apache.commons.cli.*;
 import org.checkerframework.checker.fenum.qual.Fenum;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -19,19 +19,25 @@ import java.util.ResourceBundle;
 import static innui.modelos.internacionalization.Tr.in;
 import static java.lang.System.exit;
 
+@SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Code_processor extends Initials {
     // Properties file for translactions
     private static final long serialVersionUID;
     public static @Fenum("file_path") String k_in_route;
     static {
         serialVersionUID = getSerial_version_uid();
-        String paquete_tex = ((@NonNull Package) Code_processor.class.getPackage()).getName();
+        String paquete_tex = null;
+        try {
+            paquete_tex = Oks.valide(Code_processor.class.getPackage()).getName();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         if (paquete_tex == null) {
             paquete_tex = "..";
         } else {
             paquete_tex = paquete_tex.replace(".", File.separator);
         }
-        Code_processor.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
+        Code_processor.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
     static {
         Test_methods.configure(false, false, false);
@@ -41,6 +47,7 @@ public class Code_processor extends Initials {
     // Apache Commons CLI
     public Options options = new Options();
     public OptionGroup wallet_optionGroup = new OptionGroup();
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     public transient CommandLineParser parser = new DefaultParser();
     public @Nullable Option analyse_file = null;
     public @Nullable Option get_identifiers_table = null;
@@ -112,7 +119,7 @@ public class Code_processor extends Initials {
             Code_processor code_processor;
             try {
                 code_processor = new Code_processor();
-                code_processor.run(ok, args);
+                code_processor.run(ok, (java.lang.Object[]) args);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -195,6 +202,7 @@ public class Code_processor extends Initials {
      * @return
      * @throws Exception
      */
+    @SuppressFBWarnings("SBSC_USE_STRINGBUFFER_CONCATENATION")
     public boolean process_option(CommandLine commandLine, Option option, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, commandLine, option, ok, extras_array, this);
         if (ok.is == false) return false;
@@ -206,8 +214,8 @@ public class Code_processor extends Initials {
                 if (ok.is == false) return false;
                 String file_tex = commandLine.getOptionValues(ok.valid(analyse_file))[0];
                 Code_scanners code_scanner = new Code_scanners();
-                ok.valid(code_scanner.load_file(file_tex, ok, extras_array));
-                ok.valid(code_scanner.start_scanner(ok, extras_array));
+                code_scanner.load_file(file_tex, ok, extras_array);
+                code_scanner.start_scanner(ok, extras_array);
                 ok.valid(this.write_line(Tr.in(in, "Analyse file done. "), ok));
                 Yamls yamls = new Yamls();
                 ok.valid(yamls.init(ok, extras_array));
@@ -223,15 +231,16 @@ public class Code_processor extends Initials {
                 if (ok.is == false) return false;
                 String file_tex = commandLine.getOptionValues(ok.valid(get_identifiers_table))[0];
                 Code_scanners code_scanner = new Code_scanners();
-                ok.valid(code_scanner.load_file(file_tex, ok, extras_array));
+                code_scanner.load_file(file_tex, ok, extras_array);
                 Identifiers_table_rules identifiers_table_rule = new Identifiers_table_rules(code_scanner);
                 Identifiers_table_processors identifiers_table_processor = new Identifiers_table_processors(identifiers_table_rule);
-                ok.valid(identifiers_table_processor.load_identifiers_table_rule(null, ok, extras_array));
-                ok.valid(identifiers_table_processor.start(ok, extras_array));
+                identifiers_table_processor.load_identifiers_table_rule(null, ok, extras_array);
+                identifiers_table_processor.start(ok, extras_array);
                 ok.valid(this.write_line(Tr.in(in, "Get identifiers table done. "), ok));
                 Yamls yamls = new Yamls();
                 ok.valid(yamls.init(ok, extras_array));
-                String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(identifiers_table_processor.identifiers_table_rule.identifiers_table);
+                String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(ok.valid(identifiers_table_processor
+                        .identifiers_table_rule).identifiers_table);
                 ok.valid(this.write_line(token_list_yaml, ok));
             } else {
                 ok.setTex(in(in, "No options"));

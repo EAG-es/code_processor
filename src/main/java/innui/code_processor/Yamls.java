@@ -3,6 +3,7 @@ package innui.code_processor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.Bases;
 import innui.modelos.configurations.ResourceBundles;
 import innui.modelos.errors.Oks;
@@ -22,22 +23,28 @@ import java.util.ResourceBundle;
  *
  * @author emilio
  */
+@SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Yamls extends Bases {
     // Properties file for translactions
     private static final long serialVersionUID;
     public static @Fenum("file_path") String k_in_route;
     static {
         serialVersionUID = getSerial_version_uid();
-        String paquete_tex = ((@NonNull Package) Yamls.class.getPackage()).getName();
+        String paquete_tex = null;
+        try {
+            paquete_tex = Oks.valide(Yamls.class.getPackage()).getName();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         if (paquete_tex == null) {
             paquete_tex = "..";
         } else {
             paquete_tex = paquete_tex.replace(".", File.separator);
         }
-        Yamls.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
+        Yamls.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
-    @Nullable
-    public transient ObjectMapper objectMapper = null;
+
+    public transient @Nullable ObjectMapper objectMapper = null;
 
     /**
      *
@@ -94,8 +101,7 @@ public class Yamls extends Bases {
      * @param <T>
      * @throws Exception
      */
-    @Nullable
-    public <T> T open_and_read_file(File file, Class<T> _class, Oks ok, Object ... extras_array) throws Exception {
+    public <T> @Nullable T open_and_read_file(File file, Class<T> _class, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, file, _class, ok, extras_array, this);
         if (ok.is == false) return null;
         T retorno = null;
@@ -174,8 +180,7 @@ public class Yamls extends Bases {
      * @param <T>
      * @throws Exception
      */
-    @Nullable
-    public <T extends Object> String do_to_string(T data, Oks ok, Object ... extras_array) throws Exception {
+    public <T extends Object> @Nullable String do_to_string(T data, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, data, ok, extras_array, this);
         if (!ok.is) { return null; }
         String retorno = null;

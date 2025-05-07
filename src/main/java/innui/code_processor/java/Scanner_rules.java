@@ -1,30 +1,36 @@
 package innui.code_processor.java;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.modelos.configurations.ResourceBundles;
 import innui.modelos.errors.Oks;
 import innui.modelos.internacionalization.Tr;
 import innui.modelos.tests.Test_methods;
 import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.regex.qual.Regex;
 
 import java.io.File;
 import java.util.ResourceBundle;
 
+@SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE", "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"})
 public class Scanner_rules extends innui.code_processor.Scanner_rules {
     // Properties file for translactions
     private static final long serialVersionUID;
     public static @Fenum("file_path") String k_in_route;
     static {
         serialVersionUID = getSerial_version_uid();
-        String paquete_tex = ((@NonNull Package) Scanner_rules.class.getPackage()).getName();
+        String paquete_tex = null;
+        try {
+            paquete_tex = Oks.valide(Scanner_rules.class.getPackage()).getName();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         if (paquete_tex == null) {
             paquete_tex = "..";
         } else {
             paquete_tex = paquete_tex.replace(".", File.separator);
         }
-        Scanner_rules.k_in_route = (@Fenum("file_path") String) ("in/" + paquete_tex + "/in");
+        Scanner_rules.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
 
     public Scanner_rules() throws Exception {
@@ -61,7 +67,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         , operator_plus_plus, operator_minus_minus, operator_plus, operator_minus, operator_divide, operator_multiply, operator_module
         , operator_lambda
         , comment_block_begin, comment_block, comment_line_begin, comment_line
-        , open_parenthesis, close_parenthesis, open_brace, close_brace, open_bracket, close_bracket
+        , parenthesis_open, parenthesis_close, brace_open, brace_close, bracket_open, bracket_close
         , dot, comma, semi_colon, colon, question, space
         , constant_integer, constant_integer_long, constant_decimal
         , constant_string, constant_character
@@ -85,10 +91,8 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks reset_state(Oks ok, Object ... extras_array) throws Exception {
+    public void reset_state(Oks ok, Object ... extras_array) throws Exception {
         state = States.initial;
-        return ok;
     }
     /**
      *
@@ -99,10 +103,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
+        if (ok.is == false) return;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -166,30 +169,23 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         }
         col_num = col_num + 1;
         if (ok.is == false) {
-            if (ok.equals(ok.id, k_end_of_toker_out)) {
+            if (Oks.equals(ok.id, k_end_of_toker_out)) {
                 col_num = col_num - 1;
             }
-            return null;
         }
-        return ok;
     }
 
-    @Nullable
-    public Oks init_token(Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void init_token(Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             token = new Tokens();
             token.start_pos = pos;
             token.col_num = col_num;
             token.line_num = line_num;
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
     /**
      *
@@ -200,13 +196,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_initial(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_initial(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             String char_tex = character.toString();
             token.token_tex = token.token_tex + char_tex;
             if (character.compareTo('0') >= 0
@@ -233,79 +226,77 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             } else if (char_tex.isBlank()) {
                 state = States.space;
             } else if (character == '(') {
-                token.token_type = Token_types.open_parenthesis.name();
+                token.token_type = Token_types.parenthesis_open.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == ')') {
-                token.token_type = Token_types.close_parenthesis.name();
+                token.token_type = Token_types.parenthesis_close.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == '{') {
-                token.token_type = Token_types.open_brace.name();
+                token.token_type = Token_types.brace_open.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == '}') {
-                token.token_type = Token_types.close_brace.name();
+                token.token_type = Token_types.brace_close.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == '[') {
-                token.token_type = Token_types.open_bracket.name();
+                token.token_type = Token_types.bracket_open.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == ']') {
-                token.token_type = Token_types.close_bracket.name();
+                token.token_type = Token_types.bracket_close.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == '.') {
                 token.token_type = Token_types.dot.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == ',') {
                 token.token_type = Token_types.comma.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == ';') {
                 token.token_type = Token_types.semi_colon.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == ':') {
                 token.token_type = Token_types.colon.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else if (character == '?') {
                 token.token_type = Token_types.question.name();
                 token.end_pos = pos + 1;
                 ok.id = k_end_of_toker_in;
                 state = States.initial;
-                return null;
+                return;
             } else {
                 state = States.keyword_or_identifier;
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -317,32 +308,27 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_keyword_or_identifier(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_keyword_or_identifier(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             States old_state = state;
             States new_state;
             process_character_initial(character, pos, ok, extras_array);
-            if (ok.is == false) return null;
+            if (ok.is == false) return;
             new_state = state;
             state = old_state;
             if (new_state != States.keyword_or_identifier && new_state != States.number) {
                 token.token_tex = token.token_tex.substring(0, token.token_tex.length()-1);
                 identify_keyword(ok, extras_array);
-                if (ok.is == false) return null;
+                if (ok.is == false) return;
                 token.end_pos = pos - 1;
                 state = States.initial;
                 ok.id = k_end_of_toker_out;
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -352,13 +338,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks identify_keyword(Oks ok, Object ... extras_array) throws Exception {
+    public void identify_keyword(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             switch (token.token_tex) {
                 case "package" -> {
                     token.token_type = Token_types.token_package.name();
@@ -474,9 +457,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -488,10 +469,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_number(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_number(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
+        if (ok.is == false) return;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -501,9 +481,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             } else {
                 token.end_pos = pos - 1;
                 state = States.initial;
-                @Regex String integer_reg = "^[+-]?\\d+$";
-                @Regex String long_reg = "^[+-]?\\d+[Ll]$";
-                @Regex String decimal_reg = "^[+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$";
+                final @Regex String integer_reg = "^[+-]?\\d{1,10}$";
+                final @Regex String long_reg = "^[+-]?\\d{1,19}[Ll]$";
+                final @Regex String decimal_reg = "^[+-]?\\d{1,19}(?:\\.\\d{1,19})?(?:[eE][+-]?\\d{1,19})?$";
                 if (token.token_tex.matches(integer_reg)) {
                     token.token_type = Token_types.constant_integer.name();
                 } else if (token.token_tex.matches(long_reg)) {
@@ -512,15 +492,13 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     token.token_type = Token_types.constant_decimal.name();
                 } else {
                     ok.setTex(Tr.in(in, "Number format not valid. "));
-                    return null;
+                    return;
                 }
                 ok.id = k_end_of_toker_out;
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -532,10 +510,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_number_operator_or_asignment_or_comment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_number_operator_or_asignment_or_comment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
+        if (ok.is == false) return;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -548,7 +525,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     state = States.initial;
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
-                    return null;
+                    return;
                 }
             } else if (character == '-') {
                 token.token_tex = token.token_tex + character;
@@ -559,7 +536,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     state = States.initial;
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
-                    return null;
+                    return;
                 }
             } else if (character == '*') {
                 token.token_tex = token.token_tex + character;
@@ -568,7 +545,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     state = States.comment_block;
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
-                    return null;
+                    return;
                 }
             } else if (character == '/') {
                 token.token_tex = token.token_tex + character;
@@ -577,7 +554,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     state = States.comment_line;
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
-                    return null;
+                    return;
                 }
             } else if (character == '>') {
                 token.token_tex = token.token_tex + character;
@@ -588,7 +565,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     state = States.initial;
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
-                    return null;
+                    return;
                 }
             } else if (character == '=') {
                 token.token_tex = token.token_tex + character;
@@ -604,7 +581,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     token.token_type = Token_types.assignment_module.name();
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
-                    return null;
+                    return;
                 }
                 token.end_pos = pos;
                 ok.id = k_end_of_toker_in;
@@ -622,7 +599,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     token.token_type = Token_types.operator_module.name();
                 } else {
                     ok.setTex(Tr.in(in, "Operator format not valid. "));
-                    return null;
+                    return;
                 }
                 token.end_pos = pos - 1;
                 ok.id = k_end_of_toker_out;
@@ -630,9 +607,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -644,13 +619,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_comment_line(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_comment_line(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             token.token_tex = token.token_tex + character;
             if (character == '\n') {
                 token.token_type = Token_types.comment_line.name();
@@ -660,9 +632,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -674,13 +644,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_comment_block(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_comment_block(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             token.token_tex = token.token_tex + character;
             if (character == '/') {
                 if (token.token_tex.endsWith("*/")) {
@@ -692,9 +659,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -706,17 +671,14 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_anotation(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_anotation(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             States old_state = state;
             States new_state;
             process_character_initial(character, pos, ok, extras_array);
-            if (ok.is == false) return null;
+            if (ok.is == false) return;
             new_state = state;
             state = old_state;
             if (new_state != States.keyword_or_identifier && new_state != States.number) {
@@ -728,9 +690,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -742,13 +702,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_string(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_string(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             token.token_tex = token.token_tex + character;
             if (character == '"') {
                 if (token.token_tex.endsWith("\\\"") == false) {
@@ -760,9 +717,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -774,10 +729,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
+        if (ok.is == false) return;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -791,14 +745,12 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     ok.id = k_end_of_toker_in;
                 } else {
                     ok.setTex(Tr.in(in, "Character format not valid. "));
-                    return null;
+                    return;
                 }
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -810,13 +762,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_space(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_space(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character.toString().isBlank() == false) {
                 token.token_type = Token_types.space.name();
                 token.end_pos = pos - 1;
@@ -827,9 +776,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -841,13 +788,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_logic_bitwise_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_logic_bitwise_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             String char_tex = character.toString();
             token.token_tex = token.token_tex + character;
             if ("&|".contains(char_tex)) {
@@ -892,9 +836,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -906,10 +848,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_bitwise_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_bitwise_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
+        if (ok.is == false) return;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -927,7 +868,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     ok.id = k_end_of_toker_in;
                 } else {
                     ok.setTex(Tr.in(in, "Bitwise format not valid. "));
-                    return null;
+                    return;
                 }
             } else {
                 if (token.token_tex.equals("^")) {
@@ -936,7 +877,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     token.token_type = Token_types.bitwise_not.name();
                 } else {
                     ok.setTex(Tr.in(in, "Bitwise format not valid. "));
-                    return null;
+                    return;
                 }
                 token.end_pos = pos - 1;
                 state = States.initial;
@@ -944,9 +885,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -958,13 +897,10 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_not_or_not_equal(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_not_or_not_equal(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        ResourceBundle in = null;
+        if (ok.is == false) return;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '=') {
                 token.token_tex = token.token_tex + character;
                 token.token_type = Token_types.not_equal.name();
@@ -979,9 +915,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -993,10 +927,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_compare_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_compare_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
+        if (ok.is == false) return;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -1012,7 +945,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     token.token_type = Token_types.compare_less_equal.name();
                 } else {
                     ok.setTex(Tr.in(in, "Bitwise asignment or compare format not valid. "));
-                    return null;
+                    return;
                 }
                 token.end_pos = pos;
                 state = States.initial;
@@ -1031,9 +964,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
     /**
@@ -1045,10 +976,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
      * @return
      * @throws Exception
      */
-    @Nullable
-    public Oks process_character_equal_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
+    public void process_character_equal_operator_or_asignment(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
+        if (ok.is == false) return;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
@@ -1058,7 +988,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                     token.token_type = Token_types.equal.name();
                 } else {
                     ok.setTex(Tr.in(in, "Equal operator or asignment format not valid. "));
-                    return null;
+                    return;
                 }
                 token.end_pos = pos;
                 state = States.initial;
@@ -1071,9 +1001,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             }
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return ok;
     }
 
 }
