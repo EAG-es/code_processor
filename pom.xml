@@ -19,7 +19,7 @@
                     <fork>true</fork> <!-- Must fork or else JVM arguments are ignored. -->
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
-                        <arg>-Awarns</arg>-->
+                        <!-- <arg>-Awarns</arg> Error not are warning -->
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>

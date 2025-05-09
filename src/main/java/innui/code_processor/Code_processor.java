@@ -111,7 +111,7 @@ public class Code_processor extends Initials {
      * Application init
      * @param args 
      */
-        public static void main(String[] args) {
+     public static void main(String[] args) {
         Oks ok = null;
         try {
             ok = (Oks) Bases.objects_map.create_new(Oks.class);

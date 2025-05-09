@@ -4,7 +4,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.Bases;
 import innui.modelos.errors.Oks;
 import org.checkerframework.checker.fenum.qual.Fenum;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -49,6 +48,6 @@ public abstract class Identifiers_table_rules extends Bases {
      * @return The backtrack position (null if no need to backtrack), or null if there is an error without backtrack info
      * @throws Exception
      */
-    public abstract @Nullable Integer process(Scanner_rules.Basic_tokens basic_token, Oks ok, Object... extras_array) throws Exception;
+    public abstract @Nullable Integer process_rules(Scanner_rules.Basic_tokens basic_token, Oks ok, Object... extras_array) throws Exception;
 
 }

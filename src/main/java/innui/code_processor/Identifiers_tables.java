@@ -45,7 +45,7 @@ public class Identifiers_tables extends Bases {
         public String name = "";
         public String type = "";
         public String namespace = "";
-        public ArrayList<Identifiers> properties_list = new ArrayList<>();
+        public ArrayList<Scanner_rules.Basic_tokens> properties_list = new ArrayList<>();
         public ArrayList<Identifiers> parameters_list = new ArrayList<>();
         public @Nullable Identifiers declaration_scope_identifier = null;
 

@@ -43,10 +43,15 @@ public class Code_scanners extends Bases {
     public Code_scanners() throws Exception {
     }
 
-    public interface Analizers extends Serializable {
-        public @Nullable Integer analize(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
+    public interface Validators extends Serializable {
+        boolean validate_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
     }
 
+    public interface Analizers extends Serializable {
+        @Nullable Integer analize(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
+    }
+
+    public Code_scanners.@Nullable Validators validator = null;
     public Code_scanners.@Nullable Analizers analizer = null;
     public @Nullable String code_tex = null;
     public int pos = 0;
@@ -64,7 +69,7 @@ public class Code_scanners extends Bases {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            File file = new File(FilenameUtils.getName(file_tex));
+            File file = new File(FilenameUtils.normalize(file_tex));
             code_tex = Files.readString(file.toPath(), StandardCharsets.UTF_8);
         } catch (Exception e) {
             ok.setTex(e);
@@ -82,6 +87,10 @@ public class Code_scanners extends Bases {
         }
     }
 
+    public void scan_resume(Oks ok, Object ... extras_array) throws Exception {
+        _scan_resume(false, ok, extras_array);
+    }
+
     /**
      *
      * @param ok
@@ -89,20 +98,47 @@ public class Code_scanners extends Bases {
      * @return
      * @throws Exception
      */
-    public void scan_resume(Oks ok, Object ... extras_array) throws Exception {
+    public Scanner_rules.@Nullable Basic_tokens scan_next(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return;
+        if (ok.is == false) return null;
+        Scanner_rules.Basic_tokens retorno;
+        try {
+            boolean is;
+            do {
+                retorno = ok.valid(_scan_resume(true, ok, extras_array));
+                if (ok.is == false) return null;
+                is = ok.valid(validator).validate_token(retorno, ok, extras_array);
+                if (ok.is == false) return null;
+            } while (is == false);
+        } catch (Exception e) {
+            ok.setTex(e);
+            return null;
+        }
+        return retorno;
+    }
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    public Scanner_rules.@Nullable Basic_tokens _scan_resume(boolean is_just_read, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
         Oks noted_ok = ok.create_new(extras_array);
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (code_tex == null) {
                 ok.setTex(Tr.in(in, "Not loaded file. "));
-                return;
+                return null;
             }
             int tam = code_tex.length();
             char letra;
+            boolean is_token_ready;
             while (true) {
+                is_token_ready = false;
                 if (pos >= tam) {
                     break;
                 }
@@ -110,25 +146,39 @@ public class Code_scanners extends Bases {
                 scanner_rules.process_character(letra, pos, noted_ok, extras_array);
                 if (Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_out)
                   || Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_in)) {
-                    analize_token(scanner_rules, noted_ok, extras_array);
-                    if (noted_ok.is == false) {
-                        ok.addTex(noted_ok.getTex());
-                        noted_ok.init();
+                    is_token_ready = true;
+                    if (Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_in)) {
+                        pos = pos + 1;
                     }
-                    if (Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_out)) {
-                        pos = pos - 1;
+                    noted_ok.init();
+                    tokens_list.add(scanner_rules.token);
+                    if (is_just_read == false) {
+                        analize_token(scanner_rules, noted_ok, extras_array);
+                        if (noted_ok.is == false) {
+                            ok.addTex(noted_ok.getTex());
+                            noted_ok.init();
+                        }
+                    } else {
+                        return scanner_rules.token;
                     }
+                } else {
+                    pos = pos + 1;
                 }
                 if (noted_ok.is == false) {
                     scanner_rules.reset_state(ok, extras_array);
                     ok.addTex(noted_ok.getTex());
+                    noted_ok.init();
                 }
-                noted_ok.init();
-                pos = pos + 1;
+                if (is_token_ready) {
+                    if (is_just_read) {
+                        return scanner_rules.token;
+                    }
+                }
             }
         } catch (Exception e) {
             ok.setTex(e);
         }
+        return null;
     }
 
     /**
@@ -146,7 +196,6 @@ public class Code_scanners extends Bases {
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
             Integer backtrack_pos;
-            tokens_list.add(scanner_rules.token);
             if (analizer != null) {
                 int tam = tokens_list.size();
                 int i = tam - 1;

@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 @SuppressWarnings("nullness")
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Code_processorTest {
+    public static int debug_level = 0;
     static {
         Test_methods.configure(false, true, false);
     }
@@ -38,6 +39,7 @@ public class Code_processorTest {
                 "-git",
                 "/home/emilio/proyectos/java/code_processor/src/main/java/innui/code_processor/Code_processor.java"
         };
+        debug_level = 0;
         Code_processor.main(args);
     }
 }

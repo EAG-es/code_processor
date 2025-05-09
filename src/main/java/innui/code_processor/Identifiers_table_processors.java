@@ -8,7 +8,6 @@ import innui.modelos.errors.Oks;
 import innui.modelos.internacionalization.Tr;
 import innui.modelos.tests.Test_methods;
 import org.checkerframework.checker.fenum.qual.Fenum;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -67,6 +66,10 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return;
         try {
             this.identifiers_table_rule = identifiers_table_rule;
+            this.identifiers_table_rule.analizer_rules.code_scanner.validator
+                    = (_token, _ok, _extras_array) -> {
+                return validate_token(_token, _ok, _extras_array);
+            };
             this.identifiers_table_rule.analizer_rules.code_scanner.analizer
              = (_token, _ok, _extras_array) -> {
                 return analize_token(_token, _ok, _extras_array);
@@ -92,7 +95,6 @@ public class Identifiers_table_processors extends Bases {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (file_name != null) {
                 ok.setTex(Tr.in(in, "Not implemented."));
-                return;
             } else {
                 identifiers_table_rule.load(ok, extras_array);
                 if (ok.is == false) return;
@@ -100,6 +102,28 @@ public class Identifiers_table_processors extends Bases {
         } catch (Exception e) {
             ok.setTex(e);
         }
+    }
+
+    /**
+     *
+     * @param token
+     * @param ok
+     * @param extras_array
+     * @return true if the tokes is valid for the analisys
+     * @throws Exception
+     */
+    public boolean validate_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return false;
+        boolean retorno = false;
+        try {
+            retorno = identifiers_table_rule.validate_token(token, ok, extras_array);
+            if (ok.is == false) return false;
+        } catch (Exception e) {
+            ok.setTex(e);
+            return false;
+        }
+        return retorno;
     }
 
     /**
@@ -115,7 +139,13 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return null;
         Integer retorno = null;
         try {
-            retorno = identifiers_table_rule.process(token, ok, extras_array);
+            boolean is;
+            is = validate_token(token, ok, extras_array);
+            if (ok.is == false) return null;
+            if (is == false) {
+                return null;
+            }
+            retorno = identifiers_table_rule.process_rules(token, ok, extras_array);
             if (ok.is == false) {
                 if (Oks.equals(ok.id, k_is_bad_way)) {
                     ok.setTex(Oks.no_fenum_cast(k_need_backtrack));
@@ -130,6 +160,12 @@ public class Identifiers_table_processors extends Bases {
         return retorno;
     }
 
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
     public void start(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;

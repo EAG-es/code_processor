@@ -6,7 +6,6 @@ import innui.modelos.errors.Oks;
 import innui.modelos.internacionalization.Tr;
 import innui.modelos.tests.Test_methods;
 import org.checkerframework.checker.fenum.qual.Fenum;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.regex.qual.Regex;
 
 import java.io.File;
@@ -55,15 +54,18 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
     }
 
     public enum Token_types {
-        token_package, token_import
-        , token_if, token_else, token_while, token_do, token_for
-        , token_switch, token_case, token_default
-        , token_try, token_catch, token_finally, token_throw, token_throws
-        , token_class, token_interface, token_enum, token_extends, token_implements
-        , token_public, token_private, token_protected
-        , token_static, token_final, token_volatile, token_transient
-        , token_synchronized
-        , type_boolean, type_char, type_byte, type_short, type_int, type_long, type_float, type_double
+        token_abstract, token_continue, token_for, token_new, token_switch
+        , token_assert, token_default, token_goto, token_package, token_synchronized
+        , token_do, token_if, token_private, token_this
+        , token_break, token_implements, token_protected, token_throw
+        , token_else, token_import, token_public, token_throws
+        , token_case, token_enum, token_instanceof, token_return, token_transient
+        , token_catch, token_extends, token_try
+        , token_final, token_interface, token_static
+        , token_class, token_finally, token_strictfp, token_volatile
+        , token_const, token_native, token_super, token_while
+        , token_sealed, token_permits
+        , type_void, type_boolean, type_char, type_byte, type_short, type_int, type_long, type_float, type_double
         , operator_plus_plus, operator_minus_minus, operator_plus, operator_minus, operator_divide, operator_multiply, operator_module
         , operator_lambda
         , comment_block_begin, comment_block, comment_line_begin, comment_line
@@ -373,6 +375,15 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 case "default" -> {
                     token.token_type = Token_types.token_default.name();
                 }
+                case "continue" -> {
+                    token.token_type = Token_types.token_continue.name();
+                }
+                case "break" -> {
+                    token.token_type = Token_types.token_break.name();
+                }
+                case "goto" -> {
+                    token.token_type = Token_types.token_goto.name();
+                }
                 case "try" -> {
                     token.token_type = Token_types.token_try.name();
                 }
@@ -385,8 +396,11 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 case "throw" -> {
                     token.token_type = Token_types.token_throw.name();
                 }
-                case "throes" -> {
+                case "throws" -> {
                     token.token_type = Token_types.token_throws.name();
+                }
+                case "return" -> {
+                    token.token_type = Token_types.token_return.name();
                 }
                 case "class" -> {
                     token.token_type = Token_types.token_class.name();
@@ -403,6 +417,12 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 case "implements" -> {
                     token.token_type = Token_types.token_implements.name();
                 }
+                case "sealed" -> {
+                    token.token_type = Token_types.token_sealed.name();
+                }
+                case "permits" -> {
+                    token.token_type = Token_types.token_permits.name();
+                }
                 case "public" -> {
                     token.token_type = Token_types.token_public.name();
                 }
@@ -411,6 +431,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 }
                 case "protected" -> {
                     token.token_type = Token_types.token_protected.name();
+                }
+                case "abstract" -> {
+                    token.token_type = Token_types.token_abstract.name();
                 }
                 case "static" -> {
                     token.token_type = Token_types.token_static.name();
@@ -424,8 +447,35 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 case "transient" -> {
                     token.token_type = Token_types.token_transient.name();
                 }
+                case "native" -> {
+                    token.token_type = Token_types.token_native.name();
+                }
+                case "const" -> {
+                    token.token_type = Token_types.token_const.name();
+                }
+                case "strictfp" -> {
+                    token.token_type = Token_types.token_strictfp.name();
+                }
                 case "synchronized" -> {
                     token.token_type = Token_types.token_synchronized.name();
+                }
+                case "assert" -> {
+                    token.token_type = Token_types.token_assert.name();
+                }
+                case "new" -> {
+                    token.token_type = Token_types.token_new.name();
+                }
+                case "instanceof" -> {
+                    token.token_type = Token_types.token_instanceof.name();
+                }
+                case "this" -> {
+                    token.token_type = Token_types.token_this.name();
+                }
+                case "super" -> {
+                    token.token_type = Token_types.token_super.name();
+                }
+                case "void" -> {
+                    token.token_type = Token_types.type_void.name();
                 }
                 case "boolean" -> {
                     token.token_type = Token_types.type_boolean.name();

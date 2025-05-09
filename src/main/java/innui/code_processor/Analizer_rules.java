@@ -35,9 +35,16 @@ public class Analizer_rules extends Bases {
     }
     public static @Fenum("error_id") String k_is_bad_way = Oks.no_fenum_cast("is_bad_way");
 
+    public enum Return_status {
+        matched
+        , not_matched
+        , need_next_token
+        , backtrack_request
+        , error
+    }
 
     public interface After_success_calls extends Serializable {
-        Oks call(int repetition_num, List<Scanner_rules.Basic_tokens> first_part_tokens_list, Oks ok, Object ... extras_array) throws Exception;
+        void call(int repetition_num, List<Scanner_rules.Basic_tokens> first_part_tokens_list, Oks ok, Object ... extras_array) throws Exception;
     }
 
     public static class Rule_success implements Serializable {
@@ -57,8 +64,8 @@ public class Analizer_rules extends Bases {
         public boolean defined_is_optional = false;
         public boolean defined_is_repeatable = false;
         public boolean defined_is_to_process_the_success_rules_list_if_sucess = false;
-        public @Nullable Analizer_rules _defined_analizer_rules = null;
-        public @Nullable Rule_success defined_to_put_in_list_rule_success = null;
+        public Analizer_rules _defined_analizer_rules;
+        public @Nullable Rule_success defined_to_be_called_rule_success = null;
         public Analizer_rules.@Nullable Basic_rule_nodes defined_second_part_basic_rule_node = null;
         public boolean _is_a_repeat_success_previous_not_now = false;
         public boolean _is_already_evaluated = false;
@@ -87,7 +94,7 @@ public class Analizer_rules extends Bases {
         }
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        @SuppressWarnings("nullness:method.invocation")
+        @SuppressWarnings({"nullness:method.invocation", "nullness:initialization.fields.uninitialized"})
         public Basic_rule_nodes(Basic_rule_nodes basic_rule_node) throws Exception {
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
@@ -114,9 +121,9 @@ public class Analizer_rules extends Bases {
             try {
                 _first_token_pos = null;
                 _is_a_repeat_success_previous_not_now = false;
-                if (defined_to_put_in_list_rule_success != null) {
-                    defined_to_put_in_list_rule_success.repetition_num = 0;
-                    ok.valid(defined_to_put_in_list_rule_success.first_part_tokens_list).clear();
+                if (defined_to_be_called_rule_success != null) {
+                    defined_to_be_called_rule_success.repetition_num = 0;
+                    ok.valid(defined_to_be_called_rule_success.first_part_tokens_list).clear();
                 }
                 init_for_repeat(ok, extras_array);
             } catch (Exception e) {
@@ -166,7 +173,7 @@ public class Analizer_rules extends Bases {
                 this.defined_is_optional = basic_rule_node.defined_is_optional;
                 this.defined_is_repeatable = basic_rule_node.defined_is_repeatable;
                 this.defined_is_to_process_the_success_rules_list_if_sucess = basic_rule_node.defined_is_to_process_the_success_rules_list_if_sucess;
-                this.defined_to_put_in_list_rule_success = basic_rule_node.defined_to_put_in_list_rule_success;
+                this.defined_to_be_called_rule_success = basic_rule_node.defined_to_be_called_rule_success;
                 this._is_a_repeat_success_previous_not_now = basic_rule_node._is_a_repeat_success_previous_not_now;
                 this._is_already_evaluated = basic_rule_node._is_already_evaluated;
                 this._is_bad_way = basic_rule_node._is_bad_way;
@@ -179,12 +186,12 @@ public class Analizer_rules extends Bases {
                 } else {
                     defined_second_part_basic_rule_node = ok.valid(basic_rule_node).defined_second_part_basic_rule_node;
                 }
-                if (basic_rule_node.defined_to_put_in_list_rule_success != null) {
-                    ok.valid(defined_to_put_in_list_rule_success).repetition_num
-                            = ok.valid(basic_rule_node.defined_to_put_in_list_rule_success).repetition_num;
-                    ok.valid(ok.valid(defined_to_put_in_list_rule_success).first_part_tokens_list).clear();
-                    ok.valid(ok.valid(defined_to_put_in_list_rule_success).first_part_tokens_list).addAll(ok.valid(ok.valid(basic_rule_node
-                            .defined_to_put_in_list_rule_success).first_part_tokens_list));
+                if (basic_rule_node.defined_to_be_called_rule_success != null) {
+                    ok.valid(defined_to_be_called_rule_success).repetition_num
+                            = ok.valid(basic_rule_node.defined_to_be_called_rule_success).repetition_num;
+                    ok.valid(ok.valid(defined_to_be_called_rule_success).first_part_tokens_list).clear();
+                    ok.valid(ok.valid(defined_to_be_called_rule_success).first_part_tokens_list).addAll(ok.valid(ok.valid(basic_rule_node
+                            .defined_to_be_called_rule_success).first_part_tokens_list));
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -199,7 +206,7 @@ public class Analizer_rules extends Bases {
          * @return true = success, false = fail, null = not totally evaluated or error
          * @throws Exception
          */
-        public abstract @Nullable Boolean _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
+        public abstract Return_status _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
 
         /**
          *
@@ -209,68 +216,96 @@ public class Analizer_rules extends Bases {
          * @return true = success, false = fail, null = not totally evaluated or error
          * @throws Exception
          */
-        public @Nullable Boolean evaluate(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        public Return_status evaluate(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return null;
+            if (ok.is == false) return Return_status.error;
+            Return_status retorno = null;
             ResourceBundle in = null;
             try {
-                Boolean is;
-                boolean is_pending = false;
+                do {
+                    retorno = _evaluate(basic_token, ok, extras_array);
+                    if (ok.is == false) return Return_status.error;
+                    if (retorno == Return_status.need_next_token) {
+                        basic_token = ok.valid(_defined_analizer_rules.code_scanner.scan_next(ok, extras_array));
+                        if (ok.is == false) return Return_status.error;
+                    }
+                } while (retorno == Return_status.need_next_token);
+            } catch (Exception e) {
+                ok.setTex(e);
+                return Return_status.error;
+            }
+            return retorno;
+        }
+
+        public Return_status _evaluate(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return Return_status.error;
+            Return_status retorno = null;
+            ResourceBundle in = null;
+            try {
                 in = ok.valid(ResourceBundles.getBundle(k_in_route));
                 if (_is_already_evaluated == true) {
                     if (defined_is_repeatable == false) {
                         ok.setTex(Tr.in(in, "Rule already evaluated. Must do init to reevaluate. "));
-                        return null;
+                        return Return_status.error;
                     } else {
                         init_for_repeat(ok, extras_array);
-                        if (ok.is == false) return null;
-                        if (defined_to_put_in_list_rule_success != null) {
-                            defined_to_put_in_list_rule_success.repetition_num = defined_to_put_in_list_rule_success.repetition_num + 1;
+                        if (ok.is == false) return Return_status.error;
+                        if (defined_to_be_called_rule_success != null) {
+                            defined_to_be_called_rule_success.repetition_num = defined_to_be_called_rule_success.repetition_num + 1;
                         }
                     }
                 }
                 if (_is_first_part_evaluated == false) {
                     if (_first_token_pos == null) {
-                        _first_token_pos = ok.valid(_defined_analizer_rules).code_scanner.tokens_list.size();
+                        _first_token_pos = _defined_analizer_rules.code_scanner.tokens_list.size() - 1;
                     }
-                    is = _evaluate_first_part(basic_token, ok, extras_array);
-                    if (ok.is == false) return false;
-                    if (is != null) {
-                        if (is == false) {
+                    _is_first_part_evaluated = true;
+                    retorno = _evaluate_first_part(basic_token, ok, extras_array);
+                    if (ok.is == false) return Return_status.error;
+                    if (retorno != Return_status.need_next_token) {
+                        if (retorno == Return_status.not_matched) {
                             if (_is_once_successed == null) {
                                 _is_once_successed = false;
                             }
                             _first_token_pos = null;
-                            return false;
+                            return Return_status.not_matched;
                         }
                     } else {
-                        is_pending = true;
+                        _is_first_part_evaluated = false;
+                        return Return_status.need_next_token;
                     }
                     if (defined_second_part_basic_rule_node == null) {
                         _is_first_part_evaluated = false; // for repeating
                         _is_already_evaluated = true;
                         _is_once_successed = true;
-                        if (defined_to_put_in_list_rule_success != null) {
-                            ok.valid(_defined_analizer_rules).success_rules_list.addFirst(ok.valid(defined_to_put_in_list_rule_success));
+                        if (defined_to_be_called_rule_success != null) {
+                            _defined_analizer_rules.success_rules_list.addFirst(ok.valid(defined_to_be_called_rule_success));
                         }
                         if (defined_is_to_process_the_success_rules_list_if_sucess) {
-                            ok.valid(_defined_analizer_rules).process(ok, extras_array);
-                            if (ok.is == false) return false;
+                            _defined_analizer_rules.process(ok, extras_array);
+                            if (ok.is == false) return Return_status.error;
                         }
-                        return true;
+                        return Return_status.matched;
                     } else {
-                        if (is_pending == false) {
-                            _is_first_part_evaluated = true;
+                        if (_is_already_evaluated) {
+                            return Return_status.matched;
+                        } else {
+                            return Return_status.need_next_token;
                         }
-                        return null;
                     }
                 } else {
-                    return evaluate_second_part(basic_token, ok, extras_array);
+                    if (defined_second_part_basic_rule_node.defined_is_repeatable
+                     || defined_second_part_basic_rule_node.defined_is_optional) {
+                        ok.setTex(Tr.in(in, "Second part rule cannot be repeateble nor optional. "));
+                        return Return_status.error;
+                    }
+                    return _evaluate_rule_or_second_part(basic_token, ok, extras_array);
                 }
             } catch (Exception e) {
                 ok.setTex(e);
             }
-            return null;
+            return Return_status.error;
         }
 
         /**
@@ -281,81 +316,74 @@ public class Analizer_rules extends Bases {
          * @return
          * @throws Exception
          */
-        public @Nullable Boolean evaluate_second_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        public Return_status _evaluate_rule_or_second_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return null;
+            if (ok.is == false) return Return_status.error;
             ResourceBundle in = null;
             try {
-                Boolean is;
-                boolean is_pending = false;
+                Return_status return_status;
                 in = ok.valid(ResourceBundles.getBundle(k_in_route));
                 if (_is_already_evaluated == true && defined_is_repeatable == false) {
                     ok.setTex(Tr.in(in, "Rule already evaluated. Must do init to reevaluate. "));
-                    return null;
+                    return Return_status.error;
                 }
                 _is_a_repeat_success_previous_not_now = false;
                 if (defined_second_part_basic_rule_node == null) {
                     ok.setTex(Tr.in(in, "Rule is null. "));
-                    return null;
+                    return Return_status.error;
                 }
                 if (defined_second_part_basic_rule_node._is_once_successed == null
                  || (defined_second_part_basic_rule_node._is_once_successed
                   && defined_second_part_basic_rule_node.defined_is_repeatable)) {
-                    is = defined_second_part_basic_rule_node.evaluate(basic_token, ok, extras_array);
-                    if (ok.is == false) return false;
-                    if (is != null) {
-                        if (is == false) {
+                    return_status = defined_second_part_basic_rule_node.evaluate(basic_token, ok, extras_array);
+                    if (ok.is == false) return Return_status.error;
+                    if (return_status != Return_status.need_next_token) {
+                        if (return_status == Return_status.not_matched) {
                             if (_is_once_successed == null || _is_once_successed == false) {
-                                if (ok.valid(defined_second_part_basic_rule_node).defined_is_repeatable) {
+                                if (ok.valid(defined_second_part_basic_rule_node).defined_is_repeatable == true) {
                                     if (ok.valid(defined_second_part_basic_rule_node)._is_once_successed == null) {
-                                        ok.setTex(Tr.in(in, "Not null return evaluating a node whose success state is null . "));
-                                        return null;
-                                    }
-                                    if (ok.valid(ok.valid(defined_second_part_basic_rule_node)._is_once_successed) == false) {
-                                        // Previous repeat was failed (not to consider)
-                                        _is_once_successed = false;
-                                    } else {
+                                        ok.setTex(Tr.in(in, "Not null returned evaluating a node whose success state is null . "));
+                                        return Return_status.error;
+                                    } else if (ok.valid(ok.valid(defined_second_part_basic_rule_node)._is_once_successed) == true) {
                                         // Previous repeat was failed but this basic_token does not match
                                         _is_a_repeat_success_previous_not_now = true;
                                     }
-                                } else {
-                                    _is_once_successed = false;
                                 }
                             }
-                            return false;
+                            return Return_status.not_matched;
                         } else {
                             if (ok.valid(defined_second_part_basic_rule_node)._is_already_evaluated) {
                                 _is_first_part_evaluated = false; // for repeating
                                 _is_already_evaluated = true;
                                 _is_once_successed = true;
-                                if (defined_to_put_in_list_rule_success != null) {
-                                    ok.valid(_defined_analizer_rules).success_rules_list.addFirst(ok.valid(defined_to_put_in_list_rule_success));
+                                if (defined_to_be_called_rule_success != null) {
+                                    _defined_analizer_rules.success_rules_list.addFirst(ok.valid(defined_to_be_called_rule_success));
                                 }
                                 if (defined_is_to_process_the_success_rules_list_if_sucess) {
-                                    ok.valid(_defined_analizer_rules).process(ok, extras_array);
-                                    if (ok.is == false) return false;
+                                    _defined_analizer_rules.process(ok, extras_array);
+                                    if (ok.is == false) return Return_status.error;
                                 }
-                                return true;
+                                return Return_status.matched;
                             } else {
-                                ok.setTex(Tr.in(in, "Return true for a not already evaluated rule. "));
-                                return null;
+                                ok.setTex(Tr.in(in, "Return matched for a not already evaluated rule. "));
+                                return Return_status.error;
                             }
                         }
                     } else {
-                        return null;
+                        return Return_status.need_next_token;
                     }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
             }
-            return null;
+            return Return_status.error;
         }
     }
 
     public static class Tokens_or_rule_nodes extends Basic_rule_nodes {
         private static final long serialVersionUID = getSerial_version_uid();
-        public  ArrayList<Scanner_rules.Basic_tokens> defined_first_part_evaluation_tokens_list = new ArrayList<>();
-        public  boolean is_ignore_not_matched = false;
+        public ArrayList<Scanner_rules.Basic_tokens> defined_first_part_evaluation_tokens_list = new ArrayList<>();
+        public boolean defined_is_ignore_til_matches = false;
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
@@ -414,7 +442,6 @@ public class Analizer_rules extends Bases {
             try {
                 super.init_for_repeat(ok, extras_array);
                 if (ok.is == false) return;
-                is_ignore_not_matched = false;
                 if (defined_first_part_evaluation_tokens_list != null) {
                     for (var token: defined_first_part_evaluation_tokens_list) {
                         token.init(ok, extras_array);
@@ -442,7 +469,7 @@ public class Analizer_rules extends Bases {
             try {
                 super.init(tokens_or_rule_node, ok, extras_array);
                 if (ok.is == false) return;
-                this.is_ignore_not_matched = tokens_or_rule_node.is_ignore_not_matched;
+                this.defined_is_ignore_til_matches = tokens_or_rule_node.defined_is_ignore_til_matches;
                 if (defined_first_part_evaluation_tokens_list != null) {
                     for (var token: defined_first_part_evaluation_tokens_list) {
                         token.init(token, ok);
@@ -456,76 +483,125 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
-        public @Nullable Boolean _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        public Return_status _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return null;
+            if (ok.is == false) return Return_status.error;
             ResourceBundle in = null;
+            Return_status retorno = Return_status.not_matched;
             try {
-                boolean is;
                 in = ok.valid(ResourceBundles.getBundle(k_in_route));
                 if (defined_first_part_evaluation_tokens_list != null) {
-                    for (var token: defined_first_part_evaluation_tokens_list) {
-                        if (Objects.equals(basic_token.token_type, token.token_type) == false) {
-                            if (defined_second_part_basic_rule_node == null || defined_second_part_basic_rule_node._is_already_evaluated) {
-                                init_to_reuse(ok, extras_array);
-                                if (ok.is == false) return null;
-                                _is_already_evaluated = true;
-                                ok.valid(_defined_analizer_rules).backtrack_pos = ok.valid(_first_token_pos);
-                                _is_bad_way = true;
-                                ok.setTex(Oks.no_fenum_cast(k_is_bad_way));
-                                ok.id = k_is_bad_way;
+                    for (var to_match_basic_token: defined_first_part_evaluation_tokens_list) {
+                        retorno = ok.allow_null(_evaluate_a_basic_token(basic_token, to_match_basic_token, ok, extras_array));
+                        if (ok.is == false) return Return_status.error;
+                        if (retorno == Return_status.matched) {
+                            if (defined_to_be_called_rule_success != null) {
+                                ok.valid(defined_to_be_called_rule_success.first_part_tokens_list).add(basic_token); // Token in the list of positively evaluated tokens
                             }
-                            if (is_ignore_not_matched) {
-                                _is_first_part_evaluated = false;
-                                return null;
-                            }
-                        }
-                        if (token.token_tex != null) {
-                            if (Objects.equals(basic_token.token_tex, token.token_tex) == false) {
-                                if (defined_second_part_basic_rule_node == null || defined_second_part_basic_rule_node._is_already_evaluated) {
-                                    init_to_reuse(ok, extras_array);
-                                    if (ok.is == false) return null;
-                                    _is_already_evaluated = true;
-                                    ok.valid(_defined_analizer_rules).backtrack_pos = ok.valid(_first_token_pos);
-                                    _is_bad_way = true;
-                                    ok.setTex(Oks.no_fenum_cast(k_is_bad_way));
-                                    ok.id = k_is_bad_way;
-                                }
-                                if (is_ignore_not_matched) {
-                                    _is_first_part_evaluated = false;
-                                    return null;
-                                }
-                            } else {
-                                break;
-                            }
-                        } else {
                             break;
                         }
                     }
-                    if (defined_to_put_in_list_rule_success != null) {
-                        ok.valid(defined_to_put_in_list_rule_success.first_part_tokens_list).add(basic_token); // Token in the list of positively evaluated tokens
-                    }
-                    _is_first_part_evaluated = true;
                 } else {
                     if (defined_second_part_basic_rule_node == null) {
-                        ok.setTex(Tr.in(in, "All content is null in node. "));
-                        return null;
+                        ok.setTex(Tr.in(k_in_route, "All the requirements are null in node. "));
+                        return Return_status.error;
+                    } else {
+                        _is_first_part_evaluated = true;
+                        return Return_status.need_next_token;
+                    }
+                }
+            } catch (Exception e) {
+                ok.setTex(e);
+                return Return_status.error;
+            }
+            return retorno;
+        }
+
+        /**
+         *
+         * @param basic_token
+         * @param to_match_basic_token
+         * @param ok
+         * @param extras_array
+         * @return
+         * @throws Exception
+         */
+        public Return_status _evaluate_a_basic_token(Scanner_rules.Basic_tokens basic_token
+                , Scanner_rules.Basic_tokens to_match_basic_token, Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return Return_status.error;
+            ResourceBundle in = null;
+            try {
+                if (Objects.equals(basic_token.token_type, to_match_basic_token.token_type) == false) {
+                    if (defined_second_part_basic_rule_node != null && defined_second_part_basic_rule_node._is_already_evaluated) {
+                        _is_already_evaluated = true;
+                        _defined_analizer_rules.backtrack_pos = ok.valid(_first_token_pos);
+                        _is_bad_way = true;
+                        ok.setTex(Oks.no_fenum_cast(k_is_bad_way));
+                        ok.id = k_is_bad_way;
+                        return Return_status.backtrack_request;
+                    }
+                    if (defined_is_ignore_til_matches) {
+                        _is_first_part_evaluated = false;
+                        return Return_status.need_next_token;
+                    }
+                }
+                if (to_match_basic_token.token_tex != null && to_match_basic_token.token_tex.isEmpty() == false) {
+                    if (Objects.equals(basic_token.token_tex, to_match_basic_token.token_tex) == false) {
+                        if (defined_second_part_basic_rule_node != null && defined_second_part_basic_rule_node._is_already_evaluated) {
+                            _is_already_evaluated = true;
+                            _defined_analizer_rules.backtrack_pos = ok.valid(_first_token_pos);
+                            _is_bad_way = true;
+                            ok.setTex(Oks.no_fenum_cast(k_is_bad_way));
+                            ok.id = k_is_bad_way;
+                            return Return_status.backtrack_request;
+                        }
+                        if (defined_is_ignore_til_matches) {
+                            _is_first_part_evaluated = false;
+                            return Return_status.need_next_token;
+                        } else {
+                            return Return_status.not_matched;
+                        }
+                    } else {
+                        return Return_status.matched;
+                    }
+                } else {
+                    if (defined_is_ignore_til_matches) {
+                        Return_status result;
+                        result = _evaluate_rule_or_second_part(basic_token, ok, extras_array);
+                        if (ok.is == false) return Return_status.error;
+                        if (result == Return_status.need_next_token) {
+                            _is_first_part_evaluated = true;
+                            return Return_status.need_next_token;
+                        } else if (result == Return_status.not_matched) {
+                            _is_already_evaluated = true;
+                            _defined_analizer_rules.backtrack_pos = ok.valid(_first_token_pos);
+                            _is_bad_way = true;
+                            ok.setTex(Oks.no_fenum_cast(k_is_bad_way));
+                            ok.id = k_is_bad_way;
+                            return Return_status.backtrack_request;
+                        } else {
+                            _is_already_evaluated = true;
+                            return Return_status.matched;
+                        }
+                    } else {
+                        return Return_status.matched;
                     }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
             }
-            return null;
+            return Return_status.error;
         }
     }
 
-    public static class Find_way_rule_nodes extends Basic_rule_nodes {
+    public static class Rules_or_rule_nodes extends Basic_rule_nodes {
         private static final long serialVersionUID = getSerial_version_uid();
         public ArrayList<Basic_rule_nodes> defined_first_part_basic_rule_nodes_list = new ArrayList<>();
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
-        public Find_way_rule_nodes(Analizer_rules analizer_rules) throws Exception {
+        public Rules_or_rule_nodes(Analizer_rules analizer_rules) throws Exception {
             super(analizer_rules);
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
@@ -540,7 +616,7 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
-        public Find_way_rule_nodes(Find_way_rule_nodes rule_node_find_way) throws Exception {
+        public Rules_or_rule_nodes(Rules_or_rule_nodes rule_node_find_way) throws Exception {
             super(Oks.valide(rule_node_find_way._defined_analizer_rules));
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
@@ -608,7 +684,7 @@ public class Analizer_rules extends Bases {
          * @return
          * @throws Exception
          */
-        public void init(Find_way_rule_nodes find_way_rule_node, Oks ok, Object ... extras_array) throws Exception {
+        public void init(Rules_or_rule_nodes find_way_rule_node, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             ResourceBundle in = null;
@@ -636,102 +712,141 @@ public class Analizer_rules extends Bases {
          * @throws Exception
          */
         @Override
-        public @Nullable Boolean _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        public Return_status _evaluate_first_part(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return null;
-            ResourceBundle in = null;
+            if (ok.is == false) return Return_status.error;
             try {
-                Boolean is;
                 boolean is_evaluated = true;
+                Return_status result = null;
                 if (defined_first_part_basic_rule_nodes_list != null && defined_first_part_basic_rule_nodes_list.isEmpty() == false) {
-                    for (var node : defined_first_part_basic_rule_nodes_list) {
-                        if (node._is_already_evaluated == false
-                         && (node._is_once_successed == null
-                          || (node._is_once_successed && node.defined_is_repeatable))) {
+                    for (var basic_rule_node : defined_first_part_basic_rule_nodes_list) {
+                        if (basic_rule_node._is_already_evaluated == false
+                                && (basic_rule_node._is_once_successed == null
+                                || (basic_rule_node._is_once_successed == true && basic_rule_node.defined_is_repeatable == true))) {
                             is_evaluated = true;
-                            is = node.evaluate(basic_token, ok, extras_array);
-                            if (ok.is == false) return null;
-                            if (is != null) {
-                                if (is == false) {
-                                    if (node.defined_is_repeatable) {
-                                        if (node._is_a_repeat_success_previous_not_now) {
-                                            if (defined_second_part_basic_rule_node != null) {
-                                                _is_first_part_evaluated = true;
-                                                is = evaluate_second_part(basic_token, ok, extras_array);
-                                                if (ok.is == false) return null;
-                                                if (is != null) {
-                                                    if (is) {
-                                                        _is_already_evaluated = true;
-                                                        return true;
-                                                    } else {
-                                                        ok.valid(defined_second_part_basic_rule_node).init_to_reuse(ok, extras_array);
-                                                        if (ok.is == false) return null;
-                                                    }
-                                                } else {
-                                                    return null;
-                                                }
-                                            } else {
-                                                _is_already_evaluated = true;
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                    if (node.defined_is_optional == false) {
-                                        if (defined_second_part_basic_rule_node != null) {
-                                            _is_first_part_evaluated = true;
-                                            is = evaluate_second_part(basic_token, ok, extras_array);
-                                            if (ok.is == false) return null;
-                                            if (is != null) {
-                                                if (is) {
-                                                    _is_already_evaluated = true;
-                                                    return true;
-                                                } else {
-                                                    ok.valid(defined_second_part_basic_rule_node).init_to_reuse(ok, extras_array);
-                                                    if (ok.is == false) return null;
-                                                }
-                                            } else {
-                                                return null;
-                                            }
-                                        } else {
-                                            _is_already_evaluated = true;
-                                            return true;
-                                        }
-                                    }
-                                } else {
-                                    _is_first_part_evaluated = true;
-                                    return true; // A rule has matched
-                                }
-                            } else {
-                                return null;
+                            result = Oks.allow_nulle(_evaluate_a_basic_rule_node(basic_token, basic_rule_node, ok, extras_array));
+                            if (ok.is == false) return Return_status.error;
+                            if (result == Return_status.need_next_token || result == Return_status.matched) {
+                                break;
                             }
                         }
                     }
-                    if (is_evaluated) {
-                        _is_first_part_evaluated = true;
-                        return false; // No rule matching
-                    } else {
-                        if (defined_second_part_basic_rule_node == null || defined_second_part_basic_rule_node._is_already_evaluated) {
-                            init_to_reuse(ok, extras_array);
-                            if (ok.is == false) return null;
-                            _is_already_evaluated = true;
-                            ok.valid(_defined_analizer_rules).backtrack_pos = ok.allow_null(_first_token_pos);
-                            _is_bad_way = true;
-                            ok.setTex(Oks.no_fenum_cast(k_is_bad_way));
-                            ok.id = k_is_bad_way;
-                            return false; // No rule matching
+                    if (is_evaluated == false) {
+                        return Return_status.not_matched;
+                    } else if (result != Return_status.need_next_token) {
+                        if (result == Return_status.not_matched) {
+                            if (defined_second_part_basic_rule_node == null
+                             || defined_second_part_basic_rule_node._is_already_evaluated) {
+                                _is_already_evaluated = true;
+                                _defined_analizer_rules.backtrack_pos = ok.allow_null(_first_token_pos);
+                                _is_bad_way = true;
+                                ok.setTex(Oks.no_fenum_cast(k_is_bad_way));
+                                ok.id = k_is_bad_way;
+                                return Return_status.backtrack_request;
+                            }
+                        } else {
+                            return Return_status.matched;
                         }
+                    } else {
+                        return Return_status.need_next_token;
                     }
                 } else {
                     if (defined_second_part_basic_rule_node == null) {
-                        ok.setTex(Tr.in(ok.valid(in), "All the requirements are null in node. "));
-                        return null;
+                        ok.setTex(Tr.in(k_in_route, "All the requirements are null in node. "));
+                        return Return_status.error;
+                    } else {
+                        _is_first_part_evaluated = true;
+                        return Return_status.need_next_token;
                     }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
             }
-            return null;
+            return Return_status.error;
         }
+
+        /**
+         *
+         * @param basic_token
+         * @param basic_rule_node
+         * @param ok
+         * @param extras_array
+         * @return
+         * @throws Exception
+         */
+        public Return_status _evaluate_a_basic_rule_node(Scanner_rules.Basic_tokens basic_token, Basic_rule_nodes basic_rule_node
+                , Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return Return_status.error;
+            try {
+                Return_status return_status;
+                if (basic_rule_node._is_already_evaluated
+                 || (basic_rule_node._is_once_successed != null && basic_rule_node._is_once_successed == false)) {
+                    ok.setTex(Tr.in(k_in_route, "Rule already evaluated. "));
+                    return Return_status.error;
+                }
+                return_status = basic_rule_node.evaluate(basic_token, ok, extras_array);
+                if (ok.is == false) return Return_status.error;
+                if (return_status != Return_status.need_next_token) {
+                    if (return_status == Return_status.not_matched) {
+                        if (basic_rule_node.defined_is_repeatable) {
+                            if (basic_rule_node._is_a_repeat_success_previous_not_now) {
+                                if (defined_second_part_basic_rule_node != null) {
+                                    _is_first_part_evaluated = true;
+                                    return_status = _evaluate_rule_or_second_part(basic_token, ok, extras_array);
+                                    if (ok.is == false) return Return_status.error;
+                                    if (return_status != Return_status.need_next_token) {
+                                        if (return_status == Return_status.matched) {
+                                            _is_already_evaluated = true;
+                                            return Return_status.matched;
+                                        } else {
+                                            ok.valid(defined_second_part_basic_rule_node).init_to_reuse(ok, extras_array);
+                                            if (ok.is == false) return Return_status.error;
+                                            return Return_status.not_matched;
+                                        }
+                                    } else {
+                                        return Return_status.error;
+                                    }
+                                } else {
+                                    _is_already_evaluated = true;
+                                    return Return_status.matched;
+                                }
+                            }
+                        }
+                        if (basic_rule_node.defined_is_optional == false) {
+                            if (defined_second_part_basic_rule_node != null) {
+                                _is_first_part_evaluated = true;
+                                return_status = _evaluate_rule_or_second_part(basic_token, ok, extras_array);
+                                if (ok.is == false) return Return_status.error;
+                                if (return_status != Return_status.need_next_token) {
+                                    if (return_status == Return_status.matched) {
+                                        _is_already_evaluated = true;
+                                        return Return_status.matched;
+                                    } else {
+                                        ok.valid(defined_second_part_basic_rule_node).init_to_reuse(ok, extras_array);
+                                        if (ok.is == false) return Return_status.error;
+                                        return Return_status.not_matched;
+                                    }
+                                } else {
+                                    return Return_status.need_next_token;
+                                }
+                            } else {
+                                _is_already_evaluated = true;
+                                return Return_status.matched;
+                            }
+                        }
+                    } else {
+                        return Return_status.matched;
+                    }
+                } else {
+                    return Return_status.need_next_token;
+                }
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            return Return_status.error;
+        }
+
     }
 
     public @Nullable Basic_rule_nodes start_rule_node = null;
