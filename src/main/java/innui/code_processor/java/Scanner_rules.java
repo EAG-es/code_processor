@@ -62,7 +62,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         , token_case, token_enum, token_instanceof, token_return, token_transient
         , token_catch, token_extends, token_try
         , token_final, token_interface, token_static
-        , token_class, token_finally, token_strictfp, token_volatile
+        , token_class, token_record, token_finally, token_strictfp, token_volatile
         , token_const, token_native, token_super, token_while
         , token_sealed, token_permits
         , type_void, type_boolean, type_char, type_byte, type_short, type_int, type_long, type_float, type_double
@@ -410,6 +410,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
                 }
                 case "enum" -> {
                     token.token_type = Token_types.token_enum.name();
+                }
+                case "record" -> {
+                    token.token_type = Token_types.token_record.name();
                 }
                 case "extends" -> {
                     token.token_type = Token_types.token_extends.name();

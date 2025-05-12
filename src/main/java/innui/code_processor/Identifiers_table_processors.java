@@ -14,7 +14,9 @@ import java.io.File;
 import java.util.ResourceBundle;
 
 import static innui.code_processor.Analizer_rules.k_is_bad_way;
+import static innui.code_processor.Analizer_rules.k_is_reevaluate_token;
 import static innui.code_processor.Code_scanners.k_need_backtrack;
+import static innui.code_processor.Code_scanners.k_need_once;
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Identifiers_table_processors extends Bases {
@@ -146,12 +148,13 @@ public class Identifiers_table_processors extends Bases {
                 return null;
             }
             retorno = identifiers_table_rule.process_rules(token, ok, extras_array);
-            if (ok.is == false) {
-                if (Oks.equals(ok.id, k_is_bad_way)) {
-                    ok.setTex(Oks.no_fenum_cast(k_need_backtrack));
-                    ok.id = k_need_backtrack;
-                }
-                return null;
+            if (ok.is == false) return null;
+            if (Oks.equals(ok.id, k_is_bad_way)) {
+                ok.init();
+                ok.id = k_need_backtrack;
+            } else if (Oks.equals(ok.id, k_is_reevaluate_token)) {
+                ok.init();
+                ok.id = k_need_once;
             }
         } catch (Exception e) {
             ok.setTex(e);

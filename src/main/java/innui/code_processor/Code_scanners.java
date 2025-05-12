@@ -39,6 +39,7 @@ public class Code_scanners extends Bases {
         Code_scanners.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
     public static @Fenum("error_id") String k_need_backtrack = Oks.no_fenum_cast("need_backtrack");
+    public static @Fenum("error_id") String k_need_once = Oks.no_fenum_cast("need_once");
 
     public Code_scanners() throws Exception {
     }
@@ -202,21 +203,21 @@ public class Code_scanners extends Bases {
                 Scanner_rules.Tokens token = scanner_rules.token;
                 while (true) {
                     backtrack_pos = ok.valid(analizer).analize(token, ok, extras_array);
-                    if (ok.is == false) {
-                        if (Oks.equals(ok.id, k_need_backtrack)) {
-                            if (backtrack_pos == null) {
-                                ok.setTex(Tr.in(in, "Needed backtrack not defined. "));
-                                return;
-                            }
-                            i = backtrack_pos;
-                            if (i < 0) {
-                                ok.setTex(Tr.in(in, "Reached the previous position to the beginning of the tokens list. "));
-                                return;
-                            }
-                            token = tokens_list.get(i);
-                        } else {
+                    if (ok.is == false) break;
+                    if (Oks.equals(ok.id, k_need_backtrack)) {
+                        ok.init();
+                        if (backtrack_pos == null) {
+                            ok.setTex(Tr.in(in, "Needed backtrack not defined. "));
                             return;
                         }
+                        i = backtrack_pos;
+                        if (i < 0) {
+                            ok.setTex(Tr.in(in, "Reached the previous position to the beginning of the tokens list. "));
+                            return;
+                        }
+                        token = tokens_list.get(i);
+                    } else if (Oks.equals(ok.id, k_need_once)) {
+                        ok.init();
                     } else {
                         i = i + 1;
                     }
