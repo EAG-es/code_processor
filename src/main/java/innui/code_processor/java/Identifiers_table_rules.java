@@ -215,29 +215,6 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
     }
 
     /**
-     *
-     * @param basic_token
-     * @param ok
-     * @param extras_array
-     * @return
-     * @throws Exception
-     */
-    public @Nullable Integer process_rules(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
-        new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        Integer retorno = null;
-        try {
-            ok.valid(analizer_rules.start_rule_node).evaluate(basic_token, ok, extras_array);
-            retorno = analizer_rules.backtrack_pos;
-            analizer_rules.backtrack_pos = null;
-        } catch (Exception e) {
-            ok.setTex(e);
-            return null;
-        }
-        return retorno;
-    }
-
-    /**
      * Filters tokens
      * @param basic_token
      * @param ok
@@ -250,6 +227,18 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
         if (ok.is == false) return false;
         try {
             if (basic_token.token_type.equals(space.name())) {
+                return true;
+            }
+            if (basic_token.token_type.equals(comment_block_begin.name())) {
+                return true;
+            }
+            if (basic_token.token_type.equals(comment_block.name())) {
+                return true;
+            }
+            if (basic_token.token_type.equals(comment_line_begin.name())) {
+                return true;
+            }
+            if (basic_token.token_type.equals(comment_line.name())) {
                 return true;
             }
         } catch (Exception e) {

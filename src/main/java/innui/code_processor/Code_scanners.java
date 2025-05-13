@@ -38,8 +38,8 @@ public class Code_scanners extends Bases {
         }
         Code_scanners.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
-    public static @Fenum("error_id") String k_need_backtrack = Oks.no_fenum_cast("need_backtrack");
-    public static @Fenum("error_id") String k_need_once = Oks.no_fenum_cast("need_once");
+    public static @Fenum("error_id") String k_need_token_backtrack = Oks.no_fenum_cast("need_backtrack");
+    public static @Fenum("error_id") String k_need_token_last = Oks.no_fenum_cast("need_once");
 
     public Code_scanners() throws Exception {
     }
@@ -48,12 +48,21 @@ public class Code_scanners extends Bases {
         boolean validate_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
     }
 
+    @FunctionalInterface
     public interface Analizers extends Serializable {
-        @Nullable Integer analize(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
+        /**
+         *
+         * @param basic_token
+         * @param ok
+         * @param extras_array
+         * @return The next position of the tokens stack to use, or null (if you use the next token to read)
+         * @throws Exception
+         */
+        @Nullable Integer analize(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
     }
 
-    public Code_scanners.@Nullable Validators validator = null;
-    public Code_scanners.@Nullable Analizers analizer = null;
+    public Code_scanners.@Nullable Validators tokens_validator = null;
+    public Code_scanners.@Nullable Analizers analizer_from_start_rule = null;
     public @Nullable String code_tex = null;
     public int pos = 0;
     public Scanner_rules scanner_rules = new innui.code_processor.java.Scanner_rules();
@@ -108,7 +117,7 @@ public class Code_scanners extends Bases {
             do {
                 retorno = ok.valid(_scan_resume(true, ok, extras_array));
                 if (ok.is == false) return null;
-                is = ok.valid(validator).validate_token(retorno, ok, extras_array);
+                is = ok.valid(tokens_validator).validate_token(retorno, ok, extras_array);
                 if (ok.is == false) return null;
             } while (is == false);
         } catch (Exception e) {
@@ -154,7 +163,7 @@ public class Code_scanners extends Bases {
                     noted_ok.init();
                     tokens_list.add(scanner_rules.token);
                     if (is_just_read == false) {
-                        analize_token(scanner_rules, noted_ok, extras_array);
+                        analize_token_with_token_analizer(scanner_rules.token, noted_ok, extras_array);
                         if (noted_ok.is == false) {
                             ok.addTex(noted_ok.getTex());
                             noted_ok.init();
@@ -184,50 +193,92 @@ public class Code_scanners extends Bases {
 
     /**
      *
-     * @param scanner_rules
+     * @param basic_token
      * @param ok
      * @param extras_array
      * @return
      * @throws Exception
+     *
      */
-    public void analize_token(Scanner_rules scanner_rules, Oks ok, Object ... extras_array) throws Exception {
+    public @Nullable Boolean analize_token_with_token_analizer(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return;
+        return analize_token_with_rule(basic_token, null, ok, extras_array);
+    }
+
+    /**
+     *
+     * @param basic_token
+     * @param rule_node if null will use the token_analizer attribute
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
+    public @Nullable Boolean analize_token_with_rule(Scanner_rules.Basic_tokens basic_token, Analizer_rules.@Nullable Rule_nodes rule_node, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        Boolean retorno = null;
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            Integer backtrack_pos;
-            if (analizer != null) {
-                int tam = tokens_list.size();
-                int i = tam - 1;
-                Scanner_rules.Tokens token = scanner_rules.token;
-                while (true) {
-                    backtrack_pos = ok.valid(analizer).analize(token, ok, extras_array);
-                    if (ok.is == false) break;
-                    if (Oks.equals(ok.id, k_need_backtrack)) {
-                        ok.init();
-                        if (backtrack_pos == null) {
-                            ok.setTex(Tr.in(in, "Needed backtrack not defined. "));
-                            return;
-                        }
-                        i = backtrack_pos;
-                        if (i < 0) {
-                            ok.setTex(Tr.in(in, "Reached the previous position to the beginning of the tokens list. "));
-                            return;
-                        }
-                        token = tokens_list.get(i);
-                    } else if (Oks.equals(ok.id, k_need_once)) {
-                        ok.init();
-                    } else {
-                        i = i + 1;
+            Integer backtrack_pos = null;
+            boolean is;
+            Analizer_rules.@Nullable Rule_nodes rule;
+            int tam = tokens_list.size();
+            int i = tam - 1;
+            if (rule_node != null) {
+                if (rule_node.defined_analizer_rules.backtrack_pos != null) {
+                    i = rule_node.defined_analizer_rules.backtrack_pos;
+                    if (i < 0) {
+                        ok.setTex(Tr.in(in, "Reached the previous position to the beginning of the tokens list. "));
+                        return null;
                     }
-                    if (i >= tam) {
+                    basic_token = tokens_list.get(i);
+                }
+            }
+            while (true) {
+                if (rule_node == null) {
+                    if (analizer_from_start_rule != null) {
+                        backtrack_pos = ok.valid(analizer_from_start_rule).analize(basic_token, ok, extras_array);
+                        if (ok.is == false) break;
+                        retorno = true;
+                    } else {
                         break;
                     }
+                } else {
+                    rule = ok.valid(rule_node);
+                    is = ok.valid(tokens_validator).validate_token(basic_token, ok, extras_array);
+                    if (ok.is == false) break;
+                    if (is == false) {
+                        continue;
+                    }
+                    retorno = rule.evaluate(basic_token, ok, extras_array);
+                    if (ok.is == false) break;
+                    backtrack_pos = rule.defined_analizer_rules.backtrack_pos;
+                }
+                if (Oks.equals(ok.id, k_need_token_backtrack)) {
+                    ok.init();
+                    if (backtrack_pos == null) {
+                        ok.setTex(Tr.in(in, "Needed backtrack not defined. "));
+                        return null;
+                    }
+                    i = backtrack_pos;
+                    if (i < 0) {
+                        ok.setTex(Tr.in(in, "Reached the previous position to the beginning of the tokens list. "));
+                        return null;
+                    }
+                    basic_token = tokens_list.get(i);
+                } else if (Oks.equals(ok.id, k_need_token_last)) {
+                    ok.init();
+                } else {
+                    i = i + 1;
+                }
+                if (i >= tam) {
+                    break;
                 }
             }
         } catch (Exception e) {
             ok.setTex(e);
         }
+        return retorno;
     }
 }

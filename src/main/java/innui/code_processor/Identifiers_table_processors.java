@@ -13,11 +13,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.File;
 import java.util.ResourceBundle;
 
-import static innui.code_processor.Analizer_rules.k_is_bad_way;
-import static innui.code_processor.Analizer_rules.k_is_reevaluate_token;
-import static innui.code_processor.Code_scanners.k_need_backtrack;
-import static innui.code_processor.Code_scanners.k_need_once;
-
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Identifiers_table_processors extends Bases {
     // Properties file for translactions
@@ -68,13 +63,13 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return;
         try {
             this.identifiers_table_rule = identifiers_table_rule;
-            this.identifiers_table_rule.analizer_rules.code_scanner.validator
+            this.identifiers_table_rule.analizer_rules.code_scanner.tokens_validator
                     = (_token, _ok, _extras_array) -> {
                 return validate_token(_token, _ok, _extras_array);
             };
-            this.identifiers_table_rule.analizer_rules.code_scanner.analizer
+            this.identifiers_table_rule.analizer_rules.code_scanner.analizer_from_start_rule
              = (_token, _ok, _extras_array) -> {
-                return analize_token(_token, _ok, _extras_array);
+                return analize_tokens_from_start_rule(_token, _ok, _extras_array);
             };
         } catch (Exception e) {
             ok.setTex(e);
@@ -130,32 +125,24 @@ public class Identifiers_table_processors extends Bases {
 
     /**
      * Analizes tokens
-     * @param token
+     * @param basic_token
      * @param ok
      * @param extras_array
      * @return true if success, false if fails, null if not finished or there is na error.
      * @throws Exception
      */
-    public @Nullable Integer analize_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception {
+    public @Nullable Integer analize_tokens_from_start_rule(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         Integer retorno = null;
         try {
             boolean is;
-            is = validate_token(token, ok, extras_array);
+            is = validate_token(basic_token, ok, extras_array);
             if (ok.is == false) return null;
             if (is == false) {
                 return null;
             }
-            retorno = identifiers_table_rule.process_rules(token, ok, extras_array);
-            if (ok.is == false) return null;
-            if (Oks.equals(ok.id, k_is_bad_way)) {
-                ok.init();
-                ok.id = k_need_backtrack;
-            } else if (Oks.equals(ok.id, k_is_reevaluate_token)) {
-                ok.init();
-                ok.id = k_need_once;
-            }
+            retorno = identifiers_table_rule.start_rule_processing(basic_token, ok, extras_array);
         } catch (Exception e) {
             ok.setTex(e);
             return null;

@@ -3,6 +3,7 @@ package innui.code_processor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.Bases;
 import innui.modelos.errors.Oks;
+import innui.modelos.tests.Test_methods;
 import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -42,12 +43,27 @@ public abstract class Identifiers_table_rules extends Bases {
     public abstract void load(Oks ok, Object... extras_array) throws Exception;
 
     /**
+     *
      * @param basic_token
      * @param ok
      * @param extras_array
-     * @return The backtrack position (null if no need to backtrack), or null if there is an error without backtrack info
+     * @return
      * @throws Exception
      */
-    public abstract @Nullable Integer process_rules(Scanner_rules.Basic_tokens basic_token, Oks ok, Object... extras_array) throws Exception;
+    public @Nullable Integer start_rule_processing(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        Integer retorno = null;
+        try {
+            ok.valid(analizer_rules.start_rule_node).evaluate(basic_token, ok, extras_array);
+            if (ok.is == false) return null;
+            retorno = analizer_rules.backtrack_pos;
+            analizer_rules.backtrack_pos = null;
+        } catch (Exception e) {
+            ok.setTex(e);
+            return null;
+        }
+        return retorno;
+    }
 
 }
