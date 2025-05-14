@@ -38,8 +38,8 @@ public class Code_scanners extends Bases {
         }
         Code_scanners.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
-    public static @Fenum("error_id") String k_need_token_backtrack = Oks.no_fenum_cast("need_backtrack");
-    public static @Fenum("error_id") String k_need_token_last = Oks.no_fenum_cast("need_once");
+    public static @Fenum("error_id") String k_need_token_backtrack = Oks.no_fenum_cast("need_token_backtrack");
+    public static @Fenum("error_id") String k_need_token_last = Oks.no_fenum_cast("need_token_last");
 
     public Code_scanners() throws Exception {
     }
@@ -236,6 +236,11 @@ public class Code_scanners extends Bases {
                 }
             }
             while (true) {
+                is = ok.valid(tokens_validator).validate_token(basic_token, ok, extras_array);
+                if (ok.is == false) break;
+                if (is == false) {
+                    continue;
+                }
                 if (rule_node == null) {
                     if (analizer_from_start_rule != null) {
                         backtrack_pos = ok.valid(analizer_from_start_rule).analize(basic_token, ok, extras_array);
@@ -246,11 +251,6 @@ public class Code_scanners extends Bases {
                     }
                 } else {
                     rule = ok.valid(rule_node);
-                    is = ok.valid(tokens_validator).validate_token(basic_token, ok, extras_array);
-                    if (ok.is == false) break;
-                    if (is == false) {
-                        continue;
-                    }
                     retorno = rule.evaluate(basic_token, ok, extras_array);
                     if (ok.is == false) break;
                     backtrack_pos = rule.defined_analizer_rules.backtrack_pos;

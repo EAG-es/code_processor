@@ -100,6 +100,28 @@ public class Identifiers_tables extends Bases {
             ok.setTex(e);
         }
     }
+
+    /**
+     *
+     * @param braces_num
+     * @param ok
+     * @param extras_array
+     * @return true if the condition to deleto top table are asserted
+     * @throws Exception
+     */
+    public boolean be_to_delete_top_table(Integer braces_num, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return false;
+        try {
+            if (braces_num.equals(_identifiers_maps_list.getFirst().braces_num)) {
+                return true;
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return false;
+    }
+
     /**
      *
      * @param ok
@@ -126,7 +148,18 @@ public class Identifiers_tables extends Bases {
      * @return
      * @throws Exception
      */
-    public void get_current_up(Oks ok, Object ... extras_array) throws Exception {
+    public LinkedHashMap<String, Identifiers_tables.Identifiers> get_top(Oks ok, Object ... extras_array) throws Exception {
+        return this._identifiers_maps_list.getFirst().current_identifiers_map;
+    }
+
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    public void set_current_up(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         ResourceBundle in = null;
@@ -150,7 +183,7 @@ public class Identifiers_tables extends Bases {
      * @return
      * @throws Exception
      */
-    public void get_current_down(Oks ok, Object ... extras_array) throws Exception {
+    public void set_current_down(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         ResourceBundle in = null;

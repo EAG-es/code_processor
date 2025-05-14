@@ -136,12 +136,6 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return null;
         Integer retorno = null;
         try {
-            boolean is;
-            is = validate_token(basic_token, ok, extras_array);
-            if (ok.is == false) return null;
-            if (is == false) {
-                return null;
-            }
             retorno = identifiers_table_rule.start_rule_processing(basic_token, ok, extras_array);
         } catch (Exception e) {
             ok.setTex(e);

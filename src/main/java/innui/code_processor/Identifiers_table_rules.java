@@ -8,6 +8,9 @@ import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public abstract class Identifiers_table_rules extends Bases {
@@ -34,6 +37,7 @@ public abstract class Identifiers_table_rules extends Bases {
     public Analizer_rules analizer_rules;
     public Identifiers_tables identifiers_table;
     public Integer braces_num = 0;
+    public List<Identifiers_tables.Identifiers> all_identifiers_list = new ArrayList<>();
 
     public Identifiers_table_rules(Code_scanners code_scanner) throws Exception {
         analizer_rules = new Analizer_rules(code_scanner);
