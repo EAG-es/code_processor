@@ -63,14 +63,14 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return;
         try {
             this.identifiers_table_rule = identifiers_table_rule;
-            this.identifiers_table_rule.analizer_rules.code_scanner.tokens_validator
-                    = (_token, _ok, _extras_array) -> {
+            this.identifiers_table_rule.analizer_rules.i_code_scanner.set_tokens_validator(
+                    (_token, _ok, _extras_array) -> {
                 return validate_token(_token, _ok, _extras_array);
-            };
-            this.identifiers_table_rule.analizer_rules.code_scanner.analizer_from_start_rule
-             = (_token, _ok, _extras_array) -> {
-                return analize_tokens_from_start_rule(_token, _ok, _extras_array);
-            };
+            }, ok, extras_array);
+            this.identifiers_table_rule.analizer_rules.i_code_scanner.set_tokens_analizer(
+                    (_token, _ok, _extras_array) -> {
+                        analize_token(_token, _ok, _extras_array);
+                    }, ok, extras_array);
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -106,7 +106,7 @@ public class Identifiers_table_processors extends Bases {
      * @param token
      * @param ok
      * @param extras_array
-     * @return true if the tokes is valid for the analisys
+     * @return true if the tokes is valid for the analysis
      * @throws Exception
      */
     public boolean validate_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception {
@@ -124,24 +124,25 @@ public class Identifiers_table_processors extends Bases {
     }
 
     /**
-     * Analizes tokens
-     * @param basic_token
+     *
+     * @param token
      * @param ok
      * @param extras_array
-     * @return true if success, false if fails, null if not finished or there is na error.
      * @throws Exception
      */
-    public @Nullable Integer analize_tokens_from_start_rule(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+    public void analize_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return null;
-        Integer retorno = null;
+        if (ok.is == false) return;
+        boolean retorno = false;
         try {
-            retorno = identifiers_table_rule.start_rule_processing(basic_token, ok, extras_array);
+            Analizer_rules.Rule_nodes rule_node = ok.valid(get_start_rule(ok, extras_array));
+            if (ok.is == false) return;
+            rule_node.evaluate(token, ok, extras_array);
+            if (ok.is == false) return;
         } catch (Exception e) {
             ok.setTex(e);
-            return null;
         }
-        return retorno;
+        return;
     }
 
     /**
@@ -154,9 +155,28 @@ public class Identifiers_table_processors extends Bases {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            identifiers_table_rule.analizer_rules.code_scanner.start_scanner(ok , extras_array);
+            identifiers_table_rule.analizer_rules.i_code_scanner.start_scanner(ok , extras_array);
         } catch (Exception e) {
             ok.setTex(e);
+        }
+    }
+
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    public Analizer_rules.@Nullable Rule_nodes get_start_rule(Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        Integer retorno = null;
+        try {
+            return identifiers_table_rule.get_start_rule(ok, extras_array);
+        } catch (Exception e) {
+            ok.setTex(e);
+            return null;
         }
     }
 

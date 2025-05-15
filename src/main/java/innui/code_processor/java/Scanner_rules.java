@@ -79,7 +79,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         , assignment_xor, assignment_not, assignment_and, assignment_or
         , assignment_bitwise_left, assignment_bitwise_right
         , assignment_plus, assignment_minus, assignment_multiply, assignment_divided, assignment_module
-        , compare_less, compare_less_equal, compare_bigger, compare_bigger_equal
+        , sign_less, compare_less_equal, sign_bigger, compare_bigger_equal
         , equal, not_equal
         , identifier, anotation
     }
@@ -113,7 +113,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
             if (character == '\n') {
                 line_num = line_num + 1;
-                col_num = 1;
+                col_num = 0;
             }
             switch (state) {
                 case initial -> {
@@ -170,13 +170,18 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             ok.setTex(e);
         }
         col_num = col_num + 1;
-        if (ok.is == false) {
-            if (Oks.equals(ok.id, k_end_of_toker_out)) {
-                col_num = col_num - 1;
-            }
+        if (Oks.equals(ok.id, k_end_of_toker_out)) {
+            col_num = col_num - 1;
         }
     }
 
+    /**
+     *
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
     public void init_token(Integer pos, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
@@ -189,6 +194,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             ok.setTex(e);
         }
     }
+
     /**
      *
      * @param character
@@ -1006,9 +1012,9 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             } else {
                 if (character != '<' && character != '>') {
                     if (token.token_tex.equals(">")) {
-                        token.token_type = Token_types.compare_bigger.name();
+                        token.token_type = Token_types.sign_bigger.name();
                     } else if (token.token_tex.equals("<")) {
-                        token.token_type = Token_types.compare_less.name();
+                        token.token_type = Token_types.sign_less.name();
                     }
                     token.end_pos = pos - 1;
                     state = States.initial;

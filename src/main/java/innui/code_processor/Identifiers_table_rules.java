@@ -48,26 +48,21 @@ public abstract class Identifiers_table_rules extends Bases {
 
     /**
      *
-     * @param basic_token
      * @param ok
      * @param extras_array
      * @return
      * @throws Exception
      */
-    public @Nullable Integer start_rule_processing(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+    public Analizer_rules.@Nullable Rule_nodes get_start_rule(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         Integer retorno = null;
         try {
-            ok.valid(analizer_rules.start_rule_node).evaluate(basic_token, ok, extras_array);
-            if (ok.is == false) return null;
-            retorno = analizer_rules.backtrack_pos;
-            analizer_rules.backtrack_pos = null;
+            return ok.valid(analizer_rules.start_rule_node);
         } catch (Exception e) {
             ok.setTex(e);
             return null;
         }
-        return retorno;
     }
 
 }

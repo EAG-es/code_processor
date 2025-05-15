@@ -49,6 +49,72 @@ public class Identifiers_tables extends Bases {
         public ArrayList<Identifiers> parameters_list = new ArrayList<>();
         public @Nullable Identifiers declaration_scope_identifier = null;
 
+        @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
+        @SuppressWarnings("nullness:method.invocation")
+        public Identifiers() throws Exception {
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(ok);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.getTex());
+            }
+        }
+
+        @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
+        @SuppressWarnings("nullness:method.invocation")
+        public Identifiers(Identifiers identifier) throws Exception {
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(identifier, ok);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.getTex());
+            }
+        }
+
+        public void init(Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return;
+            try {
+                name = "";
+                type = "";
+                namespace = "";
+                properties_list.clear();
+                parameters_list.clear();
+                declaration_scope_identifier = null;
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+        }
+
+        /**
+         *
+         * @param identifier
+         * @param ok
+         * @param extras_array
+         * @throws Exception
+         */
+        public void init(Identifiers identifier, Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return;
+            try {
+                name = identifier.name;
+                type = identifier.type;
+                namespace = identifier.namespace;
+                properties_list.clear();
+                properties_list.addAll(identifier.properties_list);
+                parameters_list.clear();
+                parameters_list.addAll(identifier.parameters_list);
+                declaration_scope_identifier = null;
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+        }
     }
 
     public static class Temporary_identifiers_tables implements Serializable {
@@ -57,7 +123,7 @@ public class Identifiers_tables extends Bases {
         public LinkedHashMap<String, Identifiers> current_identifiers_map = new LinkedHashMap<>();
     }
     public LinkedList<Temporary_identifiers_tables> _identifiers_maps_list = new LinkedList<>();
-    public Identifiers new_identifier = Oks.allow_nulle(null);
+    public Identifiers new_identifier = new Identifiers();
     public @Nullable Temporary_identifiers_tables current_temporary_identifiers_table = null;
     public int _current_temporary_identifiers_table_pos = 0;
 
@@ -203,17 +269,19 @@ public class Identifiers_tables extends Bases {
 
     /**
      *
-     * @param identifier
      * @param ok
      * @param extras_array
      * @return
      * @throws Exception
      */
-    public void put_identifier(Identifiers identifier, Oks ok, Object ... extras_array) throws Exception {
+    public void put_identifier(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            ok.valid(current_temporary_identifiers_table).current_identifiers_map.put(identifier.name, identifier);
+            Identifiers identifiers = new Identifiers(new_identifier);
+            ok.valid(current_temporary_identifiers_table).current_identifiers_map.put(identifiers.name, identifiers);
+            new_identifier.init(ok, extras_array);
+            if (ok.is == false) return;
         } catch (Exception e) {
             ok.setTex(e);
         }
