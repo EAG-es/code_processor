@@ -45,7 +45,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
     public @Nullable Analyzer tokens_analizer = null;
     public @Nullable String code_tex = null;
     public Integer _pos = 0;
-    public Integer _tokens_list_pos = -1;
+    public Integer _tokens_list_pos = 0;
     public Scanner_rules scanner_rules = new innui.code_processor.java.Scanner_rules();
     public List<Scanner_rules.Tokens> _tokens_list = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
                 ok.setTex(Tr.in(k_in_route, "New token position is below of the token list aize. "));
                 return -1;
             }
-            return _tokens_list_pos;
+            return _tokens_list_pos - 1;
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -84,12 +84,12 @@ public class Code_scanners extends Bases implements I_code_scanners{
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            if (tokens_list_pos >= _tokens_list.size()) {
-                ok.setTex(Tr.in(k_in_route, "New token position is over of the token list aize. "));
+            if (tokens_list_pos > _tokens_list.size()) {
+                ok.setTex(Tr.in(k_in_route, "New token position is over of the token list size. "));
                 return;
             }
             if (tokens_list_pos < 0) {
-                ok.setTex(Tr.in(k_in_route, "New token position is below of the token list aize. "));
+                ok.setTex(Tr.in(k_in_route, "New token position is below of the token list size. "));
                 return;
             }
             this._tokens_list_pos = tokens_list_pos;
@@ -170,12 +170,12 @@ public class Code_scanners extends Bases implements I_code_scanners{
             boolean is;
             int tam = _tokens_list.size();
             while (true) {
-                _tokens_list_pos = _tokens_list_pos + 1;
                 if (_tokens_list_pos >= tam) {
                     retorno = ok.valid(_scan_resume(true, ok, extras_array));
                     if (ok.is == false) return null;
                 } else {
                     retorno = _tokens_list.get(_tokens_list_pos);
+                    _tokens_list_pos = _tokens_list_pos + 1;
                 }
                 is = ok.valid(tokens_validator).validate_token(retorno, ok, extras_array);
                 if (ok.is == false) break;
@@ -215,7 +215,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
                 if (_pos >= tam) {
                     break;
                 }
-                letra = ok.valid(code_tex).charAt(_pos);
+                letra = noted_ok.valid(code_tex).charAt(_pos);
                 scanner_rules.process_character(letra, _pos, noted_ok, extras_array);
                 if (Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_out)
                   || Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_in)) {
@@ -224,8 +224,8 @@ public class Code_scanners extends Bases implements I_code_scanners{
                         _pos = _pos + 1;
                     }
                     noted_ok.init();
-                    _tokens_list_pos = _tokens_list.size();
                     _tokens_list.add(scanner_rules.token);
+                    _tokens_list_pos = _tokens_list.size();
                     if (is_just_read == false) {
                         analize_token_with_token_analizer(scanner_rules.token, noted_ok, extras_array);
                         if (noted_ok.is == false) {
@@ -273,15 +273,15 @@ public class Code_scanners extends Bases implements I_code_scanners{
             while (true) {
                 is = ok.valid(tokens_validator).validate_token(basic_token, ok, extras_array);
                 if (ok.is == false) break;
-                if (is == false) {
-                    continue;
+                if (is) {
+                    ok.valid(tokens_analizer).analyze_token(basic_token, ok, extras_array);
+                    if (ok.is == false) break;
                 }
-                ok.valid(tokens_analizer).analyze_token(basic_token, ok, extras_array);
-                if (ok.is == false) break;
-                _tokens_list_pos = _tokens_list_pos + 1;
                 if (_tokens_list_pos >= tam) {
                     break;
                 }
+                basic_token =  _tokens_list.get(_tokens_list_pos);
+                _tokens_list_pos = _tokens_list_pos + 1;
             }
         } catch (Exception e) {
             ok.setTex(e);

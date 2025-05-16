@@ -147,7 +147,6 @@ public class Analizer_rules extends Bases {
                     if (ok.is == false) return;
                 }
                 _is_once_successed = null;
-                _first_token_pos = null;
                 init_to_repeat(ok, extras_array);
                 if (ok.is == false) return;
             } catch (Exception e) {
@@ -168,6 +167,7 @@ public class Analizer_rules extends Bases {
             if (ok.is == false) return;
             ResourceBundle in = null;
             try {
+                _first_token_pos = null;
                 _is_already_evaluated = false;
                 if (defined_rule_success != null) {
                     defined_rule_success.first_token_pos = -1;
@@ -235,25 +235,27 @@ public class Analizer_rules extends Bases {
                 } else if (_is_once_successed) {
                     pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                     if (ok.is == false) return null;
-                    pos = pos - 1;
+                    // pos = pos - 1;
                     defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return null;
                     return true;
                 } else {
                     pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                     if (ok.is == false) return null;
-                    pos = pos - 1;
+                    // pos = pos - 1;
                     defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return null;
                     return false;
                 }
             }
             try {
-                if (_first_token_pos == null) {
-                    _first_token_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
-                    if (ok.is == false) return null;
-                }
+                Integer last_first_token_pos;
                 do {
+                    if (_first_token_pos == null) {
+                        _first_token_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
+                        if (ok.is == false) return null;
+                    }
+                    last_first_token_pos = _first_token_pos;
                     retorno = null;
                     result = _evaluate(basic_token, ok, extras_array);
                     if (ok.is == false) return null;
@@ -264,11 +266,11 @@ public class Analizer_rules extends Bases {
                         if (ok.is == false) return null;
                     }
                 } while (result == Return_status.need_next_token);
-                if (result.equals(Return_status.error)) {
+                if (result == Return_status.error) {
                     retorno = null;
                 } else if (result.equals(Return_status.matched)) {
                     if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                        defined_analizer_rules.process(ok.valid(_first_token_pos), ok, extras_array);
+                        defined_analizer_rules.process(ok.valid(last_first_token_pos), ok, extras_array);
                         if (ok.is == false) return null;
                     }
                     retorno = true;
@@ -298,46 +300,40 @@ public class Analizer_rules extends Bases {
             Integer pos;
             try {
                 if (return_status == Return_status.error) {
-                    _is_already_evaluated = true;
-                    _is_once_successed = false;
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
-                    if (ok.is == false) return Return_status.error;
                     return Return_status.error;
                 } else if (return_status == Return_status.not_matched) {
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
                         return Return_status.need_next_token;
                     }
-                    if (defined_repeat_mode != Repeat_mode.no_repeat) {
+                    if (defined_repeat_mode == Repeat_mode.repeat_while_success) {
                         if (_is_once_successed != null && _is_once_successed == true) {
                             _is_already_evaluated = true;
-                            _is_once_successed = false;
-                            pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
-                            if (ok.is == false) return Return_status.error;
-                            pos = pos - 1;
+                            _is_once_successed = true;
+                            pos = ok.valid(_first_token_pos);
                             defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                             if (ok.is == false) return Return_status.error;
                             return Return_status.matched;
-                        } else {
-                            _is_once_successed = false;
-                            if (defined_optional_mode == Optional_mode.no_optional) {
-                                _is_already_evaluated = true;
-                                _is_once_successed = false;
-                                defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
-                                if (ok.is == false) return Return_status.error;
-                                return Return_status.not_matched;
-                            }
+//                        } else {
+//                            _is_already_evaluated = true;
+//                            _is_once_successed = false;
+//                            pos = ok.valid(_first_token_pos);
+//                            defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+//                            if (ok.is == false) return Return_status.error;
+//                            return Return_status.not_matched;
                         }
                     }
                     if (defined_optional_mode == Optional_mode.optional) {
                         _is_already_evaluated = true;
                         _is_once_successed = true; // matched option: empty
-                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
+                        pos = ok.valid(_first_token_pos);
+                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                         return Return_status.matched;
                     }
                     _is_already_evaluated = true;
                     _is_once_successed = false;
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
+                    pos = ok.valid(_first_token_pos);
+                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return Return_status.error;
                     return Return_status.not_matched;
                 } else if (return_status == Return_status.matched) {
@@ -349,9 +345,10 @@ public class Analizer_rules extends Bases {
                     }
                     _is_already_evaluated = true;
                     _is_once_successed = true;
-                    if (defined_repeat_mode != Repeat_mode.no_repeat) {
+                    if (defined_repeat_mode == Repeat_mode.repeat_while_success) {
                         init_to_repeat(ok, extras_array);
                         if (ok.is == false) return Return_status.error;
+                        return Return_status.need_next_token;
                     }
                     return Return_status.matched;
                 }
@@ -399,7 +396,7 @@ public class Analizer_rules extends Bases {
                 super.init(analizer_rules, ok, extras_array);
                 if (ok.is == false) return;
                 defined_rule_nodes_and_list = new ArrayList<>();
-                _defined_rule_part_tam = 0;
+                _defined_rule_part_tam = -1;
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -533,10 +530,6 @@ public class Analizer_rules extends Bases {
             Integer pos;
             try {
                 if (return_status == Return_status.error) {
-                    _is_already_evaluated = true;
-                    _is_once_successed = false;
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
-                    if (ok.is == false) return Return_status.error;
                     return return_status;
                 } else if (return_status == Return_status.not_matched) {
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
@@ -548,22 +541,28 @@ public class Analizer_rules extends Bases {
                     }
                     if (defined_optional_mode  == Optional_mode.optional) {
                         _is_already_evaluated = true;
-                        _is_once_successed = true;
-                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
+                        _is_once_successed = true; // empty match
+                        pos = ok.valid(_first_token_pos);
+                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                         return Return_status.matched;
                     }
                     if (defined_repeat_mode == Repeat_mode.repeat_while_success) {
-                        if (_is_once_successed == null) {
-                            ok.setTex(Tr.in(k_in_route, "Not matched rule without success information"));
-                            return Return_status.error;
-                        } else if (_is_once_successed == true) {
+                        if (_is_once_successed == null || _is_once_successed == false) {
+                            _is_already_evaluated = true;
+                            _is_once_successed = false;
+                            pos = ok.valid(_first_token_pos);
+                            defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                            if (ok.is == false) return Return_status.error;
+                            return Return_status.not_matched;
+                        } else {
                             if (_rule_part_num < _defined_rule_part_tam) {
                                 _rule_part_num = _rule_part_num + 1;
                                 if (_rule_part_num < _defined_rule_part_tam) {
                                     _is_already_evaluated = true;
                                     _is_once_successed = false;
-                                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
+                                    pos = ok.valid(_first_token_pos);
+                                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                                     if (ok.is == false) return Return_status.error;
                                     return Return_status.not_matched;
                                 } else { // ending
@@ -571,32 +570,21 @@ public class Analizer_rules extends Bases {
                                     _is_once_successed = true;
                                     pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                                     if (ok.is == false) return Return_status.error;
-                                    pos = pos - 1;
+                                    // pos = pos - 1;
                                     defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                                     if (ok.is == false) return Return_status.error;
                                     return Return_status.matched;
                                 }
                             } else { // ending
-                                _is_already_evaluated = true;
-                                _is_once_successed = true;
-                                pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
-                                if (ok.is == false) return Return_status.error;
-                                pos = pos - 1;
-                                defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
-                                if (ok.is == false) return Return_status.error;
-                                return Return_status.matched;
+                                ok.setTex(Tr.in(k_in_route, "End of token list exceeded. " ));
+                                return Return_status.error;
                             }
-                        } else {
-                            _is_already_evaluated = true;
-                            _is_once_successed = false;
-                            defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
-                            if (ok.is == false) return Return_status.error;
-                            return Return_status.not_matched;
                         }
                     }
                     _is_already_evaluated = true;
                     _is_once_successed = false;
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(ok.valid(_first_token_pos), ok, extras_array);
+                    pos = ok.valid(_first_token_pos) ;
+                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return Return_status.error;
                     return Return_status.not_matched;
                 } else if (return_status == Return_status.matched) {
@@ -618,20 +606,15 @@ public class Analizer_rules extends Bases {
                             }
                             _is_already_evaluated = true;
                             _is_once_successed = true;
-                            if (defined_repeat_mode != Repeat_mode.no_repeat) {
+                            if (defined_repeat_mode == Repeat_mode.repeat_while_success) {
                                 init_to_repeat(ok, extras_array);
                                 if (ok.is == false) return Return_status.error;
                             }
                             return Return_status.matched;
                         }
                     } else {
-                        _is_already_evaluated = true;
-                        _is_once_successed = true;
-                        if (defined_repeat_mode != Repeat_mode.no_repeat) {
-                            init_to_repeat(ok, extras_array);
-                            if (ok.is == false) return Return_status.error;
-                        }
-                        return Return_status.matched;
+                        ok.setTex(Tr.in(k_in_route, "End of token list exceeded. " ));
+                        return Return_status.error;
                     }
                 }
             } catch (Exception e) {
@@ -771,11 +754,10 @@ public class Analizer_rules extends Bases {
                         ok.valid(defined_rule_success).tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
                     }
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
-                        _first_token_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
-                        if (ok.is == false) return Return_status.error;
                         pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
+                        _first_token_pos = pos;
                         if (ok.is == false) return Return_status.error;
-                        pos = pos - 1;
+                        // pos = pos - 1;
                         defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                     }
@@ -840,7 +822,6 @@ public class Analizer_rules extends Bases {
             try {
                 super.init(analizer_rules, ok, extras_array);
                 if (ok.is == false) return;
-                defined_rule_nodes_or_list = new ArrayList<>();
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -855,9 +836,11 @@ public class Analizer_rules extends Bases {
             try {
                 super.init_to_reuse(ok, extras_array);
                 if (ok.is == false) return;
-                for (var node : defined_rule_nodes_or_list) {
-                    node.init_to_reuse(ok);
-                    if (ok.is == false) return;
+                if (defined_rule_nodes_or_list != null) {
+                    for (var node : defined_rule_nodes_or_list) {
+                        node.init_to_reuse(ok);
+                        if (ok.is == false) return;
+                    }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -878,9 +861,11 @@ public class Analizer_rules extends Bases {
             try {
                 super.init_to_repeat(ok, extras_array);
                 if (ok.is == false) return;
-                for (var node : defined_rule_nodes_or_list) {
-                    node.init_to_repeat(ok);
-                    if (ok.is == false) return;
+                if (defined_rule_nodes_or_list != null) {
+                    for (var node : defined_rule_nodes_or_list) {
+                        node.init_to_repeat(ok);
+                        if (ok.is == false) return;
+                    }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -925,35 +910,36 @@ public class Analizer_rules extends Bases {
             if (ok.is == false) return Return_status.error;
             try {
                 Boolean result = null;
-                Integer initial_pos = null;
                 if (defined_rule_nodes_or_list.isEmpty()) {
                     ok.setTex(Tr.in(k_in_route, "No rules defined. "));
                     return Return_status.error;
                 }
-                if (defined_optional_mode == Optional_mode.ignore_until_matches) {
-                    initial_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
-                    if (ok.is == false) return Return_status.error;
-                }
                 for (var basic_rule_node : defined_rule_nodes_or_list) {
                     result = basic_rule_node.evaluate(basic_token, ok, extras_array);
                     if (ok.is == false) return Return_status.error;
-                    if (result == null || result == true) {
+                    if (result == null) {
+                        break;
+                    } else if (result == true) {
+                        if (defined_optional_mode == Optional_mode.ignore_until_matches) {
+                            _first_token_pos = basic_rule_node._first_token_pos;
+                        }
                         break;
                     }
                 }
                 if (result == null) {
                     return Return_status.need_next_token;
-                } else if (defined_optional_mode == Optional_mode.ignore_until_matches) {
-                    if (result == true) {
-                        _first_token_pos = initial_pos;
+                } else if (result == false) {
+                    if (defined_optional_mode == Optional_mode.ignore_until_matches) {
+                        return Return_status.need_next_token;
                     }
-                    return Return_status.need_next_token;
+                    return Return_status.not_matched;
+                } else {
+                    if (defined_rule_success != null) {
+                        defined_rule_success.first_token_pos = ok.valid(_first_token_pos);
+                        ok.valid(defined_rule_success).tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
+                    }
+                    return Return_status.matched;
                 }
-                if (defined_rule_success != null) {
-                    defined_rule_success.first_token_pos = ok.valid(_first_token_pos);
-                    ok.valid(defined_rule_success).tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
-                }
-                return Return_status.matched;
             } catch (Exception e) {
                 ok.setTex(e);
                 return Return_status.error;
