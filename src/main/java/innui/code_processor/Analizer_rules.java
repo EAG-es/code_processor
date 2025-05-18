@@ -126,7 +126,7 @@ public class Analizer_rules extends Bases {
                 defined_repeat_mode = Repeat_mode.no_repeat;
                 defined_is_to_process_the_success_rules_list_if_success = false;
                 defined_rule_success = null;
-                init_to_reuse(ok, extras_array);
+                init_to_reuse_or_repeat(true, ok, extras_array);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -137,36 +137,18 @@ public class Analizer_rules extends Bases {
          * @return
          * @throws Exception
          */
-        public void init_to_reuse(Oks ok, Object... extras_array) throws Exception {
+        public void init_to_reuse_or_repeat(boolean is_reuse, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             ResourceBundle in = null;
             try {
-                if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                    defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
-                    if (ok.is == false) return;
+                if (is_reuse) {
+                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
+                        defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
+                        if (ok.is == false) return;
+                    }
+                    _is_once_successed = null;
                 }
-                _is_once_successed = null;
-                init_to_repeat(ok, extras_array);
-                if (ok.is == false) return;
-            } catch (Exception e) {
-                ok.setTex(e);
-            }
-        }
-
-        /**
-         * Allows a repetition in same initial conditions
-         *
-         * @param ok
-         * @param extras_array
-         * @return
-         * @throws Exception
-         */
-        public void init_to_repeat(Oks ok, Object... extras_array) throws Exception {
-            new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return;
-            ResourceBundle in = null;
-            try {
                 _first_token_pos = null;
                 _is_already_evaluated = false;
                 if (defined_rule_success != null) {
@@ -176,7 +158,6 @@ public class Analizer_rules extends Bases {
             } catch (Exception e) {
                 ok.setTex(e);
             }
-            return;
         }
 
         /**
@@ -249,13 +230,13 @@ public class Analizer_rules extends Bases {
                 }
             }
             try {
-                Integer last_first_token_pos;
+                Integer last_first_token_pos = null;
                 do {
                     if (_first_token_pos == null) {
                         _first_token_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                         if (ok.is == false) return null;
+                        last_first_token_pos = _first_token_pos;
                     }
-                    last_first_token_pos = _first_token_pos;
                     retorno = null;
                     result = _evaluate(basic_token, ok, extras_array);
                     if (ok.is == false) return null;
@@ -346,7 +327,7 @@ public class Analizer_rules extends Bases {
                     _is_already_evaluated = true;
                     _is_once_successed = true;
                     if (defined_repeat_mode == Repeat_mode.repeat_while_success) {
-                        init_to_repeat(ok, extras_array);
+                        init_to_reuse_or_repeat(false, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                         return Return_status.need_next_token;
                     }
@@ -408,47 +389,20 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
-        public void init_to_reuse(Oks ok, Object... extras_array) throws Exception {
+        public void init_to_reuse_or_repeat(boolean is_reuse, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             ResourceBundle in = null;
             try {
-                super.init_to_reuse(ok, extras_array);
+                super.init_to_reuse_or_repeat(is_reuse, ok, extras_array);
                 if (ok.is == false) return;
-                _defined_rule_part_tam = -1;
                 if (defined_rule_nodes_and_list != null) {
                     for (var node : defined_rule_nodes_and_list) {
-                        node.init_to_reuse(ok, extras_array);
+                        node.init_to_reuse_or_repeat(is_reuse, ok, extras_array);
                         if (ok.is == false) return;
                     }
                 }
-            } catch (Exception e) {
-                ok.setTex(e);
-            }
-        }
-
-        /**
-         * Allows a repetition in same initial conditions
-         *
-         * @param ok
-         * @param extras_array
-         * @return
-         * @throws Exception
-         */
-        public void init_to_repeat(Oks ok, Object... extras_array) throws Exception {
-            new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return;
-            ResourceBundle in = null;
-            try {
                 _rule_part_num = 0;
-                super.init_to_repeat(ok, extras_array);
-                if (ok.is == false) return;
-                if (defined_rule_nodes_and_list != null) {
-                    for (var node : defined_rule_nodes_and_list) {
-                        node.init_to_repeat(ok, extras_array);
-                        if (ok.is == false) return;
-                    }
-                }
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -535,7 +489,7 @@ public class Analizer_rules extends Bases {
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
                         pos = ok.valid(_first_token_pos) + 1;
                         defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
-                        init_to_reuse(ok, extras_array);
+                        init_to_reuse_or_repeat(true, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                         return Return_status.need_next_token;
                     }
@@ -607,7 +561,7 @@ public class Analizer_rules extends Bases {
                             _is_already_evaluated = true;
                             _is_once_successed = true;
                             if (defined_repeat_mode == Repeat_mode.repeat_while_success) {
-                                init_to_repeat(ok, extras_array);
+                                init_to_reuse_or_repeat(false, ok, extras_array);
                                 if (ok.is == false) return Return_status.error;
                             }
                             return Return_status.matched;
@@ -635,7 +589,7 @@ public class Analizer_rules extends Bases {
             super(analizer_rules);
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init_to_reuse(ok);
+                init_to_reuse_or_repeat(true, ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -671,40 +625,6 @@ public class Analizer_rules extends Bases {
             } catch (Exception e) {
                 ok.setTex(e);
             }
-        }
-
-        @Override
-        public void init_to_reuse(Oks ok, Object ... extras_array) throws Exception {
-            new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return;
-            ResourceBundle in = null;
-            try {
-                super.init_to_reuse(ok, extras_array);
-                if (ok.is == false) return;
-            } catch (Exception e) {
-                ok.setTex(e);
-            }
-            return;
-        }
-
-        /**
-         *
-         * @param ok
-         * @param extras_array
-         * @return
-         * @throws Exception
-         */
-        public void init_to_repeat(Oks ok, Object ... extras_array) throws Exception {
-            new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return;
-            ResourceBundle in = null;
-            try {
-                super.init_to_repeat(ok, extras_array);
-                if (ok.is == false) return;
-            } catch (Exception e) {
-                ok.setTex(e);
-            }
-            return;
         }
 
         /**
@@ -829,48 +749,22 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("UR_UNINIT_READ_CALLED_FROM_SUPER_CONSTRUCTOR")
         @Override
-        public void init_to_reuse(Oks ok, Object... extras_array) throws Exception {
+        public void init_to_reuse_or_repeat(boolean is_reuse, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             ResourceBundle in = null;
             try {
-                super.init_to_reuse(ok, extras_array);
+                super.init_to_reuse_or_repeat(is_reuse, ok, extras_array);
                 if (ok.is == false) return;
                 if (defined_rule_nodes_or_list != null) {
                     for (var node : defined_rule_nodes_or_list) {
-                        node.init_to_reuse(ok);
+                        node.init_to_reuse_or_repeat(is_reuse, ok);
                         if (ok.is == false) return;
                     }
                 }
             } catch (Exception e) {
                 ok.setTex(e);
             }
-            return;
-        }
-
-        /**
-         * @param ok
-         * @param extras_array
-         * @return
-         * @throws Exception
-         */
-        public void init_to_repeat(Oks ok, Object... extras_array) throws Exception {
-            new Test_methods(ok, ok, extras_array, this);
-            if (ok.is == false) return;
-            ResourceBundle in = null;
-            try {
-                super.init_to_repeat(ok, extras_array);
-                if (ok.is == false) return;
-                if (defined_rule_nodes_or_list != null) {
-                    for (var node : defined_rule_nodes_or_list) {
-                        node.init_to_repeat(ok);
-                        if (ok.is == false) return;
-                    }
-                }
-            } catch (Exception e) {
-                ok.setTex(e);
-            }
-            return;
         }
 
         /**

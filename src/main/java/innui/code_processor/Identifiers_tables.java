@@ -46,8 +46,7 @@ public class Identifiers_tables extends Bases {
         public String type = "";
         public String namespace = "";
         public ArrayList<Scanner_rules.Basic_tokens> properties_list = new ArrayList<>();
-        public ArrayList<Identifiers> parameters_list = new ArrayList<>();
-        public @Nullable Identifiers declaration_scope_identifier = null;
+        public String return_class = "";
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
@@ -85,8 +84,7 @@ public class Identifiers_tables extends Bases {
                 type = "";
                 namespace = "";
                 properties_list.clear();
-                parameters_list.clear();
-                declaration_scope_identifier = null;
+                return_class = "";
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -108,9 +106,7 @@ public class Identifiers_tables extends Bases {
                 namespace = identifier.namespace;
                 properties_list.clear();
                 properties_list.addAll(identifier.properties_list);
-                parameters_list.clear();
-                parameters_list.addAll(identifier.parameters_list);
-                declaration_scope_identifier = null;
+                return_class = identifier.return_class;
             } catch (Exception e) {
                 ok.setTex(e);
             }

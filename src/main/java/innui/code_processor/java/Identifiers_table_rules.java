@@ -6,6 +6,7 @@ import innui.code_processor.Code_scanners;
 import innui.code_processor.Identifiers_tables;
 import innui.code_processor.Scanner_rules;
 import innui.modelos.errors.Oks;
+import innui.modelos.internacionalization.Tr;
 import innui.modelos.tests.Test_methods;
 import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -13,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.File;
 import java.util.LinkedHashMap;
 
-import static innui.code_processor.java.Identifiers_table_rules.Types.type_package;
 import static innui.code_processor.java.Scanner_rules.Token_types.*;
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE", "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"})
@@ -37,14 +37,14 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
         Identifiers_table_rules.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
     public enum Types {
-        type_package
-        , type_class
-        , type_interface
-        , type_annotation
-        , type_attribute
-        , type_method
-        , type_parameter
-        , type_identifier
+        token_package
+        , token_class
+        , token_interface
+        , token_enum
+        , token_record
+        , annotation
+        , attribute
+        , method
     }
 
     public Identifiers_table_rules(Code_scanners code_scanner) throws Exception {
@@ -124,7 +124,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             r_package_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
             r_package_rule_node.defined_is_to_process_the_success_rules_list_if_success = true;
             /* t_package */
-            t_package_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_package.name()));
+            t_package_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_package.name()));
             t_package_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
                     (_tokens_list, _ok, _extras_array) -> {
                         identifiers_table.new_identifier.init(ok, extras_array);
@@ -135,7 +135,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
                 (_tokens_list, _ok, _extras_array) -> {
                     identifiers_table.new_identifier.name = _tokens_list.get(0).token_tex;
-                    identifiers_table.new_identifier.type = type_package.name();
+                    identifiers_table.new_identifier.type = Types.token_package.name();
                 }
             );
             /* r_dot_identifier */
@@ -323,10 +323,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_abstract.name()));
             t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_sealed.name()));
             t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_strictfp.name()));
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_class.name()));
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_interface.name()));
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_enum.name()));
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_record.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_class.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_interface.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_enum.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_record.name()));
             t_class_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
             /* t_class_1<optional><repeat>: [public|protected|private|static|abstract|sealed] */
             t_class_1_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_public.name()));
@@ -344,13 +344,24 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     }
             );
             /* t_class_2: [class|interface|enum|record] */
-            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_class.name()));
-            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_interface.name()));
-            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_enum.name()));
-            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_record.name()));
+            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_class.name()));
+            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_interface.name()));
+            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_enum.name()));
+            t_class_2_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_record.name()));
             t_class_2_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
                     (_tokens_list, _ok, _extras_array) -> {
-                        identifiers_table.new_identifier.properties_list.add(_tokens_list.get(0));
+                        String name = _tokens_list.get(0).token_type;
+                        if (Types.token_class.name().equals(name)) {
+                            identifiers_table.new_identifier.type = Types.token_class.name();
+                        } else if (Types.token_interface.name().equals(name)) {
+                            identifiers_table.new_identifier.type = Types.token_interface.name();
+                        } else if (Types.token_enum.name().equals(name)) {
+                            identifiers_table.new_identifier.type = Types.token_enum.name();
+                        } else if (Types.token_record.name().equals(name)) {
+                            identifiers_table.new_identifier.type = Types.token_record.name();
+                        } else {
+                            ok.setTex(Tr.in(k_in_route, "Not recognized type. "));
+                        }
                     }
             );
             /* t_identifier: identifier */
@@ -429,10 +440,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             r_class_rule_node.defined_rule_nodes_and_list.add(t_class_rule_node);
             r_class_rule_node.defined_rule_nodes_and_list.add(t_class_identifier_rule_node);
             /* "t_class: [class|interface|enum|record]" */
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_class.name()));
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_interface.name()));
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_enum.name()));
-            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_record.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_class.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_interface.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_enum.name()));
+            t_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_record.name()));
             /* "t_class_identifier: identifier" */
             t_class_identifier_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(identifier.name()));
             /* "r_method_or_attribute_or_class<repeat>: " +
@@ -443,6 +454,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             r_method_or_attribute_or_class_rule_node.defined_rule_nodes_and_list.add(o_method_or_attribute_or_class_rule_node);
             r_method_or_attribute_or_class_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
             r_method_or_attribute_or_class_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
+            r_method_or_attribute_or_class_rule_node.defined_is_to_process_the_success_rules_list_if_success = true;
             /* "t_method_or_attribute_or_class<ignore>: [public|protected|private" +
                     "|static|volatile|final" +
                     "|identifier|void|boolean|byte|char|short|int|long|float|double" +
@@ -468,10 +480,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(sign_less.name()));
             t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_abstract.name()));
             t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_sealed.name()));
-            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_class.name()));
-            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_interface.name()));
-            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_enum.name()));
-            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_record.name()));
+            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_class.name()));
+            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_interface.name()));
+            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_enum.name()));
+            t_method_or_attribute_or_class_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(innui.code_processor.java.Scanner_rules.Token_types.token_record.name()));
             t_method_or_attribute_or_class_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
             /* t_method_or_attribute_or_class_1<optional><repeat>: " +
                     "[public|protected|private" +
@@ -485,6 +497,11 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             t_method_or_attribute_or_class_1_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_strictfp.name()));
             t_method_or_attribute_or_class_1_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
             t_method_or_attribute_or_class_1_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
+            t_method_or_attribute_or_class_1_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    (_tokens_list, _ok, _extras_array) -> {
+                        identifiers_table.new_identifier.properties_list.add(_tokens_list.get(0));
+                    }
+            );
             /* "o_method_or_attribute_or_class: " +
                     "[r_method_or_attribute" +
                     "|r_class]" */
@@ -520,12 +537,32 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             t_identifier_type_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(type_long.name()));
             t_identifier_type_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(type_float.name()));
             t_identifier_type_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(type_double.name()));
+            t_identifier_type_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    (_tokens_list, _ok, _extras_array) -> {
+                        identifiers_table.new_identifier.return_class = _tokens_list.get(0).token_tex;
+                    }
+            );
             /* "t_identifier: identifier" */
             t_identifier_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(identifier.name()));
+            t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    (_tokens_list, _ok, _extras_array) -> {
+                        identifiers_table.new_identifier.name = _tokens_list.get(0).token_tex;
+                    }
+            );
             /* "t_parenthesis_open_or_semicolon<ignore>: [parenthesis_open|semicolon]" */
             t_parenthesis_open_or_semicolon_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(parenthesis_open.name()));
             t_parenthesis_open_or_semicolon_rule_node.defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(semi_colon.name()));
             t_parenthesis_open_or_semicolon_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
+            t_parenthesis_open_or_semicolon_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    (_tokens_list, _ok, _extras_array) -> {
+                        if (_tokens_list.get(0).token_type.equals(parenthesis_open)) {
+                            identifiers_table.new_identifier.type = Types.method.name();
+                        } else {
+                            identifiers_table.new_identifier.type = Types.attribute.name();
+                        }
+                        identifiers_table.put_identifier(ok, extras_array);
+                    }
+            );
             retorno = r_method_or_attribute_or_class_rule_node;
         } catch (Exception e) {
             ok.setTex(e);
