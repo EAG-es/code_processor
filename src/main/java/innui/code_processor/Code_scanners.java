@@ -168,16 +168,19 @@ public class Code_scanners extends Bases implements I_code_scanners{
         Scanner_rules.Basic_tokens retorno;
         try {
             boolean is;
+            boolean is_new_token = false;
             int tam = _tokens_list.size();
             while (true) {
                 if (_tokens_list_pos >= tam) {
                     retorno = ok.valid(_scan_resume(true, ok, extras_array));
                     if (ok.is == false) return null;
+                    is_new_token = true;
                 } else {
                     retorno = _tokens_list.get(_tokens_list_pos);
                     _tokens_list_pos = _tokens_list_pos + 1;
+                    is_new_token = false;
                 }
-                is = ok.valid(tokens_validator).validate_token(retorno, ok, extras_array);
+                is = ok.valid(tokens_validator).validate_token(is_new_token, retorno, ok, extras_array);
                 if (ok.is == false) break;
                 if (is) {
                     break;
@@ -269,9 +272,10 @@ public class Code_scanners extends Bases implements I_code_scanners{
         if (ok.is == false) return;
         try {
             boolean is;
+            boolean is_new_token = true;
             int tam = _tokens_list.size();
             while (true) {
-                is = ok.valid(tokens_validator).validate_token(basic_token, ok, extras_array);
+                is = ok.valid(tokens_validator).validate_token(is_new_token, basic_token, ok, extras_array);
                 if (ok.is == false) break;
                 if (is) {
                     ok.valid(tokens_analizer).analyze_token(basic_token, ok, extras_array);
@@ -282,6 +286,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
                 }
                 basic_token =  _tokens_list.get(_tokens_list_pos);
                 _tokens_list_pos = _tokens_list_pos + 1;
+                is_new_token = false;
             }
         } catch (Exception e) {
             ok.setTex(e);

@@ -235,7 +235,9 @@ public class Analizer_rules extends Bases {
                     if (_first_token_pos == null) {
                         _first_token_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                         if (ok.is == false) return null;
-                        last_first_token_pos = _first_token_pos;
+                        if (last_first_token_pos == null) {
+                            last_first_token_pos = _first_token_pos;
+                        }
                     }
                     retorno = null;
                     result = _evaluate(basic_token, ok, extras_array);
@@ -257,7 +259,7 @@ public class Analizer_rules extends Bases {
                     retorno = true;
                 } else {
                     if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                        defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
+                        defined_analizer_rules.process_clean(ok.valid(last_first_token_pos), ok, extras_array);
                         if (ok.is == false) return null;
                     }
                     retorno = false;
@@ -294,13 +296,6 @@ public class Analizer_rules extends Bases {
                             defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                             if (ok.is == false) return Return_status.error;
                             return Return_status.matched;
-//                        } else {
-//                            _is_already_evaluated = true;
-//                            _is_once_successed = false;
-//                            pos = ok.valid(_first_token_pos);
-//                            defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
-//                            if (ok.is == false) return Return_status.error;
-//                            return Return_status.not_matched;
                         }
                     }
                     if (defined_optional_mode == Optional_mode.optional) {

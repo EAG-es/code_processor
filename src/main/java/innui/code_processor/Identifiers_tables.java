@@ -2,9 +2,7 @@ package innui.code_processor;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.Bases;
-import innui.modelos.configurations.ResourceBundles;
 import innui.modelos.errors.Oks;
-import innui.modelos.internacionalization.Tr;
 import innui.modelos.tests.Test_methods;
 import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -14,7 +12,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.ResourceBundle;
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Identifiers_tables extends Bases {
@@ -35,9 +32,6 @@ public class Identifiers_tables extends Bases {
             paquete_tex = paquete_tex.replace(".", File.separator);
         }
         Identifiers_tables.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
-    }
-
-    public Identifiers_tables() throws Exception {
     }
 
     public static class Identifiers implements Serializable {
@@ -116,15 +110,18 @@ public class Identifiers_tables extends Bases {
     public static class Temporary_identifiers_tables implements Serializable {
         private static final long serialVersionUID = getSerial_version_uid();
         public @Nullable Integer braces_num = null;
+        public @Nullable Identifiers block_identifier = null;
         public LinkedHashMap<String, Identifiers> current_identifiers_map = new LinkedHashMap<>();
     }
     public LinkedList<Temporary_identifiers_tables> _identifiers_maps_list = new LinkedList<>();
     public Identifiers new_identifier = new Identifiers();
-    public @Nullable Temporary_identifiers_tables current_temporary_identifiers_table = null;
-    public int _current_temporary_identifiers_table_pos = 0;
+    public Identifiers_tables. @Nullable Identifiers next_block_identifier = null;
+
+    public Identifiers_tables() throws Exception {
+    }
 
     /**
-     *
+     * @param braces_num
      * @param ok
      * @param extras_array
      * @return
@@ -134,30 +131,11 @@ public class Identifiers_tables extends Bases {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            current_temporary_identifiers_table = new Temporary_identifiers_tables();
-            current_temporary_identifiers_table.braces_num = braces_num;
-            _identifiers_maps_list.addFirst(current_temporary_identifiers_table);
-            _current_temporary_identifiers_table_pos = _identifiers_maps_list.size() - 1;
-        } catch (Exception e) {
-            ok.setTex(e);
-        }
-    }
-
-    /**
-     *
-     * @param braces_num If braces_num equals top.braces_num then delete top map
-     * @param ok
-     * @param extras_array
-     * @return
-     * @throws Exception
-     */
-    public void delete_top_table(Integer braces_num, Oks ok, Object ... extras_array) throws Exception {
-        new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return;
-        try {
-            if (braces_num.equals(_identifiers_maps_list.getFirst().braces_num)) {
-                delete_top_table(ok, extras_array);
-            }
+            Temporary_identifiers_tables temporary_identifiers_table = new Temporary_identifiers_tables();
+            temporary_identifiers_table.braces_num = braces_num;
+            temporary_identifiers_table.block_identifier = next_block_identifier;
+            next_block_identifier = null;
+            _identifiers_maps_list.addFirst(temporary_identifiers_table);
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -196,8 +174,6 @@ public class Identifiers_tables extends Bases {
         if (ok.is == false) return;
         try {
             _identifiers_maps_list.pollFirst();
-            current_temporary_identifiers_table = _identifiers_maps_list.getFirst();
-            _current_temporary_identifiers_table_pos = _identifiers_maps_list.size() - 1;
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -210,72 +186,53 @@ public class Identifiers_tables extends Bases {
      * @return
      * @throws Exception
      */
-    public LinkedHashMap<String, Identifiers_tables.Identifiers> get_top(Oks ok, Object ... extras_array) throws Exception {
-        return this._identifiers_maps_list.getFirst().current_identifiers_map;
+    public @Nullable Temporary_identifiers_tables get_top(Oks ok, Object ... extras_array) throws Exception {
+        if (this._identifiers_maps_list.isEmpty()) {
+            return null;
+        }
+        return this._identifiers_maps_list.getFirst();
     }
 
     /**
      *
      * @param ok
      * @param extras_array
-     * @return
-     * @throws Exception
-     */
-    public void set_current_up(Oks ok, Object ... extras_array) throws Exception {
-        new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return;
-        ResourceBundle in = null;
-        try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            _current_temporary_identifiers_table_pos = _current_temporary_identifiers_table_pos + 1;
-            if (_current_temporary_identifiers_table_pos >= _identifiers_maps_list.size()) {
-                _current_temporary_identifiers_table_pos = _current_temporary_identifiers_table_pos - 1;
-                ok.setTex(Tr.in(in, "Top reached"));
-                return;
-            }
-            current_temporary_identifiers_table = _identifiers_maps_list.get(_current_temporary_identifiers_table_pos);
-        } catch (Exception e) {
-            ok.setTex(e);
-        }
-    }
-    /**
-     *
-     * @param ok
-     * @param extras_array
-     * @return
-     * @throws Exception
-     */
-    public void set_current_down(Oks ok, Object ... extras_array) throws Exception {
-        new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return;
-        ResourceBundle in = null;
-        try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            _current_temporary_identifiers_table_pos = _current_temporary_identifiers_table_pos - 1;
-            if (_current_temporary_identifiers_table_pos < 0) {
-                _current_temporary_identifiers_table_pos = _current_temporary_identifiers_table_pos + 1;
-                ok.setTex(Tr.in(in, "Bottom reached"));
-                return;
-            }
-            current_temporary_identifiers_table = _identifiers_maps_list.get(_current_temporary_identifiers_table_pos);
-        } catch (Exception e) {
-            ok.setTex(e);
-        }
-    }
-
-    /**
-     *
-     * @param ok
-     * @param extras_array
-     * @return
      * @throws Exception
      */
     public void put_identifier(Oks ok, Object ... extras_array) throws Exception {
+        put_identifier(false, ok, extras_array);
+    }
+    /**
+     *
+     * @param is_block_identifier
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    public void put_identifier(boolean is_block_identifier, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            Identifiers identifiers = new Identifiers(new_identifier);
-            ok.valid(current_temporary_identifiers_table).current_identifiers_map.put(identifiers.name, identifiers);
+            Identifiers identifier = null;
+            identifier = new Identifiers(new_identifier);
+            Temporary_identifiers_tables temporaryIdentifiersTables = _identifiers_maps_list.getFirst();
+            if (is_block_identifier) {
+                temporaryIdentifiersTables.block_identifier = new Identifiers_tables.Identifiers(new_identifier);
+            } else {
+                if (temporaryIdentifiersTables.block_identifier != null) {
+                    identifier.namespace = ok.valid(temporaryIdentifiersTables.block_identifier).namespace;
+                    if (ok.valid(temporaryIdentifiersTables.block_identifier).name.isEmpty() == false) {
+                        if (identifier.namespace.isEmpty()) {
+                            identifier.namespace = ok.valid(temporaryIdentifiersTables.block_identifier).name;
+                        } else {
+                            identifier.namespace = identifier.namespace
+                                    + "." + ok.valid(temporaryIdentifiersTables.block_identifier).name;
+                        }
+                    }
+                }
+            }
+            _identifiers_maps_list.getFirst().current_identifiers_map.put(identifier.name, identifier);
             new_identifier.init(ok, extras_array);
             if (ok.is == false) return;
         } catch (Exception e) {

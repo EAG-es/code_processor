@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 public interface I_code_scanners extends Serializable {
     interface Validators extends Serializable {
-        boolean validate_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
+        boolean validate_token(boolean is_new_token, Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception;
     }
 
     interface Analyzer extends Serializable {

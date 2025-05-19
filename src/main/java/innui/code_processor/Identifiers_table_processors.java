@@ -64,8 +64,8 @@ public class Identifiers_table_processors extends Bases {
         try {
             this.identifiers_table_rule = identifiers_table_rule;
             this.identifiers_table_rule.analizer_rules.i_code_scanner.set_tokens_validator(
-                    (_token, _ok, _extras_array) -> {
-                return validate_token(_token, _ok, _extras_array);
+                    (_is_new_token, _token, _ok, _extras_array) -> {
+                return validate_token(_is_new_token, _token, _ok, _extras_array);
             }, ok, extras_array);
             this.identifiers_table_rule.analizer_rules.i_code_scanner.set_tokens_analizer(
                     (_token, _ok, _extras_array) -> {
@@ -103,18 +103,19 @@ public class Identifiers_table_processors extends Bases {
 
     /**
      *
+     * @param is_new_token
      * @param token
      * @param ok
      * @param extras_array
      * @return true if the tokes is valid for the analysis
      * @throws Exception
      */
-    public boolean validate_token(Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception {
+    public boolean validate_token(boolean is_new_token, Scanner_rules.Basic_tokens token, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return false;
         boolean retorno = false;
         try {
-            retorno = identifiers_table_rule.validate_token(token, ok, extras_array);
+            retorno = identifiers_table_rule.validate_token(is_new_token, token, ok, extras_array);
             if (ok.is == false) return false;
         } catch (Exception e) {
             ok.setTex(e);

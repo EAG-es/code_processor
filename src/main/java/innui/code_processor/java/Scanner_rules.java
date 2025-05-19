@@ -81,7 +81,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         , assignment_plus, assignment_minus, assignment_multiply, assignment_divided, assignment_module
         , sign_less, compare_less_equal, sign_bigger, compare_bigger_equal
         , equal, not_equal
-        , identifier, anotation
+        , identifier, annotation
     }
 
     public States state = States.initial;
@@ -742,7 +742,7 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
             state = old_state;
             if (new_state != States.keyword_or_identifier && new_state != States.number) {
                 token.token_tex = token.token_tex.substring(0, token.token_tex.length()-1);
-                token.token_type = Token_types.anotation.name();
+                token.token_type = Token_types.annotation.name();
                 token.end_pos = pos - 1;
                 state = States.initial;
                 ok.id = k_end_of_toker_out;
