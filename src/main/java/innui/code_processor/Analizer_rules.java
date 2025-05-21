@@ -230,17 +230,15 @@ public class Analizer_rules extends Bases {
                 }
             }
             try {
-                Integer last_first_token_pos = null;
                 do {
                     if (_first_token_pos == null) {
                         _first_token_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                         if (ok.is == false) return null;
-                        if (last_first_token_pos == null) {
-                            last_first_token_pos = _first_token_pos;
-                        }
                     }
                     retorno = null;
                     result = _evaluate(basic_token, ok, extras_array);
+                    if (ok.is == false) return null;
+                    _check_processing(result, ok, extras_array);
                     if (ok.is == false) return null;
                     result = change_status(result, ok, extras_array);
                     if (ok.is == false) return null;
@@ -252,16 +250,8 @@ public class Analizer_rules extends Bases {
                 if (result == Return_status.error) {
                     retorno = null;
                 } else if (result.equals(Return_status.matched)) {
-                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                        defined_analizer_rules.process(ok.valid(last_first_token_pos), ok, extras_array);
-                        if (ok.is == false) return null;
-                    }
                     retorno = true;
                 } else {
-                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                        defined_analizer_rules.process_clean(ok.valid(last_first_token_pos), ok, extras_array);
-                        if (ok.is == false) return null;
-                    }
                     retorno = false;
                 }
             } catch (Exception e) {
@@ -269,6 +259,34 @@ public class Analizer_rules extends Bases {
                 return null;
             }
             return retorno;
+        }
+
+        /**
+         *
+         * @param return_status
+         * @param ok
+         * @param extras_array
+         * @throws Exception
+         */
+        public void _check_processing(Return_status return_status, Oks ok, Object... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return;
+            Integer pos;
+            try {
+                if (return_status.equals(Return_status.matched)) {
+                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
+                        defined_analizer_rules.process(ok.valid(_first_token_pos), ok, extras_array);
+                        if (ok.is == false) return;
+                    }
+                } else {
+                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
+                        defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
+                        if (ok.is == false) return;
+                    }
+                }
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
         }
 
         /**
@@ -393,7 +411,7 @@ public class Analizer_rules extends Bases {
                 if (ok.is == false) return;
                 if (defined_rule_nodes_and_list != null) {
                     for (var node : defined_rule_nodes_and_list) {
-                        node.init_to_reuse_or_repeat(is_reuse, ok, extras_array);
+                        node.init_to_reuse_or_repeat(true, ok, extras_array);
                         if (ok.is == false) return;
                     }
                 }
@@ -470,6 +488,32 @@ public class Analizer_rules extends Bases {
                 ok.setTex(e);
             }
             return Return_status.error;
+        }
+
+        /**
+         *
+         * @param return_status
+         * @param ok
+         * @param extras_array
+         * @throws Exception
+         */
+        @Override
+        public void _check_processing(Return_status return_status, Oks ok, Object... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return;
+            Integer pos;
+            try {
+                Integer part_num = _rule_part_num;
+                if (part_num < _defined_rule_part_tam) {
+                    part_num = part_num + 1;
+                }
+                if (part_num >= _defined_rule_part_tam) {
+                    // End of rule_and
+                    super._check_processing(return_status, ok, extras_array);
+                }
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
         }
 
         @Override
@@ -558,6 +602,7 @@ public class Analizer_rules extends Bases {
                             if (defined_repeat_mode == Repeat_mode.repeat_while_success) {
                                 init_to_reuse_or_repeat(false, ok, extras_array);
                                 if (ok.is == false) return Return_status.error;
+                                return Return_status.need_next_token;
                             }
                             return Return_status.matched;
                         }
@@ -753,7 +798,7 @@ public class Analizer_rules extends Bases {
                 if (ok.is == false) return;
                 if (defined_rule_nodes_or_list != null) {
                     for (var node : defined_rule_nodes_or_list) {
-                        node.init_to_reuse_or_repeat(is_reuse, ok);
+                        node.init_to_reuse_or_repeat(true, ok);
                         if (ok.is == false) return;
                     }
                 }
@@ -813,6 +858,10 @@ public class Analizer_rules extends Bases {
                             _first_token_pos = basic_rule_node._first_token_pos;
                         }
                         break;
+                    } else {
+                        // Restore the token position
+                        basic_token = ok.valid(defined_analizer_rules.i_code_scanner.scan_next(ok, extras_array));
+                        if (ok.is == false) return Return_status.error;
                     }
                 }
                 if (result == null) {

@@ -219,10 +219,10 @@ public class Code_processor extends Initials {
                 ok.valid(this.write_line(Tr.in(in, "Analyse file done. "), ok));
                 Yamls yamls = new Yamls();
                 ok.valid(yamls.init(ok, extras_array));
-                String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(code_scanner._tokens_list);
+                String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(code_scanner._valid_tokens_list);
                 ok.valid(this.write_line(token_list_yaml, ok));
                 String content = "";
-                for (Scanner_rules.Tokens token : code_scanner._tokens_list) {
+                for (Scanner_rules.Tokens token : code_scanner._valid_tokens_list) {
                     content = content + token.token_tex;
                 }
                 ok.valid(this.write_line(content, ok));

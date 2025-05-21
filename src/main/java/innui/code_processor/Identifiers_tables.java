@@ -109,13 +109,12 @@ public class Identifiers_tables extends Bases {
 
     public static class Temporary_identifiers_tables implements Serializable {
         private static final long serialVersionUID = getSerial_version_uid();
-        public @Nullable Integer braces_num = null;
+        public Integer braces_num = -1;
         public @Nullable Identifiers block_identifier = null;
         public LinkedHashMap<String, Identifiers> current_identifiers_map = new LinkedHashMap<>();
     }
     public LinkedList<Temporary_identifiers_tables> _identifiers_maps_list = new LinkedList<>();
     public Identifiers new_identifier = new Identifiers();
-    public Identifiers_tables. @Nullable Identifiers next_block_identifier = null;
 
     public Identifiers_tables() throws Exception {
     }
@@ -133,8 +132,6 @@ public class Identifiers_tables extends Bases {
         try {
             Temporary_identifiers_tables temporary_identifiers_table = new Temporary_identifiers_tables();
             temporary_identifiers_table.braces_num = braces_num;
-            temporary_identifiers_table.block_identifier = next_block_identifier;
-            next_block_identifier = null;
             _identifiers_maps_list.addFirst(temporary_identifiers_table);
         } catch (Exception e) {
             ok.setTex(e);
@@ -199,8 +196,8 @@ public class Identifiers_tables extends Bases {
      * @param extras_array
      * @throws Exception
      */
-    public void put_identifier(Oks ok, Object ... extras_array) throws Exception {
-        put_identifier(false, ok, extras_array);
+    public @Nullable Identifiers put_identifier(Oks ok, Object ... extras_array) throws Exception {
+        return put_identifier(false, ok, extras_array);
     }
     /**
      *
@@ -210,9 +207,9 @@ public class Identifiers_tables extends Bases {
      * @return
      * @throws Exception
      */
-    public void put_identifier(boolean is_block_identifier, Oks ok, Object ... extras_array) throws Exception {
+    public @Nullable Identifiers put_identifier(boolean is_block_identifier, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
-        if (ok.is == false) return;
+        if (ok.is == false) return null;
         try {
             Identifiers identifier = null;
             identifier = new Identifiers(new_identifier);
@@ -234,9 +231,11 @@ public class Identifiers_tables extends Bases {
             }
             _identifiers_maps_list.getFirst().current_identifiers_map.put(identifier.name, identifier);
             new_identifier.init(ok, extras_array);
-            if (ok.is == false) return;
+            if (ok.is == false) return null;
+            return identifier;
         } catch (Exception e) {
             ok.setTex(e);
+            return null;
         }
     }
 

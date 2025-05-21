@@ -37,6 +37,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
         }
         Code_scanners.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
+    public static @Fenum("error_id") String k_end_of_text = (@Fenum("error_id") String) "end_of_text";
 
     public Code_scanners() throws Exception {
     }
@@ -45,9 +46,9 @@ public class Code_scanners extends Bases implements I_code_scanners{
     public @Nullable Analyzer tokens_analizer = null;
     public @Nullable String code_tex = null;
     public Integer _pos = 0;
-    public Integer _tokens_list_pos = 0;
+    public Integer _valid_tokens_list_pos = 0;
     public Scanner_rules scanner_rules = new innui.code_processor.java.Scanner_rules();
-    public List<Scanner_rules.Tokens> _tokens_list = new ArrayList<>();
+    public List<Scanner_rules.Tokens> _valid_tokens_list = new ArrayList<>();
 
     /**
      *
@@ -61,11 +62,11 @@ public class Code_scanners extends Bases implements I_code_scanners{
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return -1;
         try {
-            if (_tokens_list_pos < 0) {
+            if (_valid_tokens_list_pos < 0) {
                 ok.setTex(Tr.in(k_in_route, "New token position is below of the token list aize. "));
                 return -1;
             }
-            return _tokens_list_pos - 1;
+            return _valid_tokens_list_pos - 1;
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -84,7 +85,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            if (tokens_list_pos > _tokens_list.size()) {
+            if (tokens_list_pos > _valid_tokens_list.size()) {
                 ok.setTex(Tr.in(k_in_route, "New token position is over of the token list size. "));
                 return;
             }
@@ -92,7 +93,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
                 ok.setTex(Tr.in(k_in_route, "New token position is below of the token list size. "));
                 return;
             }
-            this._tokens_list_pos = tokens_list_pos;
+            this._valid_tokens_list_pos = tokens_list_pos;
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -138,7 +139,7 @@ public class Code_scanners extends Bases implements I_code_scanners{
         if (ok.is == false) return;
         try {
             _pos = 0;
-            scan_resume(ok , extras_array);
+            _analyze_tokens(ok, extras_array);
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -167,22 +168,26 @@ public class Code_scanners extends Bases implements I_code_scanners{
         if (ok.is == false) return null;
         Scanner_rules.Basic_tokens retorno;
         try {
-            boolean is;
+            boolean is_valid;
             boolean is_new_token = false;
-            int tam = _tokens_list.size();
+            int tam = _valid_tokens_list.size();
             while (true) {
-                if (_tokens_list_pos >= tam) {
-                    retorno = ok.valid(_scan_resume(true, ok, extras_array));
+                if (_valid_tokens_list_pos >= tam) {
+                    retorno = ok.allow_null(_scan_resume(true, ok, extras_array));
                     if (ok.is == false) return null;
                     is_new_token = true;
                 } else {
-                    retorno = _tokens_list.get(_tokens_list_pos);
-                    _tokens_list_pos = _tokens_list_pos + 1;
+                    retorno = _valid_tokens_list.get(_valid_tokens_list_pos);
+                    _valid_tokens_list_pos = _valid_tokens_list_pos + 1;
                     is_new_token = false;
                 }
-                is = ok.valid(tokens_validator).validate_token(is_new_token, retorno, ok, extras_array);
+                is_valid = ok.valid(tokens_validator).validate_token(is_new_token, retorno, ok, extras_array);
                 if (ok.is == false) break;
-                if (is) {
+                if (is_valid) {
+                    if (is_new_token) {
+                        _valid_tokens_list.add(scanner_rules.token);
+                        _valid_tokens_list_pos = _valid_tokens_list.size();
+                    }
                     break;
                 }
             }
@@ -216,6 +221,8 @@ public class Code_scanners extends Bases implements I_code_scanners{
             while (true) {
                 is_token_ready = false;
                 if (_pos >= tam) {
+                    ok.id = k_end_of_text;
+                    ok.setTex(Oks.no_fenum_cast(k_end_of_text));
                     break;
                 }
                 letra = noted_ok.valid(code_tex).charAt(_pos);
@@ -227,10 +234,8 @@ public class Code_scanners extends Bases implements I_code_scanners{
                         _pos = _pos + 1;
                     }
                     noted_ok.init();
-                    _tokens_list.add(scanner_rules.token);
-                    _tokens_list_pos = _tokens_list.size();
                     if (is_just_read == false) {
-                        analize_token_with_token_analizer(scanner_rules.token, noted_ok, extras_array);
+                        process_new_token_scanned(scanner_rules.token, noted_ok, extras_array);
                         if (noted_ok.is == false) {
                             ok.addTex(noted_ok.getTex());
                             noted_ok.init();
@@ -258,39 +263,31 @@ public class Code_scanners extends Bases implements I_code_scanners{
         return null;
     }
 
+    public void process_new_token_scanned(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+
+    }
     /**
      *
-     * @param basic_token
      * @param ok
      * @param extras_array
      * @return
      * @throws Exception
      *
      */
-    public void analize_token_with_token_analizer(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+    public void _analyze_tokens(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            boolean is;
-            boolean is_new_token = true;
-            int tam = _tokens_list.size();
-            while (true) {
-                is = ok.valid(tokens_validator).validate_token(is_new_token, basic_token, ok, extras_array);
-                if (ok.is == false) break;
-                if (is) {
-                    ok.valid(tokens_analizer).analyze_token(basic_token, ok, extras_array);
-                    if (ok.is == false) break;
-                }
-                if (_tokens_list_pos >= tam) {
-                    break;
-                }
-                basic_token =  _tokens_list.get(_tokens_list_pos);
-                _tokens_list_pos = _tokens_list_pos + 1;
-                is_new_token = false;
-            }
+            Scanner_rules.Basic_tokens basic_token = ok.allow_null(scan_next(ok , extras_array));
+            if (Oks.equals(ok.id, k_end_of_text)) {
+                ok.init();
+                return;
+            };
+            if (ok.is == false) return;
+            ok.valid(tokens_analizer).analyze_token(basic_token, ok, extras_array);
+            if (ok.is == false) return;
         } catch (Exception e) {
             ok.setTex(e);
         }
-        return;
     }
 }
