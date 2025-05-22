@@ -14,6 +14,7 @@ import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static innui.modelos.internacionalization.Tr.in;
@@ -49,7 +50,7 @@ public class Code_processor extends Initials {
     public OptionGroup wallet_optionGroup = new OptionGroup();
     @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     public transient CommandLineParser parser = new DefaultParser();
-    public @Nullable Option analyse_file = null;
+    public org.apache.commons.cli.@Nullable Option analyse_file = null;
     public @Nullable Option get_identifiers_table = null;
 
     /**
@@ -232,16 +233,23 @@ public class Code_processor extends Initials {
                 String file_tex = commandLine.getOptionValues(ok.valid(get_identifiers_table))[0];
                 Code_scanners code_scanner = new Code_scanners();
                 code_scanner.load_file(file_tex, ok, extras_array);
+                if (ok.is == false) return false;
                 Identifiers_table_rules identifiers_table_rule = new Identifiers_table_rules(code_scanner);
                 Identifiers_table_processors identifiers_table_processor = new Identifiers_table_processors(identifiers_table_rule);
                 identifiers_table_processor.load_identifiers_table_rule(null, ok, extras_array);
+                if (ok.is == false) return false;
                 identifiers_table_processor.start(ok, extras_array);
-                ok.valid(this.write_line(Tr.in(in, "Get identifiers table done. "), ok));
+                if (ok.is == false) return false;
+                List<Identifiers_tables.Identifiers> identifiers_list;
+                identifiers_list = ok.valid(identifiers_table_processor.get_identifiers_table(ok, extras_array));
+                if (ok.is == false) return false;
+                write_line(Tr.in(in, "Get identifiers table done. "), ok);
                 Yamls yamls = new Yamls();
-                ok.valid(yamls.init(ok, extras_array));
-                String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(ok.valid(identifiers_table_processor
-                        .identifiers_table_rule).identifiers_table);
-                ok.valid(this.write_line(token_list_yaml, ok));
+                yamls.init(ok, extras_array);
+                if (ok.is == false) return false;
+                String token_list_yaml = ok.valid(yamls.objectMapper).writeValueAsString(identifiers_list);
+                write_line(token_list_yaml, ok);
+                if (ok.is == false) return false;
             } else {
                 ok.setTex(in(in, "No options"));
             }

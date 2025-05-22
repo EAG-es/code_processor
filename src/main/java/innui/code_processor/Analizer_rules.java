@@ -74,7 +74,7 @@ public class Analizer_rules extends Bases {
         public Optional_mode defined_optional_mode = Optional_mode.no_optional;
         public Repeat_mode defined_repeat_mode = Repeat_mode.no_repeat;
         public boolean defined_is_to_process_the_success_rules_list_if_success = false;
-        public Analizer_rules defined_analizer_rules;
+        public Analizer_rules _defined_analizer_rules;
         public @Nullable Rule_success defined_rule_success = null;
         public boolean _is_already_evaluated = false;
         public @Nullable Integer _first_token_pos = null;
@@ -120,7 +120,7 @@ public class Analizer_rules extends Bases {
             if (ok.is == false) return;
             ResourceBundle in = null;
             try {
-                defined_analizer_rules = analizer_rules;
+                _defined_analizer_rules = analizer_rules;
                 defined_name = "";
                 defined_optional_mode = Optional_mode.no_optional;
                 defined_repeat_mode = Repeat_mode.no_repeat;
@@ -144,7 +144,7 @@ public class Analizer_rules extends Bases {
             try {
                 if (is_reuse) {
                     if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                        defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
+                        _defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
                         if (ok.is == false) return;
                     }
                     _is_once_successed = null;
@@ -173,7 +173,7 @@ public class Analizer_rules extends Bases {
             ResourceBundle in = null;
             try {
                 defined_name = basic_rule_node.defined_name;
-                defined_analizer_rules = basic_rule_node.defined_analizer_rules;
+                _defined_analizer_rules = basic_rule_node._defined_analizer_rules;
                 defined_optional_mode = basic_rule_node.defined_optional_mode;
                 defined_repeat_mode = basic_rule_node.defined_repeat_mode;
                 defined_is_to_process_the_success_rules_list_if_success = basic_rule_node.defined_is_to_process_the_success_rules_list_if_success;
@@ -214,17 +214,17 @@ public class Analizer_rules extends Bases {
                     ok.setTex(Tr.in(k_in_route, "Rule evaluated without success information. "));
                     return null;
                 } else if (_is_once_successed) {
-                    pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
+                    pos = _defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                     if (ok.is == false) return null;
                     // pos = pos - 1;
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                    _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return null;
                     return true;
                 } else {
-                    pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
+                    pos = _defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                     if (ok.is == false) return null;
                     // pos = pos - 1;
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                    _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return null;
                     return false;
                 }
@@ -232,7 +232,7 @@ public class Analizer_rules extends Bases {
             try {
                 do {
                     if (_first_token_pos == null) {
-                        _first_token_pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
+                        _first_token_pos = _defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                         if (ok.is == false) return null;
                     }
                     retorno = null;
@@ -243,7 +243,7 @@ public class Analizer_rules extends Bases {
                     result = change_status(result, ok, extras_array);
                     if (ok.is == false) return null;
                     if (result == Return_status.need_next_token) {
-                        basic_token = ok.valid(defined_analizer_rules.i_code_scanner.scan_next(ok, extras_array));
+                        basic_token = ok.allow_null(_defined_analizer_rules.i_code_scanner.scan_next(ok, extras_array));
                         if (ok.is == false) return null;
                     }
                 } while (result == Return_status.need_next_token);
@@ -275,12 +275,12 @@ public class Analizer_rules extends Bases {
             try {
                 if (return_status.equals(Return_status.matched)) {
                     if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                        defined_analizer_rules.process(ok.valid(_first_token_pos), ok, extras_array);
+                        _defined_analizer_rules.process(ok.valid(_first_token_pos), ok, extras_array);
                         if (ok.is == false) return;
                     }
                 } else {
                     if (defined_is_to_process_the_success_rules_list_if_success == true) {
-                        defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
+                        _defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
                         if (ok.is == false) return;
                     }
                 }
@@ -311,7 +311,7 @@ public class Analizer_rules extends Bases {
                             _is_already_evaluated = true;
                             _is_once_successed = true;
                             pos = ok.valid(_first_token_pos);
-                            defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                            _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                             if (ok.is == false) return Return_status.error;
                             return Return_status.matched;
                         }
@@ -320,14 +320,14 @@ public class Analizer_rules extends Bases {
                         _is_already_evaluated = true;
                         _is_once_successed = true; // matched option: empty
                         pos = ok.valid(_first_token_pos);
-                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                        _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                         return Return_status.matched;
                     }
                     _is_already_evaluated = true;
                     _is_once_successed = false;
                     pos = ok.valid(_first_token_pos);
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                    _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return Return_status.error;
                     return Return_status.not_matched;
                 } else if (return_status == Return_status.matched) {
@@ -335,7 +335,7 @@ public class Analizer_rules extends Bases {
                         Rule_success rule_success = new Rule_success(ok.valid(defined_rule_success).after_success);
                         rule_success.first_token_pos = ok.valid(_first_token_pos);
                         rule_success.tokens_list.addAll(ok.valid(defined_rule_success).tokens_list);
-                        defined_analizer_rules.success_rules_list.add(rule_success);
+                        _defined_analizer_rules.success_rules_list.add(rule_success);
                     }
                     _is_already_evaluated = true;
                     _is_once_successed = true;
@@ -363,11 +363,38 @@ public class Analizer_rules extends Bases {
          */
         public abstract Return_status _evaluate(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
 
+        /**
+         *
+         * @param rule_node
+         * @throws Exception
+         */
+        public abstract void add(Rule_nodes rule_node) throws Exception;
+        /**
+         *
+         * @param basic_token
+         */
+        public abstract void add(Scanner_rules.Basic_tokens basic_token) throws Exception;
+
+        /**
+         *
+         * @param token_type_tex
+         * @throws Exception
+         */
+        public abstract void add(String token_type_tex) throws Exception;
+
+        /**
+         *
+         * @param token_tex
+         * @param token_type_tex
+         * @throws Exception
+         */
+        public abstract void add(String token_type_tex, String token_tex) throws Exception;
+
     }
 
     public static class Rules_and_rule_nodes extends Rule_nodes {
         private static final long serialVersionUID = getSerial_version_uid();
-        public ArrayList<Rule_nodes> defined_rule_nodes_and_list = new ArrayList<>();
+        public ArrayList<Rule_nodes> _defined_rule_nodes_and_list = new ArrayList<>();
         public Integer _rule_part_num = 0;
         public Integer _defined_rule_part_tam = -1;
 
@@ -389,7 +416,7 @@ public class Analizer_rules extends Bases {
             try {
                 super.init(analizer_rules, ok, extras_array);
                 if (ok.is == false) return;
-                defined_rule_nodes_and_list = new ArrayList<>();
+                _defined_rule_nodes_and_list = new ArrayList<>();
                 _defined_rule_part_tam = -1;
             } catch (Exception e) {
                 ok.setTex(e);
@@ -398,7 +425,7 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         public Rules_and_rule_nodes(Rules_and_rule_nodes rules_and_rule_node) throws Exception {
-            super(Oks.valide(rules_and_rule_node.defined_analizer_rules));
+            super(Oks.valide(rules_and_rule_node._defined_analizer_rules));
         }
 
         @Override
@@ -409,8 +436,8 @@ public class Analizer_rules extends Bases {
             try {
                 super.init_to_reuse_or_repeat(is_reuse, ok, extras_array);
                 if (ok.is == false) return;
-                if (defined_rule_nodes_and_list != null) {
-                    for (var node : defined_rule_nodes_and_list) {
+                if (_defined_rule_nodes_and_list != null) {
+                    for (var node : _defined_rule_nodes_and_list) {
                         node.init_to_reuse_or_repeat(true, ok, extras_array);
                         if (ok.is == false) return;
                     }
@@ -439,8 +466,8 @@ public class Analizer_rules extends Bases {
                 if (ok.is == false) return;
                 _rule_part_num = rules_and_rule_node._rule_part_num;
                 _defined_rule_part_tam = rules_and_rule_node._defined_rule_part_tam;
-                defined_rule_nodes_and_list.clear();
-                defined_rule_nodes_and_list.addAll(rules_and_rule_node.defined_rule_nodes_and_list);
+                _defined_rule_nodes_and_list.clear();
+                _defined_rule_nodes_and_list.addAll(rules_and_rule_node._defined_rule_nodes_and_list);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -455,18 +482,18 @@ public class Analizer_rules extends Bases {
             try {
                 in = ok.valid(ResourceBundles.getBundle(k_in_route));
                 if (_defined_rule_part_tam == -1) {
-                    if (defined_rule_nodes_and_list.size() == 0) {
+                    if (_defined_rule_nodes_and_list.size() == 0) {
                         ok.setTex(Tr.in(in, "No rules defined. "));
                         return Return_status.error;
                     }
-                    _defined_rule_part_tam = defined_rule_nodes_and_list.size();
+                    _defined_rule_part_tam = _defined_rule_nodes_and_list.size();
                 }
                 Boolean result;
-                if (_rule_part_num >= defined_rule_nodes_and_list.size()) {
+                if (_rule_part_num >= _defined_rule_nodes_and_list.size()) {
                     ok.setTex(Tr.in(k_in_route, "Reached the end of the nodes-and list"));
                     return Return_status.error;
                 }
-                Rule_nodes rule_node = defined_rule_nodes_and_list.get(_rule_part_num);
+                Rule_nodes rule_node = _defined_rule_nodes_and_list.get(_rule_part_num);
                 result = rule_node.evaluate(basic_token, ok, extras_array);
                 if (ok.is == false) return Return_status.error;
                 if (result != null) {
@@ -527,7 +554,7 @@ public class Analizer_rules extends Bases {
                 } else if (return_status == Return_status.not_matched) {
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
                         pos = ok.valid(_first_token_pos) + 1;
-                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                        _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                         init_to_reuse_or_repeat(true, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                         return Return_status.need_next_token;
@@ -536,7 +563,7 @@ public class Analizer_rules extends Bases {
                         _is_already_evaluated = true;
                         _is_once_successed = true; // empty match
                         pos = ok.valid(_first_token_pos);
-                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                        _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                         return Return_status.matched;
                     }
@@ -545,7 +572,7 @@ public class Analizer_rules extends Bases {
                             _is_already_evaluated = true;
                             _is_once_successed = false;
                             pos = ok.valid(_first_token_pos);
-                            defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                            _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                             if (ok.is == false) return Return_status.error;
                             return Return_status.not_matched;
                         } else {
@@ -555,16 +582,16 @@ public class Analizer_rules extends Bases {
                                     _is_already_evaluated = true;
                                     _is_once_successed = false;
                                     pos = ok.valid(_first_token_pos);
-                                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                                    _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                                     if (ok.is == false) return Return_status.error;
                                     return Return_status.not_matched;
                                 } else { // ending
                                     _is_already_evaluated = true;
                                     _is_once_successed = true;
-                                    pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
+                                    pos = _defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                                     if (ok.is == false) return Return_status.error;
                                     // pos = pos - 1;
-                                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                                    _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                                     if (ok.is == false) return Return_status.error;
                                     return Return_status.matched;
                                 }
@@ -577,13 +604,13 @@ public class Analizer_rules extends Bases {
                     _is_already_evaluated = true;
                     _is_once_successed = false;
                     pos = ok.valid(_first_token_pos) ;
-                    defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                    _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                     if (ok.is == false) return Return_status.error;
                     return Return_status.not_matched;
                 } else if (return_status == Return_status.matched) {
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
                         if (_rule_part_num == 0) {
-                            _first_token_pos = ok.valid(defined_rule_nodes_and_list.get(0)._first_token_pos);
+                            _first_token_pos = ok.valid(_defined_rule_nodes_and_list.get(0)._first_token_pos);
                         }
                     }
                     if (_rule_part_num < _defined_rule_part_tam) {
@@ -595,7 +622,7 @@ public class Analizer_rules extends Bases {
                                 Rule_success rule_success = new Rule_success(ok.valid(defined_rule_success).after_success);
                                 rule_success.first_token_pos = ok.valid(_first_token_pos);
                                 rule_success.tokens_list.addAll(ok.valid(defined_rule_success).tokens_list);
-                                defined_analizer_rules.success_rules_list.add(rule_success);
+                                _defined_analizer_rules.success_rules_list.add(rule_success);
                             }
                             _is_already_evaluated = true;
                             _is_once_successed = true;
@@ -617,11 +644,39 @@ public class Analizer_rules extends Bases {
             }
             return return_status;
         }
+
+        @Override
+        public void add(Rule_nodes rule_node) throws Exception {
+            Rule_nodes new_rule_node;
+            new_rule_node = Oks.no_fenum_cast(rule_node.getClass().getConstructor(rule_node.getClass()).newInstance(rule_node));
+            _defined_rule_nodes_and_list.add(new_rule_node);
+        }
+
+        @Override
+        public void add(Scanner_rules.Basic_tokens basic_token) throws Exception {
+            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+            tokens_or_rule_node.add(basic_token);
+            _defined_rule_nodes_and_list.add(tokens_or_rule_node);
+        }
+
+        @Override
+        public void add(String token_type_tex) throws Exception {
+            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+            tokens_or_rule_node.add(token_type_tex);
+            _defined_rule_nodes_and_list.add(tokens_or_rule_node);
+        }
+
+        @Override
+        public void add(String token_type_tex, String token_tex) throws Exception {
+            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+            tokens_or_rule_node.add(token_type_tex, token_tex);
+            _defined_rule_nodes_and_list.add(tokens_or_rule_node);
+        }
     }
 
     public static class Tokens_or_rule_nodes extends Rule_nodes {
         private static final long serialVersionUID = getSerial_version_uid();
-        public ArrayList<Scanner_rules.Basic_tokens> defined_tokens_or_list = new ArrayList<>();
+        public ArrayList<Scanner_rules.Basic_tokens> _defined_tokens_or_list = new ArrayList<>();
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
@@ -641,7 +696,7 @@ public class Analizer_rules extends Bases {
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
         public Tokens_or_rule_nodes(Tokens_or_rule_nodes tokens_or_rule_node) throws Exception {
-            super(Oks.valide(tokens_or_rule_node.defined_analizer_rules));
+            super(Oks.valide(tokens_or_rule_node._defined_analizer_rules));
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
                 init(tokens_or_rule_node, ok);
@@ -661,7 +716,7 @@ public class Analizer_rules extends Bases {
             try {
                 super.init(analizer_rules, ok, extras_array);
                 if (ok.is == false) return;
-                defined_tokens_or_list = new ArrayList<>();
+                _defined_tokens_or_list = new ArrayList<>();
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -682,8 +737,8 @@ public class Analizer_rules extends Bases {
             try {
                 super.init(tokens_or_rule_node, ok, extras_array);
                 if (ok.is == false) return;
-                defined_tokens_or_list.clear();
-                defined_tokens_or_list.addAll(tokens_or_rule_node.defined_tokens_or_list);
+                _defined_tokens_or_list.clear();
+                _defined_tokens_or_list.addAll(tokens_or_rule_node._defined_tokens_or_list);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -697,11 +752,11 @@ public class Analizer_rules extends Bases {
             Return_status retorno = Return_status.not_matched;
             Integer pos;
             try {
-                if (defined_tokens_or_list.isEmpty()) {
+                if (_defined_tokens_or_list.isEmpty()) {
                     ok.setTex(Tr.in(k_in_route, "No tokens defined. "));
                     return Return_status.error;
                 }
-                for (var to_match_basic_token: defined_tokens_or_list) {
+                for (var to_match_basic_token: _defined_tokens_or_list) {
                     retorno = _evaluate_a_basic_token(basic_token, to_match_basic_token, ok, extras_array);
                     if (ok.is == false) return Return_status.error;
                     if (retorno != Return_status.not_matched) {
@@ -714,11 +769,11 @@ public class Analizer_rules extends Bases {
                         ok.valid(defined_rule_success).tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
                     }
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
-                        pos = defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
+                        pos = _defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
                         _first_token_pos = pos;
                         if (ok.is == false) return Return_status.error;
                         // pos = pos - 1;
-                        defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
+                        _defined_analizer_rules.i_code_scanner.set_tokens_list_pos(pos, ok, extras_array);
                         if (ok.is == false) return Return_status.error;
                     }
                 }
@@ -757,11 +812,31 @@ public class Analizer_rules extends Bases {
             }
             return Return_status.error;
         }
+
+        @Override
+        public void add(Rule_nodes rule_node) throws Exception {
+            throw new Exception(Tr.in(k_in_route, "This rule only accepts tokens. "));
+        }
+
+        @Override
+        public void add(Scanner_rules.Basic_tokens basic_token) throws Exception {
+            _defined_tokens_or_list.add(basic_token);
+        }
+
+        @Override
+        public void add(String token_type_tex) throws Exception {
+            _defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_type_tex));
+        }
+
+        @Override
+        public void add(String token_type_tex, String token_tex) throws Exception {
+            _defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_type_tex, token_tex));
+        }
     }
 
     public static class Rules_or_rule_nodes extends Rule_nodes {
         private static final long serialVersionUID = getSerial_version_uid();
-        public ArrayList<Rule_nodes> defined_rule_nodes_or_list = new ArrayList<>();
+        public ArrayList<Rule_nodes> _defined_rule_nodes_or_list = new ArrayList<>();
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
@@ -772,7 +847,7 @@ public class Analizer_rules extends Bases {
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
         public Rules_or_rule_nodes(Rules_or_rule_nodes rule_node_find_way) throws Exception {
-            super(Oks.valide(rule_node_find_way.defined_analizer_rules));
+            super(Oks.valide(rule_node_find_way._defined_analizer_rules));
         }
 
         @Override
@@ -796,8 +871,8 @@ public class Analizer_rules extends Bases {
             try {
                 super.init_to_reuse_or_repeat(is_reuse, ok, extras_array);
                 if (ok.is == false) return;
-                if (defined_rule_nodes_or_list != null) {
-                    for (var node : defined_rule_nodes_or_list) {
+                if (_defined_rule_nodes_or_list != null) {
+                    for (var node : _defined_rule_nodes_or_list) {
                         node.init_to_reuse_or_repeat(true, ok);
                         if (ok.is == false) return;
                     }
@@ -821,8 +896,8 @@ public class Analizer_rules extends Bases {
             try {
                 super.init(rules_or_rule_node, ok, extras_array);
                 if (ok.is == false) return;
-                defined_rule_nodes_or_list.clear();
-                defined_rule_nodes_or_list.addAll(rules_or_rule_node.defined_rule_nodes_or_list);
+                _defined_rule_nodes_or_list.clear();
+                _defined_rule_nodes_or_list.addAll(rules_or_rule_node._defined_rule_nodes_or_list);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -844,11 +919,11 @@ public class Analizer_rules extends Bases {
             if (ok.is == false) return Return_status.error;
             try {
                 Boolean result = null;
-                if (defined_rule_nodes_or_list.isEmpty()) {
+                if (_defined_rule_nodes_or_list.isEmpty()) {
                     ok.setTex(Tr.in(k_in_route, "No rules defined. "));
                     return Return_status.error;
                 }
-                for (var basic_rule_node : defined_rule_nodes_or_list) {
+                for (var basic_rule_node : _defined_rule_nodes_or_list) {
                     result = basic_rule_node.evaluate(basic_token, ok, extras_array);
                     if (ok.is == false) return Return_status.error;
                     if (result == null) {
@@ -860,7 +935,7 @@ public class Analizer_rules extends Bases {
                         break;
                     } else {
                         // Restore the token position
-                        basic_token = ok.valid(defined_analizer_rules.i_code_scanner.scan_next(ok, extras_array));
+                        basic_token = ok.valid(_defined_analizer_rules.i_code_scanner.scan_next(ok, extras_array));
                         if (ok.is == false) return Return_status.error;
                     }
                 }
@@ -882,6 +957,34 @@ public class Analizer_rules extends Bases {
                 ok.setTex(e);
                 return Return_status.error;
             }
+        }
+
+        @Override
+        public void add(Rule_nodes rule_node) throws Exception {
+            Rule_nodes new_rule_node;
+            new_rule_node = Oks.no_fenum_cast(rule_node.getClass().getConstructor(rule_node.getClass()).newInstance(rule_node));
+            _defined_rule_nodes_or_list.add(new_rule_node);
+        }
+
+        @Override
+        public void add(Scanner_rules.Basic_tokens basic_token) throws Exception {
+            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+            tokens_or_rule_node.add(basic_token);
+            _defined_rule_nodes_or_list.add(tokens_or_rule_node);
+        }
+
+        @Override
+        public void add(String token_type_tex) throws Exception {
+            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+            tokens_or_rule_node.add(token_type_tex);
+            _defined_rule_nodes_or_list.add(tokens_or_rule_node);
+        }
+
+        @Override
+        public void add(String token_type_tex, String token_tex) throws Exception {
+            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+            tokens_or_rule_node.add(token_type_tex, token_tex);
+            _defined_rule_nodes_or_list.add(tokens_or_rule_node);
         }
     }
 

@@ -236,8 +236,32 @@ public abstract class Scanner_rules extends Bases {
     public Integer line_num = 1;
     public Integer col_num = 1;
 
+    /**
+     *
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
     public abstract void process_character(Character character, Integer pos, Oks ok, Object ... extras_array) throws Exception;
 
+    /**
+     * @param is_pos_out
+     * @param character
+     * @param pos
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
+    public abstract void process_token_end(boolean is_pos_out, Character character, Oks ok, Object ... extras_array) throws Exception;
+
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
     public abstract void reset_state(Oks ok, Object ... extras_array) throws Exception;
 
 }

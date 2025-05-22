@@ -9,7 +9,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
@@ -34,13 +33,13 @@ public abstract class Identifiers_table_rules extends Bases {
         Identifiers_table_rules.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
 
-    public Analizer_rules analizer_rules;
+    public Analizer_rules analizer_rule;
     public Identifiers_tables identifiers_table;
     public Integer braces_num = 0;
     public List<Identifiers_tables.Identifiers> all_identifiers_list = new ArrayList<>();
 
     public Identifiers_table_rules(Code_scanners code_scanner) throws Exception {
-        analizer_rules = new Analizer_rules(code_scanner);
+        analizer_rule = new Analizer_rules(code_scanner);
         identifiers_table = new Identifiers_tables();
     }
 
@@ -58,7 +57,7 @@ public abstract class Identifiers_table_rules extends Bases {
         if (ok.is == false) return null;
         Integer retorno = null;
         try {
-            return ok.valid(analizer_rules.start_rule_node);
+            return ok.valid(analizer_rule.start_rule_node);
         } catch (Exception e) {
             ok.setTex(e);
             return null;

@@ -140,6 +140,9 @@ public class Code_scanners extends Bases implements I_code_scanners{
         try {
             _pos = 0;
             _analyze_tokens(ok, extras_array);
+            if (Oks.equals(ok.id, k_end_of_text)) {
+                ok.init();
+            }
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -231,9 +234,21 @@ public class Code_scanners extends Bases implements I_code_scanners{
                   || Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_in)) {
                     is_token_ready = true;
                     if (Oks.equals(noted_ok.id, Scanner_rules.k_end_of_toker_in)) {
+                        noted_ok.init();
+                        scanner_rules.process_token_end(false, letra, noted_ok, extras_array);
+                        if (noted_ok.is == false) {
+                            ok.addTex(noted_ok.getTex());
+                            noted_ok.init();
+                        }
                         _pos = _pos + 1;
+                    } else {
+                        noted_ok.init();
+                        scanner_rules.process_token_end(true, letra, noted_ok, extras_array);
+                        if (noted_ok.is == false) {
+                            ok.addTex(noted_ok.getTex());
+                            noted_ok.init();
+                        }
                     }
-                    noted_ok.init();
                     if (is_just_read == false) {
                         process_new_token_scanned(scanner_rules.token, noted_ok, extras_array);
                         if (noted_ok.is == false) {

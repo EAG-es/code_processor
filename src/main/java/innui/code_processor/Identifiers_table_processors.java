@@ -11,6 +11,7 @@ import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
+import java.util.List;
 import java.util.ResourceBundle;
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
@@ -63,11 +64,11 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return;
         try {
             this.identifiers_table_rule = identifiers_table_rule;
-            this.identifiers_table_rule.analizer_rules.i_code_scanner.set_tokens_validator(
+            this.identifiers_table_rule.analizer_rule.i_code_scanner.set_tokens_validator(
                     (_is_new_token, _token, _ok, _extras_array) -> {
                 return validate_token(_is_new_token, _token, _ok, _extras_array);
             }, ok, extras_array);
-            this.identifiers_table_rule.analizer_rules.i_code_scanner.set_tokens_analizer(
+            this.identifiers_table_rule.analizer_rule.i_code_scanner.set_tokens_analizer(
                     (_token, _ok, _extras_array) -> {
                         analize_token(_token, _ok, _extras_array);
                     }, ok, extras_array);
@@ -156,12 +157,30 @@ public class Identifiers_table_processors extends Bases {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            identifiers_table_rule.analizer_rules.i_code_scanner.start_scanner(ok , extras_array);
+            identifiers_table_rule.analizer_rule.i_code_scanner.start_scanner(ok , extras_array);
         } catch (Exception e) {
             ok.setTex(e);
         }
     }
 
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
+    public @Nullable List<Identifiers_tables.Identifiers> get_identifiers_table(Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return null;
+        try {
+            identifiers_table_rule.close(ok, extras_array);
+            if (ok.is == false) return null;
+            return identifiers_table_rule.all_identifiers_list;
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return null;
+    }
     /**
      *
      * @param ok

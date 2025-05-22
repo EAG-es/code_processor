@@ -96,6 +96,23 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
     public void reset_state(Oks ok, Object ... extras_array) throws Exception {
         state = States.initial;
     }
+
+    @Override
+    public void process_token_end(boolean is_pos_out, Character character, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return;
+        try {
+            if (is_pos_out) {
+                if (character == '\n') {
+                    // skip double read
+                    line_num = line_num - 1;
+                }
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+    }
+
     /**
      *
      * @param character
@@ -111,10 +128,6 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         ResourceBundle in = null;
         try {
             in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            if (character == '\n') {
-                line_num = line_num + 1;
-                col_num = 0;
-            }
             switch (state) {
                 case initial -> {
                     init_token(pos, ok, extras_array);
@@ -169,7 +182,12 @@ public class Scanner_rules extends innui.code_processor.Scanner_rules {
         } catch (Exception e) {
             ok.setTex(e);
         }
-        col_num = col_num + 1;
+        if (character == '\n') {
+            line_num = line_num + 1;
+            col_num = 1;
+        } else {
+            col_num = col_num + 1;
+        }
         if (Oks.equals(ok.id, k_end_of_toker_out)) {
             col_num = col_num - 1;
         }
