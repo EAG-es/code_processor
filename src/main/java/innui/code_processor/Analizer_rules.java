@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
+
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Analizer_rules extends Bases {
     // Properties file for translactions
@@ -46,11 +47,14 @@ public class Analizer_rules extends Bases {
         , optional
         , ignore_until_matches
     }
+    public static @Fenum("optional_mode") String k_optional_tex = (@Fenum("optional_mode") String) "<optional>";
+    public static @Fenum("optional_mode") String k_ignore_tex = (@Fenum("optional_mode") String) "<ignore>";
 
     public enum Repeat_mode {
         no_repeat
         , repeat_while_success
     }
+    public static @Fenum("repeat_mode") String k_repeat_tex = (@Fenum("repeat_mode") String) "<optional>";
 
     @FunctionalInterface
     public interface After_success_calls extends Serializable {
@@ -69,8 +73,17 @@ public class Analizer_rules extends Bases {
     }
 
     public static abstract class Rule_nodes implements Serializable {
+        @FunctionalInterface
+        public interface Rule_creator_calls extends Serializable {
+            @Nullable Rule_nodes call(Oks ok, Object ... extras_array) throws Exception;
+        }
+        @FunctionalInterface
+        public interface Rule_creator_suppliers extends Serializable {
+            @Nullable Rule_nodes get() throws Exception;
+        }
         private static final long serialVersionUID = getSerial_version_uid();
-        public String defined_name = "";
+        public String _defined_key_name = "";
+        public String _defined_name = "";
         public Optional_mode defined_optional_mode = Optional_mode.no_optional;
         public Repeat_mode defined_repeat_mode = Repeat_mode.no_repeat;
         public boolean defined_is_to_process_the_success_rules_list_if_success = false;
@@ -96,10 +109,10 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings({"nullness:method.invocation", "nullness:initialization.fields.uninitialized"})
-        public Rule_nodes(Rule_nodes basic_rule_node) throws Exception {
+        public Rule_nodes(Rule_nodes rule_node) throws Exception {
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
-                init(basic_rule_node, ok);
+                init(rule_node, ok);
             } catch (Exception e) {
                 ok.setTex(e);
             }
@@ -121,7 +134,8 @@ public class Analizer_rules extends Bases {
             ResourceBundle in = null;
             try {
                 _defined_analizer_rules = analizer_rules;
-                defined_name = "";
+                _defined_key_name = "";
+                _defined_name = "";
                 defined_optional_mode = Optional_mode.no_optional;
                 defined_repeat_mode = Repeat_mode.no_repeat;
                 defined_is_to_process_the_success_rules_list_if_success = false;
@@ -172,7 +186,8 @@ public class Analizer_rules extends Bases {
             if (ok.is == false) return;
             ResourceBundle in = null;
             try {
-                defined_name = basic_rule_node.defined_name;
+                _defined_key_name = basic_rule_node._defined_key_name;
+                _defined_name = basic_rule_node._defined_name;
                 _defined_analizer_rules = basic_rule_node._defined_analizer_rules;
                 defined_optional_mode = basic_rule_node.defined_optional_mode;
                 defined_repeat_mode = basic_rule_node.defined_repeat_mode;
@@ -363,32 +378,280 @@ public class Analizer_rules extends Bases {
          */
         public abstract Return_status _evaluate(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
 
+        public @Nullable Rule_nodes find_by_key_name(String key_name) throws Exception {
+            if (_defined_analizer_rules.rule_nodes_map.containsKey(key_name)) {
+                return _defined_analizer_rules.rule_nodes_map.get(key_name);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Add to map if was not added
+         * @param rule_node
+         * @throws Exception
+         */
+        public void _add_to_map(Rule_nodes rule_node) throws Exception {
+            _defined_analizer_rules.rule_nodes_map.put(rule_node._defined_key_name, rule_node);
+        }
+        /**
+         *
+         * @param key_name
+         * @throws Exception
+         */
+        public void add_by_key_name(String key_name) throws Exception {
+            Rule_nodes rule_node = Oks.allow_nulle(find_by_key_name(key_name));
+            if (rule_node != null) {
+                _add_new(rule_node);
+            }
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public String get_key_name() {
+            return _defined_key_name;
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public String get_name() {
+            return _defined_name;
+        }
+
+        /**
+         * 
+         * @param basic_token
+         * @return
+         */
+        public String create_token_name(Scanner_rules.Basic_tokens basic_token) {
+            return create_token_name(basic_token.token_type, basic_token.token_tex);
+        }
+
+        /**
+         * 
+         * @param token_type
+         * @param token_tex
+         * @return
+         */
+        public String create_token_name(String token_type, String token_tex) {
+            return token_type + "-" + token_tex;
+        }
+
+        /**
+         * 
+         * @param token_type
+         * @return
+         */
+        public String create_token_name(String token_type) {
+            return token_type + "-";
+        }
+
+        /**
+         * Set name, key_name and other attributes of the object
+         * @param rule_name_with_attributes Format: "key_name [&lt;optional&gt; | &lt;ignore&gt;] [&lt;repeat&gt;]: rest of the name (i.e: my_rule&lt;optional&gt;: call_other_rule&lt;repeat&gt;)"
+         */
+        public void set_name(String rule_name_with_attributes) {
+            try {
+                String old_defined_key_name = _defined_key_name;
+                this._defined_name = rule_name_with_attributes;
+                int pos = rule_name_with_attributes.indexOf(":");
+                if (pos >= 0) {
+                    _defined_key_name = rule_name_with_attributes.substring(0, pos);
+                } else {
+                    _defined_key_name = rule_name_with_attributes;
+                }
+                if (_defined_key_name.contains(Oks.no_fenum_cast(k_optional_tex))) {
+                    if (_defined_key_name.contains(Oks.no_fenum_cast(k_ignore_tex))) {
+                        throw new Exception(Tr.in(k_in_route, "<optional> and <ignore> cannot go together. ")
+                            + rule_name_with_attributes);
+                    } else {
+                        defined_optional_mode = Optional_mode.optional;
+                    }
+                } else if (_defined_key_name.contains(Oks.no_fenum_cast(k_ignore_tex))) {
+                    defined_optional_mode = Optional_mode.ignore_until_matches;
+                }
+                if (_defined_key_name.contains(Oks.no_fenum_cast(k_repeat_tex))) {
+                    defined_repeat_mode = Repeat_mode.repeat_while_success;
+                }
+                Rule_nodes rule_node = find_by_key_name(old_defined_key_name);
+                if (rule_node != null) {
+                    _defined_analizer_rules.rule_nodes_map.remove(_defined_key_name);
+                    _add_to_map(this);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        /**
+         *
+         * @param rule_node_supplier
+         * @throws Exception
+         */
+        public void add_new(Rule_creator_suppliers rule_node_supplier) throws Exception {
+             add_new(Oks.valide(rule_node_supplier.get()));
+        }
+
+        /**
+         *
+         * @param rule_creator_call
+         * @param ok
+         * @param extras_array
+         * @throws Exception
+         */
+        public void add_new(Rule_creator_calls rule_creator_call, Oks ok, Object ... extras_array) throws Exception {
+            Rule_nodes rule_node = ok.allow_null(rule_creator_call.call(ok, extras_array));
+            if (ok.is == false) return;
+            add_new(rule_node);
+        }
+
+        /**
+         *
+         * @param extras_arrayRule_creator_call
+         * @param rule_name_with_attributes Format: "key_name [&lt;optional&gt; | &lt;ignore&gt;] [&lt;repeat&gt;]: rest of the name (i.e: my_rule&lt;optional&gt;: call_other_rule&lt;repeat&gt;)"
+         * @param ok
+         * @param extras_array
+         * @throws Exception
+         */
+        public void add_new(Rule_creator_calls extras_arrayRule_creator_call, String rule_name_with_attributes
+                , Oks ok, Object ... extras_array) throws Exception {
+            Rule_nodes rule_node = ok.allow_null(extras_arrayRule_creator_call.call(ok, extras_array));
+            if (ok.is == false) return;
+            add_new(rule_node);
+        }
+
         /**
          *
          * @param rule_node
          * @throws Exception
          */
-        public abstract void add(Rule_nodes rule_node) throws Exception;
+        public void add_new(Rule_nodes rule_node) throws Exception {
+            add_new(rule_node, null);
+        }
+
+        /**
+         *
+         * @param rule_node
+         * @param rule_name_with_attributes Format: "key_name [&lt;optional&gt; | &lt;ignore&gt;] [&lt;repeat&gt;]: rest of the name (i.e: my_rule&lt;optional&gt;: call_other_rule&lt;repeat&gt;)"
+         * @throws Exception
+         */
+        public void add_new(Rule_nodes rule_node, @Nullable String rule_name_with_attributes) throws Exception {
+            Rule_nodes new_rule_nodes = _add_new(rule_node);
+            if (rule_name_with_attributes != null) {
+                new_rule_nodes.set_name(rule_name_with_attributes);
+            }
+            _add_to_map(new_rule_nodes);
+        }
+
+        /**
+         *
+         * @param basic_token
+         * @throws Exception
+         */
+        public void add_new(Scanner_rules.Basic_tokens basic_token) throws Exception {
+            add_new(basic_token, null);
+        }
+
+        /**
+         *
+         * @param basic_token
+         * @param rule_name_with_attributes Format: "key_name [&lt;optional&gt; | &lt;ignore&gt;] [&lt;repeat&gt;]: rest of the name (i.e: my_rule&lt;optional&gt;: call_other_rule&lt;repeat&gt;)"
+         * @throws Exception
+         */
+        public void add_new(Scanner_rules.Basic_tokens basic_token, @Nullable String rule_name_with_attributes) throws Exception {
+            Rule_nodes new_rule_nodes = _add_new(basic_token);
+            if (rule_name_with_attributes != null) {
+                new_rule_nodes.set_name(rule_name_with_attributes);
+            }
+            _add_to_map(new_rule_nodes);
+        }
+
+        /**
+         *
+         * @param token_type_tex
+         * @throws Exception
+         */
+        public void add_new(String token_type_tex) throws Exception {
+            add_new(new Scanner_rules.Basic_tokens(token_type_tex));
+        }
+
+        /**
+         *
+         * @param token_type_tex
+         * @param rule_name_with_attributes Format: "key_name [&lt;optional&gt; | &lt;ignore&gt;] [&lt;repeat&gt;]: rest of the name (i.e: my_rule&lt;optional&gt;: call_other_rule&lt;repeat&gt;)"
+         * @throws Exception
+         */
+        public void add_new(String token_type_tex, @Nullable String rule_name_with_attributes) throws Exception {
+            add_new(new Scanner_rules.Basic_tokens(token_type_tex), rule_name_with_attributes);
+        }
+
+        /**
+         *
+         * @param token_type_tex
+         * @param token_tex
+         * @param rule_name_with_attributes Format: "key_name [&lt;optional&gt; | &lt;ignore&gt;] [&lt;repeat&gt;]: rest of the name (i.e: my_rule&lt;optional&gt;: call_other_rule&lt;repeat&gt;)"
+         * @throws Exception
+         */
+        public void add_new(String token_type_tex, String token_tex, @Nullable String rule_name_with_attributes) throws Exception {
+            add_new(new Scanner_rules.Basic_tokens(token_type_tex, token_tex), rule_name_with_attributes);
+        }
+        /**
+         *
+         * @param rule_node
+         * @throws Exception
+         */
+        public abstract Rule_nodes _add_new(Rule_nodes rule_node) throws Exception;
+
         /**
          *
          * @param basic_token
          */
-        public abstract void add(Scanner_rules.Basic_tokens basic_token) throws Exception;
+        public abstract Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception;
 
         /**
          *
          * @param token_type_tex
          * @throws Exception
          */
-        public abstract void add(String token_type_tex) throws Exception;
+        public Rule_nodes _add_new(String token_type_tex) throws Exception {
+            return _add_new(new Scanner_rules.Basic_tokens(token_type_tex));
+        }
 
         /**
-         *
+         * 
+         * @param token_type_tex
          * @param token_tex
-         * @param token_type_tex
+         * @return
          * @throws Exception
          */
-        public abstract void add(String token_type_tex, String token_tex) throws Exception;
+        public Rule_nodes _add_new(String token_type_tex, String token_tex) throws Exception {
+            return _add_new(new Scanner_rules.Basic_tokens(token_type_tex, token_tex));
+        }
+
+        /**
+         *
+         * @param basic_tokens_list
+         * @throws Exception
+         */
+        public void add_new(List<Scanner_rules.Basic_tokens> basic_tokens_list) throws Exception {
+            for (var item: basic_tokens_list) {
+                add_new(item);
+            }
+        }
+
+        /**
+         *
+         * @param token_type_tex_array
+         */
+        public void add_new(String[] token_type_tex_array) throws Exception {
+            for (var item: token_type_tex_array) {
+                add_new(item);
+            }
+        }
 
     }
 
@@ -426,6 +689,15 @@ public class Analizer_rules extends Bases {
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         public Rules_and_rule_nodes(Rules_and_rule_nodes rules_and_rule_node) throws Exception {
             super(Oks.valide(rules_and_rule_node._defined_analizer_rules));
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(rules_and_rule_node, ok);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.tex);
+            }
         }
 
         @Override
@@ -646,32 +918,38 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
-        public void add(Rule_nodes rule_node) throws Exception {
+        public Rule_nodes _add_new(Rule_nodes rule_node) throws Exception {
             Rule_nodes new_rule_node;
             new_rule_node = Oks.no_fenum_cast(rule_node.getClass().getConstructor(rule_node.getClass()).newInstance(rule_node));
             _defined_rule_nodes_and_list.add(new_rule_node);
+            return rule_node;
         }
 
         @Override
-        public void add(Scanner_rules.Basic_tokens basic_token) throws Exception {
-            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-            tokens_or_rule_node.add(basic_token);
-            _defined_rule_nodes_and_list.add(tokens_or_rule_node);
+        public Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception {
+            Rule_nodes rule_node = Oks.allow_nulle(find_by_key_name(create_token_name(basic_token)));
+            Tokens_or_rule_nodes tokens_or_rule_node;
+            if (rule_node == null) {
+                // Create Tokens_or_rule_nodes for only one token
+                tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+                tokens_or_rule_node.set_name(create_token_name(basic_token));
+                tokens_or_rule_node.add_new(basic_token);
+                _defined_rule_nodes_and_list.add(tokens_or_rule_node);
+            } else {
+                if (rule_node instanceof Tokens_or_rule_nodes) {
+                    tokens_or_rule_node = new Tokens_or_rule_nodes((Tokens_or_rule_nodes) rule_node);
+                    if (tokens_or_rule_node._defined_tokens_or_list.contains(basic_token) == false) {
+                        throw new Exception(Tr.in(k_in_route, "Rule node found does not contain token: ")
+                            + create_token_name(basic_token));
+                    }
+                    _defined_rule_nodes_and_list.add(tokens_or_rule_node);
+                } else {
+                    throw new Exception(Tr.in(k_in_route, "Rule node found is instance of another class. "));
+                }
+            }
+            return tokens_or_rule_node;
         }
 
-        @Override
-        public void add(String token_type_tex) throws Exception {
-            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-            tokens_or_rule_node.add(token_type_tex);
-            _defined_rule_nodes_and_list.add(tokens_or_rule_node);
-        }
-
-        @Override
-        public void add(String token_type_tex, String token_tex) throws Exception {
-            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-            tokens_or_rule_node.add(token_type_tex, token_tex);
-            _defined_rule_nodes_and_list.add(tokens_or_rule_node);
-        }
     }
 
     public static class Tokens_or_rule_nodes extends Rule_nodes {
@@ -814,24 +1092,22 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
-        public void add(Rule_nodes rule_node) throws Exception {
+        public Rule_nodes _add_new(Rule_nodes rule_node) throws Exception {
             throw new Exception(Tr.in(k_in_route, "This rule only accepts tokens. "));
         }
 
         @Override
-        public void add(Scanner_rules.Basic_tokens basic_token) throws Exception {
+        public void add_new(Scanner_rules.Basic_tokens basic_token, @Nullable String rule_name_with_attributes) throws Exception {
+            _add_new(basic_token);
+        }
+
+        @Override
+        public Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception {
+            // Does not create a new Rule_node.
             _defined_tokens_or_list.add(basic_token);
+            return this;
         }
 
-        @Override
-        public void add(String token_type_tex) throws Exception {
-            _defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_type_tex));
-        }
-
-        @Override
-        public void add(String token_type_tex, String token_tex) throws Exception {
-            _defined_tokens_or_list.add(new Scanner_rules.Basic_tokens(token_type_tex, token_tex));
-        }
     }
 
     public static class Rules_or_rule_nodes extends Rule_nodes {
@@ -846,8 +1122,17 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
-        public Rules_or_rule_nodes(Rules_or_rule_nodes rule_node_find_way) throws Exception {
-            super(Oks.valide(rule_node_find_way._defined_analizer_rules));
+        public Rules_or_rule_nodes(Rules_or_rule_nodes rules_or_rule_nodes) throws Exception {
+            super(Oks.valide(rules_or_rule_nodes._defined_analizer_rules));
+            Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+            try {
+                init(rules_or_rule_nodes, ok);
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+            if (ok.is == false) {
+                throw new Exception(ok.tex);
+            }
         }
 
         @Override
@@ -960,37 +1245,44 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
-        public void add(Rule_nodes rule_node) throws Exception {
+        public Rule_nodes _add_new(Rule_nodes rule_node) throws Exception {
             Rule_nodes new_rule_node;
             new_rule_node = Oks.no_fenum_cast(rule_node.getClass().getConstructor(rule_node.getClass()).newInstance(rule_node));
             _defined_rule_nodes_or_list.add(new_rule_node);
+            return rule_node;
         }
 
         @Override
-        public void add(Scanner_rules.Basic_tokens basic_token) throws Exception {
-            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-            tokens_or_rule_node.add(basic_token);
-            _defined_rule_nodes_or_list.add(tokens_or_rule_node);
+        public Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception {
+            Tokens_or_rule_nodes tokens_or_rule_node;
+            Rule_nodes rule_node = Oks.allow_nulle(find_by_key_name(create_token_name(basic_token)));
+            if (rule_node == null) {
+                // Create Tokens_or_rule_nodes for only one token
+                tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
+                tokens_or_rule_node.set_name(create_token_name(basic_token));
+                tokens_or_rule_node.add_new(basic_token);
+                _defined_rule_nodes_or_list.add(tokens_or_rule_node);
+            } else {
+                if (rule_node instanceof Tokens_or_rule_nodes) {
+                    tokens_or_rule_node = new Tokens_or_rule_nodes((Tokens_or_rule_nodes) rule_node);
+                    if (tokens_or_rule_node._defined_tokens_or_list.contains(basic_token) == false) {
+                        throw new Exception(Tr.in(k_in_route, "Rule node found does not contain token: ")
+                                + create_token_name(basic_token));
+                    }
+                    _defined_rule_nodes_or_list.add(tokens_or_rule_node);
+                } else {
+                    throw new Exception(Tr.in(k_in_route, "Rule node found is instance of another class. "));
+                }
+            }
+            return tokens_or_rule_node;
         }
 
-        @Override
-        public void add(String token_type_tex) throws Exception {
-            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-            tokens_or_rule_node.add(token_type_tex);
-            _defined_rule_nodes_or_list.add(tokens_or_rule_node);
-        }
-
-        @Override
-        public void add(String token_type_tex, String token_tex) throws Exception {
-            Tokens_or_rule_nodes tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-            tokens_or_rule_node.add(token_type_tex, token_tex);
-            _defined_rule_nodes_or_list.add(tokens_or_rule_node);
-        }
     }
 
     public @Nullable Rule_nodes start_rule_node = null;
     public I_code_scanners i_code_scanner;
     public Deque<Rule_success> success_rules_list = new LinkedList<>();
+    public Map<String, Rule_nodes> rule_nodes_map = new HashMap<>();
 
     public Analizer_rules(I_code_scanners i_code_scanner) {
         this.i_code_scanner = i_code_scanner;

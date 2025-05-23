@@ -249,7 +249,6 @@ public abstract class Scanner_rules extends Bases {
     /**
      * @param is_pos_out
      * @param character
-     * @param pos
      * @param ok
      * @param extras_array
      * @throws Exception
