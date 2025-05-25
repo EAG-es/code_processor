@@ -55,6 +55,7 @@ public class Analizer_rules extends Bases {
         , repeat_while_success
     }
     public static @Fenum("repeat_mode") String k_repeat_tex = (@Fenum("repeat_mode") String) "<optional>";
+    public static @Fenum("call_mode") String k_call_tex = (@Fenum("repeat_mode") String) "<call>";
 
     @FunctionalInterface
     public interface After_success_calls extends Serializable {
@@ -86,7 +87,7 @@ public class Analizer_rules extends Bases {
         public String _defined_name = "";
         public Optional_mode defined_optional_mode = Optional_mode.no_optional;
         public Repeat_mode defined_repeat_mode = Repeat_mode.no_repeat;
-        public boolean defined_is_to_process_the_success_rules_list_if_success = false;
+        public boolean defined_call_the_success_rules_list_if_success = false;
         public Analizer_rules _defined_analizer_rules;
         public @Nullable Rule_success defined_rule_success = null;
         public boolean _is_already_evaluated = false;
@@ -138,7 +139,7 @@ public class Analizer_rules extends Bases {
                 _defined_name = "";
                 defined_optional_mode = Optional_mode.no_optional;
                 defined_repeat_mode = Repeat_mode.no_repeat;
-                defined_is_to_process_the_success_rules_list_if_success = false;
+                defined_call_the_success_rules_list_if_success = false;
                 defined_rule_success = null;
                 init_to_reuse_or_repeat(true, ok, extras_array);
             } catch (Exception e) {
@@ -157,7 +158,7 @@ public class Analizer_rules extends Bases {
             ResourceBundle in = null;
             try {
                 if (is_reuse) {
-                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
+                    if (defined_call_the_success_rules_list_if_success == true) {
                         _defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
                         if (ok.is == false) return;
                     }
@@ -191,7 +192,7 @@ public class Analizer_rules extends Bases {
                 _defined_analizer_rules = basic_rule_node._defined_analizer_rules;
                 defined_optional_mode = basic_rule_node.defined_optional_mode;
                 defined_repeat_mode = basic_rule_node.defined_repeat_mode;
-                defined_is_to_process_the_success_rules_list_if_success = basic_rule_node.defined_is_to_process_the_success_rules_list_if_success;
+                defined_call_the_success_rules_list_if_success = basic_rule_node.defined_call_the_success_rules_list_if_success;
                 _is_already_evaluated = basic_rule_node._is_already_evaluated;
                 _first_token_pos = basic_rule_node._first_token_pos;
                 _is_once_successed = basic_rule_node._is_once_successed;
@@ -289,12 +290,12 @@ public class Analizer_rules extends Bases {
             Integer pos;
             try {
                 if (return_status.equals(Return_status.matched)) {
-                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
+                    if (defined_call_the_success_rules_list_if_success == true) {
                         _defined_analizer_rules.process(ok.valid(_first_token_pos), ok, extras_array);
                         if (ok.is == false) return;
                     }
                 } else {
-                    if (defined_is_to_process_the_success_rules_list_if_success == true) {
+                    if (defined_call_the_success_rules_list_if_success == true) {
                         _defined_analizer_rules.process_clean(ok.valid(_first_token_pos), ok, extras_array);
                         if (ok.is == false) return;
                     }
@@ -454,7 +455,7 @@ public class Analizer_rules extends Bases {
          * Set name, key_name and other attributes of the object
          * @param rule_name_with_attributes Format: "key_name [&lt;optional&gt; | &lt;ignore&gt;] [&lt;repeat&gt;]: rest of the name (i.e: my_rule&lt;optional&gt;: call_other_rule&lt;repeat&gt;)"
          */
-        public void set_name(String rule_name_with_attributes) {
+        public void configure_from_key_name(String rule_name_with_attributes) {
             try {
                 String old_defined_key_name = _defined_key_name;
                 this._defined_name = rule_name_with_attributes;
@@ -464,18 +465,30 @@ public class Analizer_rules extends Bases {
                 } else {
                     _defined_key_name = rule_name_with_attributes;
                 }
-                if (_defined_key_name.contains(Oks.no_fenum_cast(k_optional_tex))) {
-                    if (_defined_key_name.contains(Oks.no_fenum_cast(k_ignore_tex))) {
-                        throw new Exception(Tr.in(k_in_route, "<optional> and <ignore> cannot go together. ")
-                            + rule_name_with_attributes);
-                    } else {
-                        defined_optional_mode = Optional_mode.optional;
+                pos = _defined_key_name.indexOf("<");
+                if (pos >= 0) {
+                    String new_name = _defined_key_name.substring(0, pos);
+                    if (_defined_key_name.contains(Oks.no_fenum_cast(k_optional_tex))) {
+                        if (_defined_key_name.contains(Oks.no_fenum_cast(k_ignore_tex))) {
+                            throw new Exception(Tr.in(k_in_route, "<optional> and <ignore> cannot go together. ")
+                                    + rule_name_with_attributes);
+                        } else {
+                            defined_optional_mode = Optional_mode.optional;
+                            new_name = new_name + k_optional_tex;
+                        }
+                    } else if (_defined_key_name.contains(Oks.no_fenum_cast(k_ignore_tex))) {
+                        defined_optional_mode = Optional_mode.ignore_until_matches;
+                        new_name = new_name + k_ignore_tex;
                     }
-                } else if (_defined_key_name.contains(Oks.no_fenum_cast(k_ignore_tex))) {
-                    defined_optional_mode = Optional_mode.ignore_until_matches;
-                }
-                if (_defined_key_name.contains(Oks.no_fenum_cast(k_repeat_tex))) {
-                    defined_repeat_mode = Repeat_mode.repeat_while_success;
+                    if (_defined_key_name.contains(Oks.no_fenum_cast(k_repeat_tex))) {
+                        defined_repeat_mode = Repeat_mode.repeat_while_success;
+                        new_name = new_name + k_repeat_tex;
+                    }
+                    if (_defined_key_name.contains(Oks.no_fenum_cast(k_call_tex))) {
+                        defined_call_the_success_rules_list_if_success = true;
+                        new_name = new_name + k_call_tex;
+                    }
+                    _defined_key_name = new_name;
                 }
                 Rule_nodes rule_node = find_by_key_name(old_defined_key_name);
                 if (rule_node != null) {
@@ -542,7 +555,7 @@ public class Analizer_rules extends Bases {
         public void add_new(Rule_nodes rule_node, @Nullable String rule_name_with_attributes) throws Exception {
             Rule_nodes new_rule_nodes = _add_new(rule_node);
             if (rule_name_with_attributes != null) {
-                new_rule_nodes.set_name(rule_name_with_attributes);
+                new_rule_nodes.configure_from_key_name(rule_name_with_attributes);
             }
             _add_to_map(new_rule_nodes);
         }
@@ -565,7 +578,7 @@ public class Analizer_rules extends Bases {
         public void add_new(Scanner_rules.Basic_tokens basic_token, @Nullable String rule_name_with_attributes) throws Exception {
             Rule_nodes new_rule_nodes = _add_new(basic_token);
             if (rule_name_with_attributes != null) {
-                new_rule_nodes.set_name(rule_name_with_attributes);
+                new_rule_nodes.configure_from_key_name(rule_name_with_attributes);
             }
             _add_to_map(new_rule_nodes);
         }
@@ -687,6 +700,7 @@ public class Analizer_rules extends Bases {
         }
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
+        @SuppressWarnings({"nullness:method.invocation", "nullness:initialization.fields.uninitialized"})
         public Rules_and_rule_nodes(Rules_and_rule_nodes rules_and_rule_node) throws Exception {
             super(Oks.valide(rules_and_rule_node._defined_analizer_rules));
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
@@ -932,7 +946,7 @@ public class Analizer_rules extends Bases {
             if (rule_node == null) {
                 // Create Tokens_or_rule_nodes for only one token
                 tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-                tokens_or_rule_node.set_name(create_token_name(basic_token));
+                tokens_or_rule_node.configure_from_key_name(create_token_name(basic_token));
                 tokens_or_rule_node.add_new(basic_token);
                 _defined_rule_nodes_and_list.add(tokens_or_rule_node);
             } else {
@@ -972,7 +986,7 @@ public class Analizer_rules extends Bases {
         }
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        @SuppressWarnings("nullness:method.invocation")
+        @SuppressWarnings({"nullness:method.invocation", "nullness:initialization.fields.uninitialized"})
         public Tokens_or_rule_nodes(Tokens_or_rule_nodes tokens_or_rule_node) throws Exception {
             super(Oks.valide(tokens_or_rule_node._defined_analizer_rules));
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
@@ -1121,7 +1135,7 @@ public class Analizer_rules extends Bases {
         }
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        @SuppressWarnings("nullness:method.invocation")
+        @SuppressWarnings({"nullness:method.invocation", "nullness:initialization.fields.uninitialized"})
         public Rules_or_rule_nodes(Rules_or_rule_nodes rules_or_rule_nodes) throws Exception {
             super(Oks.valide(rules_or_rule_nodes._defined_analizer_rules));
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
@@ -1259,7 +1273,7 @@ public class Analizer_rules extends Bases {
             if (rule_node == null) {
                 // Create Tokens_or_rule_nodes for only one token
                 tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-                tokens_or_rule_node.set_name(create_token_name(basic_token));
+                tokens_or_rule_node.configure_from_key_name(create_token_name(basic_token));
                 tokens_or_rule_node.add_new(basic_token);
                 _defined_rule_nodes_or_list.add(tokens_or_rule_node);
             } else {
