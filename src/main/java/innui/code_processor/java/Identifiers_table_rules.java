@@ -84,6 +84,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "define_rule_start(): _define_rule_package()<optional><call> _define_rule_class_method_and_attribute()<repeat>" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_start_rule_node_supplier = () -> {
                 try {
+                    r_start_rule_node.clear_add_new_list();
                     r_start_rule_node.add_new(this::_define_rule_package, ok, extras_array);
                     if (ok.is == false) return null;
                     r_start_rule_node.add_new(this::_define_rule_class_method_and_attribute, ok, extras_array);
@@ -129,9 +130,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_semi_colon: semi_colon" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_semi_colon_rule_node_supplier = () -> {
                 try {
+                    t_semi_colon_rule_node.clear_add_new_list();
                     t_semi_colon_rule_node.add_new(semi_colon.name());
                     t_semi_colon_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_first_part_tokens_list, _ok, _extras_array) -> {
+                            (_first_part_basic_token, _ok, _extras_array) -> {
                                 identifiers_table.create_top_table(braces_num, _ok, _extras_array);
                                 if (_ok.is == false) return;
                                 identifiers_table.put_identifier(true, _ok, _extras_array);
@@ -146,9 +148,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_identifier_1: identifier" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_1_rule_node_supplier = () -> {
                 try {
+                    t_identifier_1_rule_node.clear_add_new_list();
                     t_identifier_1_rule_node.add_new(identifier.name());
                     t_identifier_1_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
+                            (_basic_token, _ok, _extras_array) -> {
                                 if (identifiers_table.new_identifier.namespace.isEmpty()) {
                                     identifiers_table.new_identifier.namespace
                                             = identifiers_table.new_identifier.name;
@@ -158,7 +161,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                                             + "."
                                             + identifiers_table.new_identifier.name;
                                 }
-                                identifiers_table.new_identifier.name = _tokens_list.get(0).token_tex;
+                                identifiers_table.new_identifier.name = _basic_token.token_tex;
                             }
                     );
                 } catch (Exception e) {
@@ -169,6 +172,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_dot: dot " */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_dot_rule_node_supplier = () -> {
                 try {
+                    t_dot_rule_node.clear_add_new_list();
                     t_dot_rule_node.add_new(dot.name());
                 } catch (Exception e) {
                     return null;
@@ -178,10 +182,11 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_identifier: identifier" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_rule_node_supplier = () -> {
                 try {
+                    t_identifier_rule_node.clear_add_new_list();
                     t_identifier_rule_node.add_new(identifier.name());
                     t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
-                                identifiers_table.new_identifier.name = _tokens_list.get(0).token_tex;
+                            (_basic_token, _ok, _extras_array) -> {
+                                identifiers_table.new_identifier.name = _basic_token.token_tex;
                                 identifiers_table.new_identifier.type = Types.token_package.name();
                             }
                     );
@@ -193,6 +198,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "r_dot_identifier<optional><repeat>: t_dot t_identifier_1" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_dot_identifier_rule_node_supplier = () -> {
                 try {
+                    r_dot_identifier_rule_node.clear_add_new_list();
                     r_dot_identifier_rule_node.add_new(t_dot_rule_node_supplier);
                     r_dot_identifier_rule_node.add_new(t_identifier_1_rule_node_supplier);
                     r_dot_identifier_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
@@ -205,9 +211,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_package: package " */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_package_rule_node_supplier = () -> {
                 try {
+                    t_package_rule_node.clear_add_new_list();
                     t_package_rule_node.add_new(token_package.name());
                     t_package_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
+                            (_basic_token, _ok, _extras_array) -> {
                                 identifiers_table.new_identifier.init(_ok, _extras_array);
                             }
                     );
@@ -219,6 +226,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "_define_rule_package()<optional><call>: t_package r_identifier r_dot_identifier<optional><repeat> r_semi_colon" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_define_rule_package_rule_node_supplier = () -> {
                 try {
+                    r_define_rule_package_rule_node.clear_add_new_list();
                     r_define_rule_package_rule_node.add_new(t_package_rule_node_supplier);
                     r_define_rule_package_rule_node.add_new(t_identifier_rule_node_supplier);
                     r_define_rule_package_rule_node.add_new(r_dot_identifier_rule_node_supplier);
@@ -411,14 +419,16 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "t_class<ignore> t_class_1<optional><repeat> t_class_2 t_identifier");
             t_class_rule_node.configure_from_key_name("t_class<ignore>: [public|protected|private" +
                     "|static|abstract|sealed" +
-                    "|strictfp" +
+                    "|strictfp|transient" +
                     "|class|interface|enum|record]");
-            t_class_1_rule_node.configure_from_key_name("t_class_1<optional><repeat>: [public|protected|private|static|abstract|sealed|strictfp]");
+            t_class_1_rule_node.configure_from_key_name("t_class_1<optional><repeat>: " +
+                    "[public|protected|private|static|abstract|sealed|strictfp|transient]");
             t_class_2_rule_node.configure_from_key_name("t_class_2: [class|interface|enum|record]");
             t_identifier_rule_node.configure_from_key_name("t_identifier: identifier");
-            /* t_class<ignore>: [public|protected|private|static|abstract|sealed|class|interface|enum]<ignore> r_class_2 */
+            /* t_class<ignore>: [public|protected|private|static|abstract|sealed|strictfp|transient|class|interface|enum]<ignore> r_class_2 */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_rule_node_supplier = () -> {
                 try {
+                    t_class_rule_node.clear_add_new_list();
                     t_class_rule_node.add_new(token_public.name());
                     t_class_rule_node.add_new(token_protected.name());
                     t_class_rule_node.add_new(token_private.name());
@@ -426,6 +436,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     t_class_rule_node.add_new(token_abstract.name());
                     t_class_rule_node.add_new(token_sealed.name());
                     t_class_rule_node.add_new(token_strictfp.name());
+                    t_class_rule_node.add_new(token_transient.name());
                     t_class_rule_node.add_new(token_class.name());
                     t_class_rule_node.add_new(token_interface.name());
                     t_class_rule_node.add_new(token_enum.name());
@@ -436,9 +447,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 }
                 return t_class_rule_node;
             };
-            /* t_class_1<optional><repeat>: [public|protected|private|static|abstract|sealed] */
+            /* t_class_1<optional><repeat>: [public|protected|private|static|abstract|sealed|strictfp|transient] */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_1_rule_node_supplier = () -> {
                 try {
+                    t_class_1_rule_node.clear_add_new_list();
                     t_class_1_rule_node.add_new(token_public.name());
                     t_class_1_rule_node.add_new(token_protected.name());
                     t_class_1_rule_node.add_new(token_private.name());
@@ -446,11 +458,12 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     t_class_1_rule_node.add_new(token_abstract.name());
                     t_class_1_rule_node.add_new(token_sealed.name());
                     t_class_1_rule_node.add_new(token_strictfp.name());
+                    t_class_1_rule_node.add_new(token_transient.name());
                     t_class_1_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
                     t_class_1_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
                     t_class_1_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
-                                Scanner_rules.Basic_tokens basic_token = _tokens_list.get(0);
+                            (_basic_token, _ok, _extras_array) -> {
+                                Scanner_rules.Basic_tokens basic_token = _basic_token;
                                 identifiers_table.new_identifier.properties_list.add(new Scanner_rules.Basic_tokens(basic_token.token_type
                                         , basic_token.token_tex));
                             }
@@ -463,13 +476,14 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* t_class_2: [class|interface|enum|record] */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_2_rule_node_supplier = () -> {
                 try {
+                    t_class_2_rule_node.clear_add_new_list();
                     t_class_2_rule_node.add_new(token_class.name());
                     t_class_2_rule_node.add_new(token_interface.name());
                     t_class_2_rule_node.add_new(token_enum.name());
                     t_class_2_rule_node.add_new(token_record.name());
                     t_class_2_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
-                                String name = _tokens_list.get(0).token_type;
+                            (_basic_token, _ok, _extras_array) -> {
+                                String name = _basic_token.token_type;
                                 if (Types.token_class.name().equals(name)) {
                                     identifiers_table.new_identifier.type = Types.token_class.name();
                                 } else if (Types.token_interface.name().equals(name)) {
@@ -491,10 +505,11 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* t_identifier: identifier */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_rule_node_supplier = () -> {
                 try {
+                    t_identifier_rule_node.clear_add_new_list();
                     t_identifier_rule_node.add_new(identifier.name());
                     t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
-                                identifiers_table.new_identifier.name = _tokens_list.get(0).token_tex;
+                            (_basic_token, _ok, _extras_array) -> {
+                                identifiers_table.new_identifier.name = _basic_token.token_tex;
                                 Identifiers_tables.Identifiers identifier = _ok.valid(identifiers_table.put_identifier(_ok, _extras_array));
                                 next_block_identifier = new Identifiers_tables.Identifiers(identifier);
                             }
@@ -507,6 +522,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* r_class<ignore><call>: t_class<ignore> t_class_1<repeat> t_class_2<ignore> t_class_3 t_identifier */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_class_rule_node_supplier = () -> {
                 try {
+                    r_class_rule_node.clear_add_new_list();
                     r_class_rule_node.add_new(t_class_rule_node_supplier);
                     r_class_rule_node.add_new(t_class_1_rule_node_supplier);
                     r_class_rule_node.add_new(t_class_2_rule_node_supplier);
@@ -521,6 +537,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "_define_rule_class_method_and_attribute()<repeat>: r_class _define_rule_method_or_attribute_or_class()" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_define_rule_class_method_and_attribute_rule_node_supplier = () -> {
                 try {
+                    r_define_rule_class_method_and_attribute_rule_node.clear_add_new_list();
                     r_define_rule_class_method_and_attribute_rule_node.add_new(r_class_rule_node_supplier);
                     r_define_rule_class_method_and_attribute_rule_node.add_new(this::_define_rule_method_or_attribute_or_class, ok, extras_array);
                     r_define_rule_class_method_and_attribute_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
@@ -555,7 +572,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             Analizer_rules.Tokens_or_rule_nodes t_method_or_attribute_or_class_1_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
             Analizer_rules.Rules_or_rule_nodes o_method_or_attribute_or_class_rule_node = new Analizer_rules.Rules_or_rule_nodes(analizer_rule);
             Analizer_rules.Tokens_or_rule_nodes t_identifier_type_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_identifier_type_extra_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
+            Analizer_rules.Tokens_or_rule_nodes t_identifier_type_class_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
             Analizer_rules.Tokens_or_rule_nodes t_identifier_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
             Analizer_rules.Rules_or_rule_nodes o_parenthesis_open_or_semicolon_rule_node = new Analizer_rules.Rules_or_rule_nodes(analizer_rule);
             Analizer_rules.Rules_and_rule_nodes r_parenthesis_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
@@ -585,12 +602,12 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "o_method_or_attribute_or_class");
             t_method_or_attribute_or_class_rule_node.configure_from_key_name("t_method_or_attribute_or_class<ignore>: [public|protected|private" +
                     "|static|volatile|final" +
-                    "|strictfp" +
+                    "|strictfp|transient" +
                     "|identifier|void|boolean|byte|char|short|int|long|float|double" +
                     "|sign_less" +
                     "|abstract|sealed|class|interface|enum|record" +
                     "|annotation]");
-            o_method_or_attribute_or_class_1_rule_node.configure_from_key_name("o_method_or_attribute_or_class_1_rule_node<optional><repeat>: " +
+            o_method_or_attribute_or_class_1_rule_node.configure_from_key_name("o_method_or_attribute_or_class_1<optional><repeat>: " +
                     "[t_method_or_attribute_or_class_1|r_annotation]");
             r_annotation_rule_node.configure_from_key_name("r_annotation: t_annotation r_annotation_begin_end<optional>");
             t_annotation_rule_node.configure_from_key_name("t_annotation: annotation");
@@ -601,7 +618,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             t_method_or_attribute_or_class_1_rule_node.configure_from_key_name("t_method_or_attribute_or_class_1: " +
                     "[public|protected|private" +
                     "|static|volatile|final" +
-                    "|strictfp]");
+                    "|strictfp|transient]");
             o_method_or_attribute_or_class_rule_node.configure_from_key_name("o_method_or_attribute_or_class: " +
                     "[r_method_or_attribute" +
                     "|r_class]");
@@ -615,15 +632,15 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             t_template_sign_bigger_rule_node.configure_from_key_name("t_sign_bigger<ignore>: sign_bigger");
             o_identifier_type_rule_node.configure_from_key_name("o_identifier_type: [t_identifier_type|r_identifier_class]");
             r_identifier_class_rule_node.configure_from_key_name("r_identifier_class: " +
-                    "t_identifier r_dot_identifier<optional><repeat>");
+                    "t_identifier_type_class r_dot_identifier<optional><repeat>");
             r_dot_identifier_rule_node.configure_from_key_name("r_dot_identifier<optional><repeat>: " +
-                    "t_dot r_annotation_in_identifier<optional><repeat> t_identifier_type_extra");
+                    "t_dot r_annotation_in_identifier<optional><repeat> t_identifier_type_class");
             t_dot_rule_node.configure_from_key_name("t_dot: dot");
             r_annotation_in_identifier_rule_node.configure_from_key_name("r_annotation_in_identifier<optional><repeat>: " +
                     "r_annotation");
             t_identifier_type_rule_node.configure_from_key_name("t_identifier_type: " +
                     "[void|boolean|byte|char|short|int|long|float|double]");
-            t_identifier_type_extra_rule_node.configure_from_key_name("t_identifier_type_extra: identifier");
+            t_identifier_type_class_rule_node.configure_from_key_name("t_identifier_type_class: identifier");
             t_identifier_rule_node.configure_from_key_name("t_identifier: identifier");
             o_parenthesis_open_or_semicolon_rule_node.configure_from_key_name("o_parenthesis_open_or_semicolon: [t_parenthesis_open|t_semicolon<ignore>]");
             r_parenthesis_rule_node.configure_from_key_name("r_parenthesis: t_parenthesis_open t_parenthesis_close<ignore>");
@@ -633,6 +650,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_class: [class|interface|enum|record]" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_rule_node_supplier = () -> {
                 try {
+                    t_class_rule_node.clear_add_new_list();
                     t_class_rule_node.add_new(token_class.name());
                     t_class_rule_node.add_new(token_interface.name());
                     t_class_rule_node.add_new(token_enum.name());
@@ -645,6 +663,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_class_identifier: identifier" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_identifier_rule_node_supplier = () -> {
                 try {
+                    t_class_identifier_rule_node.clear_add_new_list();
                     t_class_identifier_rule_node.add_new(identifier.name());
                 } catch (Exception e) {
                     return null;
@@ -654,6 +673,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "r_class: t_class t_class_identifier" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_class_rule_node_supplier = () -> {
                 try {
+                    r_class_rule_node.clear_add_new_list();
                     r_class_rule_node.add_new(t_class_rule_node_supplier);
                     r_class_rule_node.add_new(t_class_identifier_rule_node_supplier);
                 } catch (Exception e) {
@@ -668,6 +688,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "|abstract|sealed|class|interface|enum|record]" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_method_or_attribute_or_class_rule_node_supplier = () -> {
                 try {
+                    t_method_or_attribute_or_class_rule_node.clear_add_new_list();
                     t_method_or_attribute_or_class_rule_node.add_new(token_public.name());
                     t_method_or_attribute_or_class_rule_node.add_new(token_protected.name());
                     t_method_or_attribute_or_class_rule_node.add_new(token_private.name());
@@ -675,6 +696,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     t_method_or_attribute_or_class_rule_node.add_new(token_volatile.name());
                     t_method_or_attribute_or_class_rule_node.add_new(token_final.name());
                     t_method_or_attribute_or_class_rule_node.add_new(token_strictfp.name());
+                    t_method_or_attribute_or_class_rule_node.add_new(token_transient.name());
                     t_method_or_attribute_or_class_rule_node.add_new(identifier.name());
                     t_method_or_attribute_or_class_rule_node.add_new(type_void.name());
                     t_method_or_attribute_or_class_rule_node.add_new(type_boolean.name());
@@ -704,6 +726,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "|static]" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_method_or_attribute_or_class_1_rule_node_supplier = () -> {
                 try {
+                    t_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
                     t_method_or_attribute_or_class_1_rule_node.add_new(token_public.name());
                     t_method_or_attribute_or_class_1_rule_node.add_new(token_protected.name());
                     t_method_or_attribute_or_class_1_rule_node.add_new(token_private.name());
@@ -711,11 +734,11 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     t_method_or_attribute_or_class_1_rule_node.add_new(token_volatile.name());
                     t_method_or_attribute_or_class_1_rule_node.add_new(token_final.name());
                     t_method_or_attribute_or_class_1_rule_node.add_new(token_strictfp.name());
+                    t_method_or_attribute_or_class_1_rule_node.add_new(token_transient.name());
                     t_method_or_attribute_or_class_1_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
-                                Scanner_rules.Basic_tokens basic_token = _tokens_list.get(0);
-                                identifiers_table.new_identifier.properties_list.add(new Scanner_rules.Basic_tokens(basic_token.token_type
-                                        , basic_token.token_tex));
+                            (_basic_token, _ok, _extras_array) -> {
+                                identifiers_table.new_identifier.properties_list.add(new Scanner_rules.Basic_tokens(_basic_token.token_type
+                                        , _basic_token.token_tex));
                             }
                     );
                 } catch (Exception e) {
@@ -726,6 +749,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_annotation: annotation" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_rule_node_supplier = () -> {
                 try {
+                    t_annotation_rule_node.clear_add_new_list();
                     t_annotation_rule_node.add_new(annotation.name());
                 } catch (Exception e) {
                     return null;
@@ -735,6 +759,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_annotation_parenthesis_open: parenthesis_open" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_parenthesis_open_rule_node_supplier = () -> {
                 try {
+                    t_annotation_parenthesis_open_rule_node.clear_add_new_list();
                     t_annotation_parenthesis_open_rule_node.add_new(parenthesis_open.name());
                 } catch (Exception e) {
                     return null;
@@ -744,6 +769,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_annotation_parenthesis_close<ignore>: parenthesis_close" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_parenthesis_close_rule_node_supplier = () -> {
                 try {
+                    t_annotation_parenthesis_close_rule_node.clear_add_new_list();
                     t_annotation_parenthesis_close_rule_node.add_new(parenthesis_close.name());
                     t_annotation_parenthesis_close_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {
@@ -754,6 +780,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_annotation_parenthesis_close_1: parenthesis_close" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_parenthesis_close_1_rule_node_supplier = () -> {
                 try {
+                    t_annotation_parenthesis_close_1_rule_node.clear_add_new_list();
                     t_annotation_parenthesis_close_1_rule_node.add_new(parenthesis_close.name());
                 } catch (Exception e) {
                     return null;
@@ -763,6 +790,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "r_annotation_begin_end<optional>: t_annotation_parenthesis_open t_annotation_parenthesis_close<ignore>" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_annotation_begin_end_rule_node_supplier = () -> {
                 try {
+                    r_annotation_begin_end_rule_node.clear_add_new_list();
                     r_annotation_begin_end_rule_node.add_new(t_annotation_parenthesis_open_rule_node_supplier);
                     r_annotation_begin_end_rule_node.add_new(t_annotation_parenthesis_close_rule_node_supplier);
                     r_annotation_begin_end_rule_node.add_new(t_annotation_parenthesis_close_1_rule_node_supplier);
@@ -772,9 +800,10 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 }
                 return r_annotation_begin_end_rule_node;
             };
-            /* "r_annotation: r_annotation_1 r_annotation_begin_end<optional>" */
+            /* "r_annotation: t_annotation r_annotation_begin_end<optional>" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_annotation_rule_node_supplier = () -> {
                 try {
+                    r_annotation_rule_node.clear_add_new_list();
                     r_annotation_rule_node.add_new(t_annotation_rule_node_supplier);
                     r_annotation_rule_node.add_new(r_annotation_begin_end_rule_node_supplier);
                 } catch (Exception e) {
@@ -782,10 +811,12 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 }
                 return r_annotation_rule_node;
             };
-            /* "o_method_or_attribute_or_class_1_rule_node<optional><repeat>: " +
+            /* "o_method_or_attribute_or_class_1<optional><repeat>: " +
                     "[t_method_or_attribute_or_class_1|r_annotation" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_method_or_attribute_or_class_1_rule_node_supplier = () -> {
                 try {
+                    o_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
+                    o_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
                     o_method_or_attribute_or_class_1_rule_node.add_new(t_method_or_attribute_or_class_1_rule_node_supplier);
                     o_method_or_attribute_or_class_1_rule_node.add_new(r_annotation_rule_node_supplier);
                     o_method_or_attribute_or_class_1_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
@@ -798,6 +829,8 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_sign_less: sign_less" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_template_sign_less_rule_node_supplier = () -> {
                 try {
+                    t_template_sign_less_rule_node.clear_add_new_list();
+                    t_template_sign_less_rule_node.clear_add_new_list();
                     t_template_sign_less_rule_node.add_new(sign_less.name());
                 } catch (Exception e) {
                     return null;
@@ -807,6 +840,8 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_sign_bigger<ignore>: sign_bigger" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_template_sign_bigger_rule_node_supplier = () -> {
                 try {
+                    t_template_sign_bigger_rule_node.clear_add_new_list();
+                    t_template_sign_bigger_rule_node.clear_add_new_list();
                     t_template_sign_bigger_rule_node.add_new(sign_bigger.name());
                     t_template_sign_bigger_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {
@@ -817,6 +852,8 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "r_template<optional>: t_sign_less t_sign_bigger<ignore> t_sign_bigger_1" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_template_rule_node_supplier = () -> {
                 try {
+                    r_template_rule_node.clear_add_new_list();
+                    r_template_rule_node.clear_add_new_list();
                     r_template_rule_node.add_new(t_template_sign_less_rule_node_supplier);
                     r_template_rule_node.add_new(t_template_sign_bigger_rule_node_supplier);
                     r_template_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
@@ -829,6 +866,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "[void|boolean|byte|char|short|int|long|float|double]" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_type_rule_node_supplier = () -> {
                 try {
+                    t_identifier_type_rule_node.clear_add_new_list();
                     t_identifier_type_rule_node.add_new(type_void.name());
                     t_identifier_type_rule_node.add_new(type_boolean.name());
                     t_identifier_type_rule_node.add_new(type_byte.name());
@@ -839,12 +877,12 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     t_identifier_type_rule_node.add_new(type_float.name());
                     t_identifier_type_rule_node.add_new(type_double.name());
                     t_identifier_type_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
+                            (_basic_token, _ok, _extras_array) -> {
                                 if (identifiers_table.new_identifier.return_class.isEmpty()) {
-                                    identifiers_table.new_identifier.return_class = _tokens_list.get(0).token_tex;
+                                    identifiers_table.new_identifier.return_class = _basic_token.token_tex;
                                 } else {
-                                    identifiers_table.new_identifier.return_class = _tokens_list.get(0).token_tex
-                                            + "." + _tokens_list.get(0).token_tex;
+                                    identifiers_table.new_identifier.return_class = _basic_token.token_tex
+                                            + "." + _basic_token.token_tex;
                                 }
                             }
                     );
@@ -856,10 +894,11 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_identifier: identifier" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_rule_node_supplier = () -> {
                 try {
+                    t_identifier_rule_node.clear_add_new_list();
                     t_identifier_rule_node.add_new(identifier.name());
                     t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
-                                identifiers_table.new_identifier.name = _tokens_list.get(0).token_tex;
+                            (_basic_token, _ok, _extras_array) -> {
+                                identifiers_table.new_identifier.name = _basic_token.token_tex;
                             }
                     );
                 } catch (Exception e) {
@@ -870,6 +909,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_dot: dot" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_dot_rule_node_supplier = () -> {
                 try {
+                    t_dot_rule_node.clear_add_new_list();
                     t_dot_rule_node.add_new(dot.name());
                 } catch (Exception e) {
                     return null;
@@ -880,6 +920,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "r_annotation" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_annotation_in_identifier_rule_node_supplier = () -> {
                 try {
+                    r_annotation_in_identifier_rule_node.clear_add_new_list();
                     r_annotation_in_identifier_rule_node.add_new(r_annotation_rule_node_supplier);
                     r_annotation_in_identifier_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
                     r_annotation_in_identifier_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
@@ -888,32 +929,34 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 }
                 return r_annotation_in_identifier_rule_node;
             };
-            /* "t_identifier_type_extra: identifier" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_type_extra_rule_node_supplier = () -> {
+            /* "t_identifier_type_class: identifier" */
+            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_type_class_rule_node_supplier = () -> {
                 try {
-                    t_identifier_type_extra_rule_node.add_new(identifier.name());
-                    t_identifier_type_extra_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
+                    t_identifier_type_class_rule_node.clear_add_new_list();
+                    t_identifier_type_class_rule_node.add_new(identifier.name());
+                    t_identifier_type_class_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                            (_basic_token, _ok, _extras_array) -> {
                                 if (identifiers_table.new_identifier.return_class.isEmpty()) {
-                                    identifiers_table.new_identifier.return_class = _tokens_list.get(0).token_tex;
+                                    identifiers_table.new_identifier.return_class = _basic_token.token_tex;
                                 } else {
-                                    identifiers_table.new_identifier.return_class = _tokens_list.get(0).token_tex
-                                            + "." + _tokens_list.get(0).token_tex;
+                                    identifiers_table.new_identifier.return_class = identifiers_table.new_identifier.return_class
+                                            + "." + _basic_token.token_tex;
                                 }
                             }
                     );
                 } catch (Exception e) {
                     return null;
                 }
-                return t_identifier_type_extra_rule_node;
+                return t_identifier_type_class_rule_node;
             };
             /* "r_dot_identifier<optional><repeat>: " +
                     "t_dot r_annotation_in_identifier<optional> t_identifier_extra" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_dot_identifier_rule_node_supplier = () -> {
                 try {
+                    r_dot_identifier_rule_node.clear_add_new_list();
                     r_dot_identifier_rule_node.add_new(t_dot_rule_node_supplier);
                     r_dot_identifier_rule_node.add_new(r_annotation_in_identifier_rule_node_supplier);
-                    r_dot_identifier_rule_node.add_new(t_identifier_type_extra_rule_node_supplier);
+                    r_dot_identifier_rule_node.add_new(t_identifier_type_class_rule_node_supplier);
                     r_dot_identifier_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
                     r_dot_identifier_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
                 } catch (Exception e) {
@@ -922,10 +965,11 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 return r_dot_identifier_rule_node;
             };
             /* "r_identifier_class: " +
-                    "t_identifier r_dot_identifier<optional><repeat>" */
+                    "t_identifier_type_class r_dot_identifier<optional><repeat>" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_identifier_class_rule_node_supplier = () -> {
                 try {
-                    r_identifier_class_rule_node.add_new(t_identifier_rule_node_supplier);
+                    r_identifier_class_rule_node.clear_add_new_list();
+                    r_identifier_class_rule_node.add_new(t_identifier_type_class_rule_node_supplier);
                     r_identifier_class_rule_node.add_new(r_dot_identifier_rule_node_supplier);
                 } catch (Exception e) {
                     return null;
@@ -935,6 +979,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "o_identifier_type: [t_identifier_type|r_identifier_class]" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_identifier_type_rule_node_supplier = () -> {
                 try {
+                    o_identifier_type_rule_node.clear_add_new_list();
                     o_identifier_type_rule_node.add_new(t_identifier_type_rule_node_supplier);
                     o_identifier_type_rule_node.add_new(r_identifier_class_rule_node_supplier);
                 } catch (Exception e) {
@@ -945,6 +990,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "r_parenthesis: t_parenthesis_open t_parenthesis_close<ignore>" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_parenthesis_rule_node_supplier = () -> {
                 try {
+                    r_parenthesis_rule_node.clear_add_new_list();
                     r_parenthesis_rule_node.add_new(t_annotation_parenthesis_open_rule_node_supplier);
                     r_parenthesis_rule_node.add_new(t_annotation_parenthesis_close_rule_node_supplier);
                 } catch (Exception e) {
@@ -955,6 +1001,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_semicolon<ignore>: semi_colon" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_semicolon_rule_node_supplier = () -> {
                 try {
+                    t_semicolon_rule_node.clear_add_new_list();
                     t_semicolon_rule_node.add_new(semi_colon.name());
                     t_semicolon_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {
@@ -965,10 +1012,11 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "o_parenthesis_open_or_semicolon: [t_parenthesis_open|t_semicolon<ignore>]" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_parenthesis_open_or_semicolon_rule_node_supplier = () -> {
                 try {
+                    o_parenthesis_open_or_semicolon_rule_node.clear_add_new_list();
                     o_parenthesis_open_or_semicolon_rule_node.add_new(r_parenthesis_rule_node_supplier);
                     o_parenthesis_open_or_semicolon_rule_node.add_new(t_semicolon_rule_node_supplier);
                     o_parenthesis_open_or_semicolon_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_tokens_list, _ok, _extras_array) -> {
+                            (_basic_token, _ok, _extras_array) -> {
                                 if (next_block_identifier != null) {
                                     Identifiers_tables.Temporary_identifiers_tables temporary_identifiers_table
                                             = _ok.valid(identifiers_table.get_top(_ok, _extras_array));
@@ -976,7 +1024,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                                     temporary_identifiers_table.block_identifier = next_block_identifier;
                                     next_block_identifier = null;
                                 }
-                                if (_tokens_list.get(0).token_type.equals(parenthesis_open.name())) {
+                                if (_basic_token.token_type.equals(parenthesis_open.name())) {
                                     identifiers_table.new_identifier.type = Types.method.name();
                                 } else {
                                     identifiers_table.new_identifier.type = Types.attribute.name();
@@ -994,6 +1042,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "t_volatile_or_final<optional><repeat> r_template<optional> t_identifier_type t_identifier t_parenthesis_open_or_semicolon<ignore>" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_method_or_attribute_rule_node_supplier = () -> {
                 try {
+                    r_method_or_attribute_rule_node.clear_add_new_list();
                     r_method_or_attribute_rule_node.add_new(r_template_rule_node_supplier);
                     r_method_or_attribute_rule_node.add_new(o_identifier_type_rule_node_supplier);
                     r_method_or_attribute_rule_node.add_new(t_identifier_rule_node_supplier);
@@ -1008,6 +1057,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "|r_class]" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_method_or_attribute_or_class_rule_node_supplier = () -> {
                 try {
+                    o_method_or_attribute_or_class_rule_node.clear_add_new_list();
                     o_method_or_attribute_or_class_rule_node.add_new(r_method_or_attribute_rule_node_supplier);
                     o_method_or_attribute_or_class_rule_node.add_new(r_class_rule_node_supplier);
                 } catch (Exception e) {
@@ -1020,6 +1070,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                     "o_method_or_attribute_or_class" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_method_or_attribute_or_class_rule_node_supplier = () -> {
                 try {
+                    r_method_or_attribute_or_class_rule_node.clear_add_new_list();
                     r_method_or_attribute_or_class_rule_node.add_new(t_method_or_attribute_or_class_rule_node_supplier);
                     r_method_or_attribute_or_class_rule_node.add_new(o_method_or_attribute_or_class_1_rule_node_supplier);
                     r_method_or_attribute_or_class_rule_node.add_new(o_method_or_attribute_or_class_rule_node_supplier);
@@ -1034,6 +1085,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_parenthesis_open: parenthesis_open" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_parenthesis_open_rule_node_supplier = () -> {
                 try {
+                    t_parenthesis_open_rule_node.clear_add_new_list();
                     t_parenthesis_open_rule_node.add_new(parenthesis_open.name());
                 } catch (Exception e) {
                     return null;
@@ -1043,6 +1095,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
             /* "t_parenthesis_close<ignore>: parenthesis_close" */
             final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_parenthesis_close_rule_node_supplier = () -> {
                 try {
+                    t_parenthesis_close_rule_node.clear_add_new_list();
                     t_parenthesis_close_rule_node.add_new(parenthesis_close.name());
                     t_parenthesis_close_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {

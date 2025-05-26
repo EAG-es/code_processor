@@ -55,16 +55,16 @@ public class Analizer_rules extends Bases {
         , repeat_while_success
     }
     public static @Fenum("repeat_mode") String k_repeat_tex = (@Fenum("repeat_mode") String) "<optional>";
-    public static @Fenum("call_mode") String k_call_tex = (@Fenum("repeat_mode") String) "<call>";
+    public static @Fenum("call_mode") String k_call_tex = (@Fenum("call_mode") String) "<call>";
 
     @FunctionalInterface
     public interface After_success_calls extends Serializable {
-        void call(List<Scanner_rules.Basic_tokens> tokens_list, Oks ok, Object ... extras_array) throws Exception;
+        void call(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
     }
 
     public static class Rule_success implements Serializable {
         private static final long serialVersionUID = getSerial_version_uid();
-        public ArrayList<Scanner_rules.Basic_tokens> tokens_list = new ArrayList<>();
+        public Scanner_rules.@Nullable Basic_tokens basic_token = null;
         public Integer first_token_pos = -1;
         public After_success_calls after_success;
 
@@ -168,7 +168,7 @@ public class Analizer_rules extends Bases {
                 _is_already_evaluated = false;
                 if (defined_rule_success != null) {
                     defined_rule_success.first_token_pos = -1;
-                    defined_rule_success.tokens_list.clear();
+                    defined_rule_success.basic_token = null;
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -202,9 +202,8 @@ public class Analizer_rules extends Bases {
                     defined_rule_success = new Rule_success(basic_rule_node.defined_rule_success.after_success);
                     defined_rule_success.first_token_pos = ok.valid(basic_rule_node
                             .defined_rule_success).first_token_pos;
-                    ok.valid(defined_rule_success).tokens_list.clear();
-                    ok.valid(defined_rule_success).tokens_list.addAll(ok.valid(basic_rule_node
-                            .defined_rule_success).tokens_list);
+                    ok.valid(defined_rule_success).basic_token = ok.valid(basic_rule_node
+                            .defined_rule_success).basic_token;
                 }
             } catch (Exception e) {
                 ok.setTex(e);
@@ -350,7 +349,7 @@ public class Analizer_rules extends Bases {
                     if (defined_rule_success != null) {
                         Rule_success rule_success = new Rule_success(ok.valid(defined_rule_success).after_success);
                         rule_success.first_token_pos = ok.valid(_first_token_pos);
-                        rule_success.tokens_list.addAll(ok.valid(defined_rule_success).tokens_list);
+                        rule_success.basic_token = ok.valid(defined_rule_success).basic_token;
                         _defined_analizer_rules.success_rules_list.add(rule_success);
                     }
                     _is_already_evaluated = true;
@@ -488,7 +487,7 @@ public class Analizer_rules extends Bases {
                         defined_call_the_success_rules_list_if_success = true;
                         new_name = new_name + k_call_tex;
                     }
-                    _defined_key_name = new_name;
+                    _defined_key_name = Oks.no_fenum_cast(new_name);
                 }
                 Rule_nodes rule_node = find_by_key_name(old_defined_key_name);
                 if (rule_node != null) {
@@ -612,6 +611,14 @@ public class Analizer_rules extends Bases {
         public void add_new(String token_type_tex, String token_tex, @Nullable String rule_name_with_attributes) throws Exception {
             add_new(new Scanner_rules.Basic_tokens(token_type_tex, token_tex), rule_name_with_attributes);
         }
+
+        /**
+         *
+         * @return true if it has success
+         * @throws Exception
+         */
+        public abstract boolean clear_add_new_list() throws Exception;
+
         /**
          *
          * @param rule_node
@@ -787,7 +794,7 @@ public class Analizer_rules extends Bases {
                         if (defined_rule_success != null) {
                             if (_rule_part_num == 0) {
                                 defined_rule_success.first_token_pos = ok.valid(_first_token_pos);
-                                ok.valid(defined_rule_success).tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
+                                ok.valid(defined_rule_success).basic_token = basic_token;
                             }
                         }
                         return Return_status.matched;
@@ -801,6 +808,12 @@ public class Analizer_rules extends Bases {
                 ok.setTex(e);
             }
             return Return_status.error;
+        }
+
+        @Override
+        public boolean clear_add_new_list() throws Exception {
+            _defined_rule_nodes_and_list.clear();
+            return true;
         }
 
         /**
@@ -907,7 +920,7 @@ public class Analizer_rules extends Bases {
                             if (defined_rule_success != null) {
                                 Rule_success rule_success = new Rule_success(ok.valid(defined_rule_success).after_success);
                                 rule_success.first_token_pos = ok.valid(_first_token_pos);
-                                rule_success.tokens_list.addAll(ok.valid(defined_rule_success).tokens_list);
+                                rule_success.basic_token = ok.valid(defined_rule_success).basic_token;
                                 _defined_analizer_rules.success_rules_list.add(rule_success);
                             }
                             _is_already_evaluated = true;
@@ -1058,7 +1071,7 @@ public class Analizer_rules extends Bases {
                 if (retorno == Return_status.matched) {
                     if (defined_rule_success != null) {
                         defined_rule_success.first_token_pos = ok.valid(_first_token_pos);
-                        ok.valid(defined_rule_success).tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
+                        ok.valid(defined_rule_success).basic_token = basic_token;
                     }
                     if (defined_optional_mode == Optional_mode.ignore_until_matches) {
                         pos = _defined_analizer_rules.i_code_scanner.get_tokens_list_pos(ok, extras_array);
@@ -1113,6 +1126,12 @@ public class Analizer_rules extends Bases {
         @Override
         public void add_new(Scanner_rules.Basic_tokens basic_token, @Nullable String rule_name_with_attributes) throws Exception {
             _add_new(basic_token);
+        }
+
+        @Override
+        public boolean clear_add_new_list() throws Exception {
+            _defined_tokens_or_list.clear();
+            return true;
         }
 
         @Override
@@ -1248,7 +1267,7 @@ public class Analizer_rules extends Bases {
                 } else {
                     if (defined_rule_success != null) {
                         defined_rule_success.first_token_pos = ok.valid(_first_token_pos);
-                        ok.valid(defined_rule_success).tokens_list.add(basic_token); // Token in the list of positively evaluated tokens
+                        ok.valid(defined_rule_success).basic_token = basic_token; // Token in the list of positively evaluated tokens
                     }
                     return Return_status.matched;
                 }
@@ -1256,6 +1275,12 @@ public class Analizer_rules extends Bases {
                 ok.setTex(e);
                 return Return_status.error;
             }
+        }
+
+        @Override
+        public boolean clear_add_new_list() throws Exception {
+            _defined_rule_nodes_or_list.clear();
+            return true;
         }
 
         @Override
@@ -1319,7 +1344,7 @@ public class Analizer_rules extends Bases {
             for(var rule_success: success_rules_list) {
                 if (rule_success.first_token_pos >= first_token_pos) {
                     is_processed = true;
-                    rule_success.after_success.call(ok.valid(rule_success.tokens_list)
+                    rule_success.after_success.call(ok.valid(rule_success.basic_token)
                             , ok, extras_array);
                     if (ok.is == false) return;
                     to_delete_success_rules_list.add(rule_success);

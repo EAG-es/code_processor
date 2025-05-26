@@ -47,7 +47,6 @@ public class Code_processor extends Initials {
     public static String k_cmdLineSyntax = "cmdLineSyntax";
     // Apache Commons CLI
     public Options options = new Options();
-    public OptionGroup wallet_optionGroup = new OptionGroup();
     @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     public transient CommandLineParser parser = new DefaultParser();
     public org.apache.commons.cli.@Nullable Option analyse_file = null;
@@ -76,9 +75,9 @@ public class Code_processor extends Initials {
                     .build();
             options.addOption(analyse_file);
             // G
-            get_identifiers_table = Option.builder("git")
-                    .longOpt("get_identifiers_table")
-                    .desc(in(in, "Gets the identifiers table from a java code file"))
+            get_identifiers_table = Option.builder("gitam")
+                    .longOpt("get_identifiers_table_attributes_methods")
+                    .desc(in(in, "Gets the identifiers table (package, attributes and methods) from a java code file"))
                     .hasArg()
                     .numberOfArgs(1)
                     .argName(in(in, "File_name"))
