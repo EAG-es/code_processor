@@ -1,0 +1,275 @@
+ra_annotation_begin_end<optional>:
+  _defined_name: "ra_annotation_begin_end<optional>: -> to_annotation_parenthesis_open\
+    \ -> to_annotation_parenthesis_close<ignore> -> to_annotation_parenthesis_close_1"
+  name_based_rule_nodes_list:
+    - "to_annotation_parenthesis_open"
+    - "to_annotation_parenthesis_close<ignore>"
+    - "to_annotation_parenthesis_close_1"
+ra_doto_identifier<optional><repeat>:
+  _defined_name: "ra_doto_identifier<optional><repeat>: -> to_dot -> ra_annotation_in_identifier<optional><repeat>\
+    \ -> to_identifier_type_class"
+  name_based_rule_nodes_list:
+    - "to_dot"
+    - "ra_annotation_in_identifier<optional><repeat>"
+    - "to_identifier_type_class"
+to_semi_colon:
+  _defined_name: "to_semi_colon: semi_colon-''"
+  name_based_rule_nodes_list:
+    - "semi_colon-''"
+to_class_2:
+  _defined_name: "to_class_2: [ token_class-'' | token_interface-'' | token_enum-''\
+    \ | token_record-'' ]"
+  name_based_rule_nodes_list:
+    - "token_class-''"
+    - "token_interface-''"
+    - "token_enum-''"
+    - "token_record-''"
+to_class_identifier:
+  _defined_name: "to_class_identifier: identifier-''"
+  name_based_rule_nodes_list:
+    - "identifier-''"
+to_package_identifier:
+  _defined_name: "to_package_identifier: identifier-''"
+  name_based_rule_nodes_list:
+    - "identifier-''"
+ra_identifier_class:
+  _defined_name: "ra_identifier_class: -> to_identifier_type_class -> ra_doto_identifier<optional><repeat>"
+  name_based_rule_nodes_list:
+    - "to_identifier_type_class"
+    - "ra_doto_identifier<optional><repeat>"
+ro_parenthesis_open_or_semicolon:
+  _defined_name: "ro_parenthesis_open_or_semicolon: [ to_parenthesis_open | to_semicolon<ignore>\
+    \ ]"
+  name_based_rule_nodes_list: []
+ra_method_or_attribute:
+  _defined_name: "ra_method_or_attribute: -> ra_template<optional> -> ro_identifier_type\
+    \ -> to_identifier -> ro_parenthesis_open_or_semicolon"
+  name_based_rule_nodes_list:
+    - "ra_template<optional>"
+    - "ro_identifier_type"
+    - "to_identifier"
+    - "ro_parenthesis_open_or_semicolon"
+to_class_1<optional><repeat>:
+  _defined_name: "to_class_1<optional><repeat>: [ token_public-''<optional><repeat>\
+    \ | token_protected-''<optional><repeat> | token_private-''<optional><repeat>\
+    \ | token_static-''<optional><repeat> | token_abstract-''<optional><repeat> |\
+    \ token_sealed-''<optional><repeat> | token_strictfp-''<optional><repeat> | token_transient-''<optional><repeat>\
+    \ ]"
+  name_based_rule_nodes_list:
+    - "token_public-''<optional><repeat>"
+    - "token_protected-''<optional><repeat>"
+    - "token_private-''<optional><repeat>"
+    - "token_static-''<optional><repeat>"
+    - "token_abstract-''<optional><repeat>"
+    - "token_sealed-''<optional><repeat>"
+    - "token_strictfp-''<optional><repeat>"
+    - "token_transient-''<optional><repeat>"
+to_identifier_type:
+  _defined_name: "to_identifier_type: [ type_void-'' | type_boolean-'' | type_byte-''\
+    \ | type_char-'' | type_short-'' | type_int-'' | type_long-'' | type_float-''\
+    \ | type_double-'' ]"
+  name_based_rule_nodes_list:
+    - "type_void-''"
+    - "type_boolean-''"
+    - "type_byte-''"
+    - "type_char-''"
+    - "type_short-''"
+    - "type_int-''"
+    - "type_long-''"
+    - "type_float-''"
+    - "type_double-''"
+ra_define_rule_package()<optional><call>:
+  _defined_name: "ra_define_rule_package()<optional><call>: -> to_package -> to_package_identifier\
+    \ -> ra_doto_identifier<optional><repeat> -> to_semi_colon"
+  name_based_rule_nodes_list:
+    - "to_package"
+    - "to_package_identifier"
+    - "ra_doto_identifier<optional><repeat>"
+    - "to_semi_colon"
+to_method_or_attribute_or_class_1:
+  _defined_name: "to_method_or_attribute_or_class_1: [ token_public-'' | token_protected-''\
+    \ | token_private-'' | token_static-'' | token_volatile-'' | token_final-'' |\
+    \ token_strictfp-'' | token_transient-'' ]"
+  name_based_rule_nodes_list:
+    - "token_public-''"
+    - "token_protected-''"
+    - "token_private-''"
+    - "token_static-''"
+    - "token_volatile-''"
+    - "token_final-''"
+    - "token_strictfp-''"
+    - "token_transient-''"
+ro_method_or_attribute_or_class_1<optional><repeat>:
+  _defined_name: "ro_method_or_attribute_or_class_1<optional><repeat>: [ to_method_or_attribute_or_class_1\
+    \ | ra_annotation ]"
+  name_based_rule_nodes_list: []
+to_sign_less:
+  _defined_name: "to_sign_less: sign_less-''"
+  name_based_rule_nodes_list:
+    - "sign_less-''"
+to_annotation_parenthesis_close<ignore>:
+  _defined_name: "to_annotation_parenthesis_close<ignore>: parenthesis_close-''<ignore>"
+  name_based_rule_nodes_list:
+    - "parenthesis_close-''<ignore>"
+to_sign_bigger<ignore>:
+  _defined_name: "to_sign_bigger<ignore>: sign_bigger-''<ignore>"
+  name_based_rule_nodes_list:
+    - "sign_bigger-''<ignore>"
+ro_identifier_type:
+  _defined_name: "ro_identifier_type: [ to_identifier_type | ra_identifier_class\
+    \ ]"
+  name_based_rule_nodes_list: []
+to_package_identifier_1:
+  _defined_name: "to_package_identifier_1: identifier-''"
+  name_based_rule_nodes_list:
+    - "identifier-''"
+to_class<ignore>:
+  _defined_name: "to_class<ignore>: [ token_public-''<ignore> | token_protected-''<ignore>\
+    \ | token_private-''<ignore> | token_static-''<ignore> | token_abstract-''<ignore>\
+    \ | token_sealed-''<ignore> | token_strictfp-''<ignore> | token_transient-''<ignore>\
+    \ | token_class-''<ignore> | token_interface-''<ignore> | token_enum-''<ignore>\
+    \ | token_record-''<ignore> ]"
+  name_based_rule_nodes_list:
+    - "token_public-''<ignore>"
+    - "token_protected-''<ignore>"
+    - "token_private-''<ignore>"
+    - "token_static-''<ignore>"
+    - "token_abstract-''<ignore>"
+    - "token_sealed-''<ignore>"
+    - "token_strictfp-''<ignore>"
+    - "token_transient-''<ignore>"
+    - "token_class-''<ignore>"
+    - "token_interface-''<ignore>"
+    - "token_enum-''<ignore>"
+    - "token_record-''<ignore>"
+to_annotation:
+  _defined_name: "to_annotation: annotation-''"
+  name_based_rule_nodes_list:
+    - "annotation-''"
+to_identifier:
+  _defined_name: "to_identifier: identifier-''"
+  name_based_rule_nodes_list:
+    - "identifier-''"
+to_parenthesis_open:
+  _defined_name: "to_parenthesis_open: parenthesis_open-''"
+  name_based_rule_nodes_list:
+    - "parenthesis_open-''"
+to_semicolon<ignore>:
+  _defined_name: "to_semicolon<ignore>: semi_colon-''<ignore>"
+  name_based_rule_nodes_list:
+    - "semi_colon-''<ignore>"
+ra_template<optional>:
+  _defined_name: "ra_template<optional>: -> to_sign_less -> to_sign_bigger<ignore>"
+  name_based_rule_nodes_list:
+    - "to_sign_less"
+    - "to_sign_bigger<ignore>"
+ra_class<ignore><call>:
+  _defined_name: "ra_class<ignore><call>: -> to_class<ignore> -> to_class_1<optional><repeat>\
+    \ -> to_class_2 -> to_class_identifier"
+  name_based_rule_nodes_list:
+    - "to_class<ignore>"
+    - "to_class_1<optional><repeat>"
+    - "to_class_2"
+    - "to_class_identifier"
+to_method_or_attribute_or_class<ignore>:
+  _defined_name: "to_method_or_attribute_or_class<ignore>: [ token_public-''<ignore>\
+    \ | token_protected-''<ignore> | token_private-''<ignore> | token_static-''<ignore>\
+    \ | token_volatile-''<ignore> | token_final-''<ignore> | token_strictfp-''<ignore>\
+    \ | token_transient-''<ignore> | identifier-''<ignore> | type_void-''<ignore>\
+    \ | type_boolean-''<ignore> | type_byte-''<ignore> | type_char-''<ignore> | type_short-''<ignore>\
+    \ | type_int-''<ignore> | type_long-''<ignore> | type_float-''<ignore> | type_double-''<ignore>\
+    \ | sign_less-''<ignore> | token_abstract-''<ignore> | token_sealed-''<ignore>\
+    \ | token_class-''<ignore> | token_interface-''<ignore> | token_enum-''<ignore>\
+    \ | token_record-''<ignore> | annotation-''<ignore> ]"
+  name_based_rule_nodes_list:
+    - "token_public-''<ignore>"
+    - "token_protected-''<ignore>"
+    - "token_private-''<ignore>"
+    - "token_static-''<ignore>"
+    - "token_volatile-''<ignore>"
+    - "token_final-''<ignore>"
+    - "token_strictfp-''<ignore>"
+    - "token_transient-''<ignore>"
+    - "identifier-''<ignore>"
+    - "type_void-''<ignore>"
+    - "type_boolean-''<ignore>"
+    - "type_byte-''<ignore>"
+    - "type_char-''<ignore>"
+    - "type_short-''<ignore>"
+    - "type_int-''<ignore>"
+    - "type_long-''<ignore>"
+    - "type_float-''<ignore>"
+    - "type_double-''<ignore>"
+    - "sign_less-''<ignore>"
+    - "token_abstract-''<ignore>"
+    - "token_sealed-''<ignore>"
+    - "token_class-''<ignore>"
+    - "token_interface-''<ignore>"
+    - "token_enum-''<ignore>"
+    - "token_record-''<ignore>"
+    - "annotation-''<ignore>"
+ra_annotation_in_identifier<optional><repeat>:
+  _defined_name: "ra_annotation_in_identifier<optional><repeat>: -> ra_annotation"
+  name_based_rule_nodes_list:
+    - "ra_annotation"
+ra_annotation:
+  _defined_name: "ra_annotation: -> to_annotation -> ra_annotation_begin_end<optional>"
+  name_based_rule_nodes_list:
+    - "to_annotation"
+    - "ra_annotation_begin_end<optional>"
+to_package:
+  _defined_name: "to_package: token_package-''"
+  name_based_rule_nodes_list:
+    - "token_package-''"
+to_class:
+  _defined_name: "to_class: [ token_class-'' | token_interface-'' | token_enum-''\
+    \ | token_record-'' ]"
+  name_based_rule_nodes_list:
+    - "token_class-''"
+    - "token_interface-''"
+    - "token_enum-''"
+    - "token_record-''"
+ra_class:
+  _defined_name: "ra_class: -> to_class -> to_class_identifier"
+  name_based_rule_nodes_list:
+    - "to_class"
+    - "to_class_identifier"
+ro_method_or_attribute_or_class:
+  _defined_name: "ro_method_or_attribute_or_class: [ ra_method_or_attribute | ra_class\
+    \ ]"
+  name_based_rule_nodes_list: []
+ra_method_or_attribute_or_class<ignore><repeat><call>:
+  _defined_name: "ra_method_or_attribute_or_class<ignore><repeat><call>: -> to_method_or_attribute_or_class<ignore>\
+    \ -> ro_method_or_attribute_or_class_1<optional><repeat> -> ro_method_or_attribute_or_class"
+  name_based_rule_nodes_list:
+    - "to_method_or_attribute_or_class<ignore>"
+    - "ro_method_or_attribute_or_class_1<optional><repeat>"
+    - "ro_method_or_attribute_or_class"
+to_identifier_type_class:
+  _defined_name: "to_identifier_type_class: identifier-''"
+  name_based_rule_nodes_list:
+    - "identifier-''"
+ra_define_rule_class_method_and_attribute()<repeat>:
+  _defined_name: "ra_define_rule_class_method_and_attribute()<repeat>: -> ra_class<ignore><call>\
+    \ -> ra_method_or_attribute_or_class<ignore><repeat><call>"
+  name_based_rule_nodes_list:
+    - "ra_class<ignore><call>"
+    - "ra_method_or_attribute_or_class<ignore><repeat><call>"
+ra_define_rule_start():
+  _defined_name: "ra_define_rule_start(): -> ra_define_rule_package()<optional><call>\
+    \ -> ra_define_rule_class_method_and_attribute()<repeat>"
+  name_based_rule_nodes_list:
+    - "ra_define_rule_package()<optional><call>"
+    - "ra_define_rule_class_method_and_attribute()<repeat>"
+to_annotation_parenthesis_close_1:
+  _defined_name: "to_annotation_parenthesis_close_1: parenthesis_close-''"
+  name_based_rule_nodes_list:
+    - "parenthesis_close-''"
+to_dot:
+  _defined_name: "to_dot: dot-''"
+  name_based_rule_nodes_list:
+    - "dot-''"
+to_annotation_parenthesis_open:
+  _defined_name: "to_annotation_parenthesis_open: parenthesis_open-''"
+  name_based_rule_nodes_list:
+    - "parenthesis_open-''"

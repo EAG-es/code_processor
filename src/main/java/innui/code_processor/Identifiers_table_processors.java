@@ -3,16 +3,13 @@ package innui.code_processor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.Bases;
 import innui.code_processor.java.Identifiers_table_rules;
-import innui.modelos.configurations.ResourceBundles;
 import innui.modelos.errors.Oks;
-import innui.modelos.internacionalization.Tr;
 import innui.modelos.tests.Test_methods;
 import org.checkerframework.checker.fenum.qual.Fenum;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.util.List;
-import java.util.ResourceBundle;
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
 public class Identifiers_table_processors extends Bases {
@@ -64,11 +61,11 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return;
         try {
             this.identifiers_table_rule = identifiers_table_rule;
-            this.identifiers_table_rule.analizer_rule.i_code_scanner.set_tokens_validator(
+            this.identifiers_table_rule.analyizer_rule.i_code_scanner.set_tokens_validator(
                     (_is_new_token, _token, _ok, _extras_array) -> {
                 return validate_token(_is_new_token, _token, _ok, _extras_array);
             }, ok, extras_array);
-            this.identifiers_table_rule.analizer_rule.i_code_scanner.set_tokens_analizer(
+            this.identifiers_table_rule.analyizer_rule.i_code_scanner.set_tokens_analizer(
                     (_token, _ok, _extras_array) -> {
                         analize_token(_token, _ok, _extras_array);
                     }, ok, extras_array);
@@ -79,24 +76,17 @@ public class Identifiers_table_processors extends Bases {
 
     /**
      *
-     * @param file_name If null uses de default one
      * @param ok
      * @param extras_array
      * @return
      * @throws Exception
      */
-    public void load_identifiers_table_rule(@Nullable String file_name, Oks ok, Object ... extras_array) throws Exception {
+    public void load_identifiers_table_rule(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
-        ResourceBundle in = null;
         try {
-            in = ok.valid(ResourceBundles.getBundle(k_in_route));
-            if (file_name != null) {
-                ok.setTex(Tr.in(in, "Not implemented."));
-            } else {
-                identifiers_table_rule.load(ok, extras_array);
-                if (ok.is == false) return;
-            }
+            identifiers_table_rule.load(ok, extras_array);
+            if (ok.is == false) return;
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -137,7 +127,7 @@ public class Identifiers_table_processors extends Bases {
         if (ok.is == false) return;
         boolean retorno = false;
         try {
-            Analizer_rules.Rule_nodes rule_node = ok.valid(get_start_rule(ok, extras_array));
+            Analyzer_rules.Rule_nodes rule_node = ok.valid(get_start_rule(ok, extras_array));
             if (ok.is == false) return;
             rule_node.evaluate(token, ok, extras_array);
             if (ok.is == false) return;
@@ -157,7 +147,7 @@ public class Identifiers_table_processors extends Bases {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            identifiers_table_rule.analizer_rule.i_code_scanner.start_scanner(ok , extras_array);
+            identifiers_table_rule.analyizer_rule.i_code_scanner.start_scanner(ok , extras_array);
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -188,7 +178,7 @@ public class Identifiers_table_processors extends Bases {
      * @return
      * @throws Exception
      */
-    public Analizer_rules.@Nullable Rule_nodes get_start_rule(Oks ok, Object ... extras_array) throws Exception {
+    public Analyzer_rules.@Nullable Rule_nodes get_start_rule(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         Integer retorno = null;

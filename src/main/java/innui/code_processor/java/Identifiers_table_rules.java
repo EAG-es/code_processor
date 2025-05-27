@@ -1,7 +1,7 @@
 package innui.code_processor.java;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import innui.code_processor.Analizer_rules;
+import innui.code_processor.Analyzer_rules;
 import innui.code_processor.Code_scanners;
 import innui.code_processor.Identifiers_tables;
 import innui.code_processor.Scanner_rules;
@@ -45,8 +45,6 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
         , method
     }
 
-    public Identifiers_tables. @Nullable Identifiers next_block_identifier = null;
-
     public Identifiers_table_rules(Code_scanners code_scanner) throws Exception {
         super(code_scanner);
     }
@@ -61,7 +59,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return;
         try {
-            analizer_rule.start_rule_node = define_rule_start(ok, extras_array);
+            analyizer_rule.start_rule_node = ra_define_rule_start(ok, extras_array);
             if (ok.is == false) return;
         } catch (Exception e) {
             ok.setTex(e);
@@ -75,26 +73,28 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
      * @return
      * @throws Exception
      */
-    public Analizer_rules.@Nullable Rule_nodes define_rule_start(Oks ok, Object ... extras_array) throws Exception {
+    public Analyzer_rules.@Nullable Rule_nodes ra_define_rule_start(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
         try {
-            Analizer_rules.Rules_and_rule_nodes r_start_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            r_start_rule_node.configure_from_key_name("define_rule_start(): _define_rule_package()<optional><call> _define_rule_class_method_and_attribute()<repeat>");
-            /* "define_rule_start(): _define_rule_package()<optional><call> _define_rule_class_method_and_attribute()<repeat>" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_start_rule_node_supplier = () -> {
+            Analyzer_rules.Rules_and_rule_nodes ra_start_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            ra_start_rule_node.configure_from_key_name("ra_define_rule_start(): ra_define_rule_package()<optional><call> ra_define_rule_class_method_and_attribute()<repeat>");
+            /* "ra_define_rule_start(): ra_define_rule_package()<optional><call> ra_define_rule_class_method_and_attribute()<repeat>" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_start_rule_node_supplier = () -> {
                 try {
-                    r_start_rule_node.clear_add_new_list();
-                    r_start_rule_node.add_new(this::_define_rule_package, ok, extras_array);
+                    ra_start_rule_node.clear_add_new_list();
+                    ra_start_rule_node.add_new(this::ra_define_rule_package, ok, extras_array);
                     if (ok.is == false) return null;
-                    r_start_rule_node.add_new(this::_define_rule_class_method_and_attribute, ok, extras_array);
+                    ra_start_rule_node.add_new(this::ra_define_rule_class_method_and_attribute, ok, extras_array);
                     if (ok.is == false) return null;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_start_rule_node;
+                return ra_start_rule_node;
             };
-            return r_start_rule_node_supplier.get();
+            Analyzer_rules.Rule_nodes rule_node = ok.valid(ra_start_rule_node_supplier.get());
+            analyizer_rule.rule_nodes_map.put(rule_node.get_key_name(), rule_node);
+            return rule_node;
         } catch (Exception e) {
             ok.setTex(e);
         }
@@ -108,32 +108,32 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
      * @return
      * @throws Exception
      */
-    public Analizer_rules.@Nullable Rule_nodes _define_rule_package(Oks ok, Object ... extras_array) throws Exception {
+    public Analyzer_rules.@Nullable Rule_nodes ra_define_rule_package(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
-        Analizer_rules.Rules_and_rule_nodes retorno = null;
+        Analyzer_rules.Rules_and_rule_nodes retorno = null;
         try {
-            Analizer_rules.Rules_and_rule_nodes r_define_rule_package_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_package_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_identifier_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_dot_identifier_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_dot_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_identifier_1_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_semi_colon_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            r_define_rule_package_rule_node.configure_from_key_name("_define_rule_package()<optional><call>: t_package r_identifier r_dot_identifier<optional><repeat> r_semi_colon");
-            t_package_rule_node.configure_from_key_name("t_package: package ");
-            t_identifier_rule_node.configure_from_key_name("t_identifier: identifier");
-            r_dot_identifier_rule_node.configure_from_key_name("r_dot_identifier<optional><repeat>: t_dot t_identifier_1");
-            t_semi_colon_rule_node.configure_from_key_name("t_semi_colon: semi_colon");
-            t_dot_rule_node.configure_from_key_name("t_dot: dot ");
-            t_identifier_1_rule_node.configure_from_key_name("t_identifier_1: identifier");
-            /* "t_semi_colon: semi_colon" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_semi_colon_rule_node_supplier = () -> {
+            Analyzer_rules.Rules_and_rule_nodes ra_define_rule_package_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_package_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_package_identifier_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_doto_identifier_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_doto_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_package_identifier_1_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_semi_colon_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            ra_define_rule_package_rule_node.configure_from_key_name("ra_define_rule_package()<optional><call>: to_package ra_identifier ra_doto_identifier<optional><repeat> ra_semi_colon");
+            to_package_rule_node.configure_from_key_name("to_package: package ");
+            to_package_identifier_rule_node.configure_from_key_name("to_package_identifier: identifier");
+            ra_doto_identifier_rule_node.configure_from_key_name("ra_doto_identifier<optional><repeat>: to_dot to_identifier_1");
+            to_semi_colon_rule_node.configure_from_key_name("to_semi_colon: semi_colon");
+            to_doto_rule_node.configure_from_key_name("to_dot: dot ");
+            to_package_identifier_1_rule_node.configure_from_key_name("to_package_identifier_1: identifier");
+            /* "to_semi_colon: semi_colon" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_semi_colon_rule_node_supplier = () -> {
                 try {
-                    t_semi_colon_rule_node.clear_add_new_list();
-                    t_semi_colon_rule_node.add_new(semi_colon.name());
-                    t_semi_colon_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_first_part_basic_token, _ok, _extras_array) -> {
+                    to_semi_colon_rule_node.clear_add_new_list();
+                    to_semi_colon_rule_node.add_new(semi_colon.name());
+                    to_semi_colon_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
+                            (_basic_token, _ok, _extras_array) -> {
                                 identifiers_table.create_top_table(braces_num, _ok, _extras_array);
                                 if (_ok.is == false) return;
                                 identifiers_table.put_identifier(true, _ok, _extras_array);
@@ -143,14 +143,14 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_semi_colon_rule_node;
+                return to_semi_colon_rule_node;
             };
-            /* "t_identifier_1: identifier" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_1_rule_node_supplier = () -> {
+            /* "to_package_identifier_1: identifier" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_identifier_1_rule_node_supplier = () -> {
                 try {
-                    t_identifier_1_rule_node.clear_add_new_list();
-                    t_identifier_1_rule_node.add_new(identifier.name());
-                    t_identifier_1_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_package_identifier_1_rule_node.clear_add_new_list();
+                    to_package_identifier_1_rule_node.add_new(identifier.name());
+                    to_package_identifier_1_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 if (identifiers_table.new_identifier.namespace.isEmpty()) {
                                     identifiers_table.new_identifier.namespace
@@ -167,24 +167,24 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_identifier_1_rule_node;
+                return to_package_identifier_1_rule_node;
             };
-            /* "t_dot: dot " */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_dot_rule_node_supplier = () -> {
+            /* "to_dot: dot " */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_doto_rule_node_supplier = () -> {
                 try {
-                    t_dot_rule_node.clear_add_new_list();
-                    t_dot_rule_node.add_new(dot.name());
+                    to_doto_rule_node.clear_add_new_list();
+                    to_doto_rule_node.add_new(dot.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return t_dot_rule_node;
+                return to_doto_rule_node;
             };
-            /* "t_identifier: identifier" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_rule_node_supplier = () -> {
+            /* "to_package_identifier: identifier" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_identifier_rule_node_supplier = () -> {
                 try {
-                    t_identifier_rule_node.clear_add_new_list();
-                    t_identifier_rule_node.add_new(identifier.name());
-                    t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_package_identifier_rule_node.clear_add_new_list();
+                    to_package_identifier_rule_node.add_new(identifier.name());
+                    to_package_identifier_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 identifiers_table.new_identifier.name = _basic_token.token_tex;
                                 identifiers_table.new_identifier.type = Types.token_package.name();
@@ -193,27 +193,27 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_identifier_rule_node;
+                return to_package_identifier_rule_node;
             };
-            /* "r_dot_identifier<optional><repeat>: t_dot t_identifier_1" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_dot_identifier_rule_node_supplier = () -> {
+            /* "ra_doto_identifier<optional><repeat>: to_dot to_identifier_1" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_doto_identifier_rule_node_supplier = () -> {
                 try {
-                    r_dot_identifier_rule_node.clear_add_new_list();
-                    r_dot_identifier_rule_node.add_new(t_dot_rule_node_supplier);
-                    r_dot_identifier_rule_node.add_new(t_identifier_1_rule_node_supplier);
-                    r_dot_identifier_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
-                    r_dot_identifier_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
+                    ra_doto_identifier_rule_node.clear_add_new_list();
+                    ra_doto_identifier_rule_node.add_new(to_doto_rule_node_supplier);
+                    ra_doto_identifier_rule_node.add_new(to_identifier_1_rule_node_supplier);
+                    ra_doto_identifier_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
+                    ra_doto_identifier_rule_node.defined_repeat_mode = Analyzer_rules.Repeat_mode.repeat_while_success;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_dot_identifier_rule_node;
+                return ra_doto_identifier_rule_node;
             };
-            /* "t_package: package " */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_package_rule_node_supplier = () -> {
+            /* "to_package: package " */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_package_rule_node_supplier = () -> {
                 try {
-                    t_package_rule_node.clear_add_new_list();
-                    t_package_rule_node.add_new(token_package.name());
-                    t_package_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_package_rule_node.clear_add_new_list();
+                    to_package_rule_node.add_new(token_package.name());
+                    to_package_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 identifiers_table.new_identifier.init(_ok, _extras_array);
                             }
@@ -221,24 +221,24 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_package_rule_node;
+                return to_package_rule_node;
             };
-            /* "_define_rule_package()<optional><call>: t_package r_identifier r_dot_identifier<optional><repeat> r_semi_colon" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_define_rule_package_rule_node_supplier = () -> {
+            /* "ra_define_rule_package()<optional><call>: to_package ra_identifier ra_doto_identifier<optional><repeat> ra_semi_colon" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_define_rule_package_rule_node_supplier = () -> {
                 try {
-                    r_define_rule_package_rule_node.clear_add_new_list();
-                    r_define_rule_package_rule_node.add_new(t_package_rule_node_supplier);
-                    r_define_rule_package_rule_node.add_new(t_identifier_rule_node_supplier);
-                    r_define_rule_package_rule_node.add_new(r_dot_identifier_rule_node_supplier);
-                    r_define_rule_package_rule_node.add_new(t_semi_colon_rule_node_supplier);
-                    r_define_rule_package_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
-                    r_define_rule_package_rule_node.defined_call_the_success_rules_list_if_success = true;
+                    ra_define_rule_package_rule_node.clear_add_new_list();
+                    ra_define_rule_package_rule_node.add_new(to_package_rule_node_supplier);
+                    ra_define_rule_package_rule_node.add_new(to_identifier_rule_node_supplier);
+                    ra_define_rule_package_rule_node.add_new(ra_doto_identifier_rule_node_supplier);
+                    ra_define_rule_package_rule_node.add_new(to_semi_colon_rule_node_supplier);
+                    ra_define_rule_package_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
+                    ra_define_rule_package_rule_node.defined_call_the_success_rules_list_if_success = true;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_define_rule_package_rule_node;
+                return ra_define_rule_package_rule_node;
             };
-            retorno = (Analizer_rules.Rules_and_rule_nodes) r_define_rule_package_rule_node_supplier.get();
+            retorno = (Analyzer_rules.Rules_and_rule_nodes) ra_define_rule_package_rule_node_supplier.get();
         } catch (Exception e) {
             ok.setTex(e);
             return null;
@@ -260,12 +260,12 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
         if (ok.is == false) return false;
         boolean retorno = false;
         try {
-            retorno = count_braces(is_new_token, basic_token, ok, extras_array);
+            retorno = counto_braces(is_new_token, basic_token, ok, extras_array);
             if (ok.is == false) return false;
             if (retorno) {
                 return false;
             }
-            retorno = filter_token(is_new_token, basic_token, ok, extras_array);
+            retorno = filtera_token(is_new_token, basic_token, ok, extras_array);
             if (ok.is == false) return false;
             if (retorno) {
                 return false;
@@ -286,7 +286,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
      * @return true if there is to get a new token, false otherwise
      * @throws Exception
      */
-    public boolean filter_token(boolean is_new_token, Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+    public boolean filtera_token(boolean is_new_token, Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return false;
         try {
@@ -336,7 +336,7 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
      * @return true if count braces was done, false otherwise
      * @throws Exception
      */
-    public boolean count_braces(boolean is_new_token, Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
+    public boolean counto_braces(boolean is_new_token, Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return false;
         try {
@@ -402,86 +402,85 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
      * @return
      * @throws Exception
      */
-    public Analizer_rules.@Nullable Rule_nodes _define_rule_class_method_and_attribute(Oks ok, Object ... extras_array) throws Exception {
+    public Analyzer_rules.@Nullable Rule_nodes ra_define_rule_class_method_and_attribute(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
-        Analizer_rules.Rule_nodes retorno = null;
+        Analyzer_rules.Rule_nodes retorno = null;
         try {
-            Analizer_rules.Rules_and_rule_nodes r_define_rule_class_method_and_attribute_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_class_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_class_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_class_1_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_class_2_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_identifier_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            r_define_rule_class_method_and_attribute_rule_node.configure_from_key_name("_define_rule_class_method_and_attribute()<repeat>: " +
-                    "r_class<ignore><call> _define_rule_method_or_attribute_or_class()");
-            r_class_rule_node.configure_from_key_name("r_class<ignore><call>: " +
-                    "t_class<ignore> t_class_1<optional><repeat> t_class_2 t_identifier");
-            t_class_rule_node.configure_from_key_name("t_class<ignore>: [public|protected|private" +
+            Analyzer_rules.Rules_and_rule_nodes ra_define_rule_class_method_and_attribute_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_class_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_class_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_class_1_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_class_2_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_class_identifier_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            ra_define_rule_class_method_and_attribute_rule_node.configure_from_key_name("ra_define_rule_class_method_and_attribute()<repeat>: " +
+                    "ra_class<ignore><call> ra_define_rule_method_or_attribute_or_class()");
+            ra_class_rule_node.configure_from_key_name("ra_class<ignore><call>: " +
+                    "to_class<ignore> to_class_1<optional><repeat> to_class_2 to_identifier");
+            to_class_rule_node.configure_from_key_name("to_class<ignore>: [public|protected|private" +
                     "|static|abstract|sealed" +
                     "|strictfp|transient" +
                     "|class|interface|enum|record]");
-            t_class_1_rule_node.configure_from_key_name("t_class_1<optional><repeat>: " +
+            to_class_1_rule_node.configure_from_key_name("to_class_1<optional><repeat>: " +
                     "[public|protected|private|static|abstract|sealed|strictfp|transient]");
-            t_class_2_rule_node.configure_from_key_name("t_class_2: [class|interface|enum|record]");
-            t_identifier_rule_node.configure_from_key_name("t_identifier: identifier");
-            /* t_class<ignore>: [public|protected|private|static|abstract|sealed|strictfp|transient|class|interface|enum]<ignore> r_class_2 */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_rule_node_supplier = () -> {
+            to_class_2_rule_node.configure_from_key_name("to_class_2: [class|interface|enum|record]");
+            to_class_identifier_rule_node.configure_from_key_name("to_class_identifier: identifier");
+            /* to_class<ignore>: [public|protected|private|static|abstract|sealed|strictfp|transient|class|interface|enum]<ignore> ra_class_2 */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_class_rule_node_supplier = () -> {
                 try {
-                    t_class_rule_node.clear_add_new_list();
-                    t_class_rule_node.add_new(token_public.name());
-                    t_class_rule_node.add_new(token_protected.name());
-                    t_class_rule_node.add_new(token_private.name());
-                    t_class_rule_node.add_new(token_static.name());
-                    t_class_rule_node.add_new(token_abstract.name());
-                    t_class_rule_node.add_new(token_sealed.name());
-                    t_class_rule_node.add_new(token_strictfp.name());
-                    t_class_rule_node.add_new(token_transient.name());
-                    t_class_rule_node.add_new(token_class.name());
-                    t_class_rule_node.add_new(token_interface.name());
-                    t_class_rule_node.add_new(token_enum.name());
-                    t_class_rule_node.add_new(token_record.name());
-                    t_class_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
+                    to_class_rule_node.clear_add_new_list();
+                    to_class_rule_node.add_new(token_public.name());
+                    to_class_rule_node.add_new(token_protected.name());
+                    to_class_rule_node.add_new(token_private.name());
+                    to_class_rule_node.add_new(token_static.name());
+                    to_class_rule_node.add_new(token_abstract.name());
+                    to_class_rule_node.add_new(token_sealed.name());
+                    to_class_rule_node.add_new(token_strictfp.name());
+                    to_class_rule_node.add_new(token_transient.name());
+                    to_class_rule_node.add_new(token_class.name());
+                    to_class_rule_node.add_new(token_interface.name());
+                    to_class_rule_node.add_new(token_enum.name());
+                    to_class_rule_node.add_new(token_record.name());
+                    to_class_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {
                     return null;
                 }
-                return t_class_rule_node;
+                return to_class_rule_node;
             };
-            /* t_class_1<optional><repeat>: [public|protected|private|static|abstract|sealed|strictfp|transient] */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_1_rule_node_supplier = () -> {
+            /* to_class_1<optional><repeat>: [public|protected|private|static|abstract|sealed|strictfp|transient] */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_class_1_rule_node_supplier = () -> {
                 try {
-                    t_class_1_rule_node.clear_add_new_list();
-                    t_class_1_rule_node.add_new(token_public.name());
-                    t_class_1_rule_node.add_new(token_protected.name());
-                    t_class_1_rule_node.add_new(token_private.name());
-                    t_class_1_rule_node.add_new(token_static.name());
-                    t_class_1_rule_node.add_new(token_abstract.name());
-                    t_class_1_rule_node.add_new(token_sealed.name());
-                    t_class_1_rule_node.add_new(token_strictfp.name());
-                    t_class_1_rule_node.add_new(token_transient.name());
-                    t_class_1_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
-                    t_class_1_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
-                    t_class_1_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_class_1_rule_node.clear_add_new_list();
+                    to_class_1_rule_node.add_new(token_public.name());
+                    to_class_1_rule_node.add_new(token_protected.name());
+                    to_class_1_rule_node.add_new(token_private.name());
+                    to_class_1_rule_node.add_new(token_static.name());
+                    to_class_1_rule_node.add_new(token_abstract.name());
+                    to_class_1_rule_node.add_new(token_sealed.name());
+                    to_class_1_rule_node.add_new(token_strictfp.name());
+                    to_class_1_rule_node.add_new(token_transient.name());
+                    to_class_1_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
+                    to_class_1_rule_node.defined_repeat_mode = Analyzer_rules.Repeat_mode.repeat_while_success;
+                    to_class_1_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
-                                Scanner_rules.Basic_tokens basic_token = _basic_token;
-                                identifiers_table.new_identifier.properties_list.add(new Scanner_rules.Basic_tokens(basic_token.token_type
-                                        , basic_token.token_tex));
+                                identifiers_table.new_identifier.properties_list.add(new Scanner_rules.Basic_tokens(_basic_token.token_type
+                                        , _basic_token.token_tex));
                             }
                     );
                 } catch (Exception e) {
                     return null;
                 }
-                return t_class_1_rule_node;
+                return to_class_1_rule_node;
             };
-            /* t_class_2: [class|interface|enum|record] */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_2_rule_node_supplier = () -> {
+            /* to_class_2: [class|interface|enum|record] */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_class_2_rule_node_supplier = () -> {
                 try {
-                    t_class_2_rule_node.clear_add_new_list();
-                    t_class_2_rule_node.add_new(token_class.name());
-                    t_class_2_rule_node.add_new(token_interface.name());
-                    t_class_2_rule_node.add_new(token_enum.name());
-                    t_class_2_rule_node.add_new(token_record.name());
-                    t_class_2_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_class_2_rule_node.clear_add_new_list();
+                    to_class_2_rule_node.add_new(token_class.name());
+                    to_class_2_rule_node.add_new(token_interface.name());
+                    to_class_2_rule_node.add_new(token_enum.name());
+                    to_class_2_rule_node.add_new(token_record.name());
+                    to_class_2_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 String name = _basic_token.token_type;
                                 if (Types.token_class.name().equals(name)) {
@@ -500,14 +499,14 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_class_2_rule_node;
+                return to_class_2_rule_node;
             };
-            /* t_identifier: identifier */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_rule_node_supplier = () -> {
+            /* to_class_identifier: identifier */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_identifier_rule_node_supplier = () -> {
                 try {
-                    t_identifier_rule_node.clear_add_new_list();
-                    t_identifier_rule_node.add_new(identifier.name());
-                    t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_class_identifier_rule_node.clear_add_new_list();
+                    to_class_identifier_rule_node.add_new(identifier.name());
+                    to_class_identifier_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 identifiers_table.new_identifier.name = _basic_token.token_tex;
                                 Identifiers_tables.Identifiers identifier = _ok.valid(identifiers_table.put_identifier(_ok, _extras_array));
@@ -517,36 +516,36 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_identifier_rule_node;
+                return to_class_identifier_rule_node;
             };
-            /* r_class<ignore><call>: t_class<ignore> t_class_1<repeat> t_class_2<ignore> t_class_3 t_identifier */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_class_rule_node_supplier = () -> {
+            /* ra_class<ignore><call>: to_class<ignore> to_class_1<repeat> to_class_2<ignore> to_class_3 to_identifier */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_class_rule_node_supplier = () -> {
                 try {
-                    r_class_rule_node.clear_add_new_list();
-                    r_class_rule_node.add_new(t_class_rule_node_supplier);
-                    r_class_rule_node.add_new(t_class_1_rule_node_supplier);
-                    r_class_rule_node.add_new(t_class_2_rule_node_supplier);
-                    r_class_rule_node.add_new(t_identifier_rule_node_supplier);
-                    r_class_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
-                    r_class_rule_node.defined_call_the_success_rules_list_if_success = true;
+                    ra_class_rule_node.clear_add_new_list();
+                    ra_class_rule_node.add_new(to_class_rule_node_supplier);
+                    ra_class_rule_node.add_new(to_class_1_rule_node_supplier);
+                    ra_class_rule_node.add_new(to_class_2_rule_node_supplier);
+                    ra_class_rule_node.add_new(to_identifier_rule_node_supplier);
+                    ra_class_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.ignore_until_matches;
+                    ra_class_rule_node.defined_call_the_success_rules_list_if_success = true;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_class_rule_node;
+                return ra_class_rule_node;
             };
-            /* "_define_rule_class_method_and_attribute()<repeat>: r_class _define_rule_method_or_attribute_or_class()" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_define_rule_class_method_and_attribute_rule_node_supplier = () -> {
+            /* "ra_define_rule_class_method_and_attribute()<repeat>: ra_class ra_define_rule_method_or_attribute_or_class()" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_define_rule_class_method_and_attribute_rule_node_supplier = () -> {
                 try {
-                    r_define_rule_class_method_and_attribute_rule_node.clear_add_new_list();
-                    r_define_rule_class_method_and_attribute_rule_node.add_new(r_class_rule_node_supplier);
-                    r_define_rule_class_method_and_attribute_rule_node.add_new(this::_define_rule_method_or_attribute_or_class, ok, extras_array);
-                    r_define_rule_class_method_and_attribute_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
+                    ra_define_rule_class_method_and_attribute_rule_node.clear_add_new_list();
+                    ra_define_rule_class_method_and_attribute_rule_node.add_new(ra_class_rule_node_supplier);
+                    ra_define_rule_class_method_and_attribute_rule_node.add_new(this::ra_define_rule_method_or_attribute_or_class, ok, extras_array);
+                    ra_define_rule_class_method_and_attribute_rule_node.defined_repeat_mode = Analyzer_rules.Repeat_mode.repeat_while_success;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_define_rule_class_method_and_attribute_rule_node;
+                return ra_define_rule_class_method_and_attribute_rule_node;
             };
-            retorno = r_define_rule_class_method_and_attribute_rule_node_supplier.get();
+            retorno = ra_define_rule_class_method_and_attribute_rule_node_supplier.get();
         } catch (Exception e) {
             ok.setTex(e);
             return null;
@@ -561,181 +560,181 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
      * @return
      * @throws Exception
      */
-    public Analizer_rules.@Nullable Rule_nodes _define_rule_method_or_attribute_or_class(Oks ok, Object ... extras_array) throws Exception {
+    public Analyzer_rules.@Nullable Rule_nodes ra_define_rule_method_or_attribute_or_class(Oks ok, Object ... extras_array) throws Exception {
         new Test_methods(ok, ok, extras_array, this);
         if (ok.is == false) return null;
-        Analizer_rules.Rule_nodes retorno = null;
+        Analyzer_rules.Rule_nodes retorno = null;
         try {
-            Analizer_rules.Rules_and_rule_nodes r_method_or_attribute_or_class_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_method_or_attribute_or_class_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_or_rule_nodes o_method_or_attribute_or_class_1_rule_node = new Analizer_rules.Rules_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_method_or_attribute_or_class_1_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_or_rule_nodes o_method_or_attribute_or_class_rule_node = new Analizer_rules.Rules_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_identifier_type_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_identifier_type_class_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_identifier_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_or_rule_nodes o_parenthesis_open_or_semicolon_rule_node = new Analizer_rules.Rules_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_parenthesis_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_parenthesis_open_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_parenthesis_close_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_semicolon_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_template_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_template_sign_less_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_template_sign_bigger_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_or_rule_nodes o_identifier_type_rule_node = new Analizer_rules.Rules_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_identifier_class_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_dot_identifier_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_dot_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_annotation_in_identifier_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_annotation_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_annotation_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_annotation_begin_end_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_annotation_parenthesis_open_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_annotation_parenthesis_close_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_annotation_parenthesis_close_1_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_method_or_attribute_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Rules_and_rule_nodes r_class_rule_node = new Analizer_rules.Rules_and_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_class_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            Analizer_rules.Tokens_or_rule_nodes t_class_identifier_rule_node = new Analizer_rules.Tokens_or_rule_nodes(analizer_rule);
-            r_method_or_attribute_or_class_rule_node.configure_from_key_name("r_method_or_attribute_or_class<ignore><repeat><call>: " +
-                    "t_method_or_attribute_or_class<ignore> o_method_or_attribute_or_class_1<optional><repeat> " +
-                    "o_method_or_attribute_or_class");
-            t_method_or_attribute_or_class_rule_node.configure_from_key_name("t_method_or_attribute_or_class<ignore>: [public|protected|private" +
+            Analyzer_rules.Rules_and_rule_nodes ra_method_or_attribute_or_class_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_method_or_attribute_or_class_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_or_rule_nodes ro_method_or_attribute_or_class_1_rule_node = new Analyzer_rules.Rules_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_method_or_attribute_or_class_1_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_or_rule_nodes ro_method_or_attribute_or_class_rule_node = new Analyzer_rules.Rules_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_identifier_type_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_identifier_type_class_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_identifier_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_or_rule_nodes ro_parenthesis_open_or_semicolon_rule_node = new Analyzer_rules.Rules_or_rule_nodes(analyizer_rule);
+//            Analizera_rules.Rules_and_rule_nodes ra_parenthesis_rule_node = new Analizera_rules.Rules_and_rule_nodes(analizera_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_parenthesis_open_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+//            Analizera_rules.Tokens_or_rule_nodes to_parenthesis_close_rule_node = new Analizera_rules.Tokens_or_rule_nodes(analizera_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_semicolon_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_template_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_template_sign_less_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_template_sign_biggera_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_or_rule_nodes ro_identifier_type_rule_node = new Analyzer_rules.Rules_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_identifier_class_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_doto_identifier_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_doto_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_annotation_in_identifier_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_annotation_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_annotation_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_annotation_begin_end_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_annotation_parenthesis_open_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_annotation_parenthesis_close_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_annotation_parenthesis_close_1_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_method_or_attribute_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Rules_and_rule_nodes ra_class_rule_node = new Analyzer_rules.Rules_and_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_class_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            Analyzer_rules.Tokens_or_rule_nodes to_class_identifier_rule_node = new Analyzer_rules.Tokens_or_rule_nodes(analyizer_rule);
+            ra_method_or_attribute_or_class_rule_node.configure_from_key_name("ra_method_or_attribute_or_class<ignore><repeat><call>: " +
+                    "to_method_or_attribute_or_class<ignore> ro_method_or_attribute_or_class_1<optional><repeat> " +
+                    "ro_method_or_attribute_or_class");
+            to_method_or_attribute_or_class_rule_node.configure_from_key_name("to_method_or_attribute_or_class<ignore>: [public|protected|private" +
                     "|static|volatile|final" +
                     "|strictfp|transient" +
                     "|identifier|void|boolean|byte|char|short|int|long|float|double" +
                     "|sign_less" +
                     "|abstract|sealed|class|interface|enum|record" +
                     "|annotation]");
-            o_method_or_attribute_or_class_1_rule_node.configure_from_key_name("o_method_or_attribute_or_class_1<optional><repeat>: " +
-                    "[t_method_or_attribute_or_class_1|r_annotation]");
-            r_annotation_rule_node.configure_from_key_name("r_annotation: t_annotation r_annotation_begin_end<optional>");
-            t_annotation_rule_node.configure_from_key_name("t_annotation: annotation");
-            r_annotation_begin_end_rule_node.configure_from_key_name("r_annotation_begin_end<optional>: t_annotation_parenthesis_open t_annotation_parenthesis_close<ignore> t_annotation_parenthesis_close_1");
-            t_annotation_parenthesis_open_rule_node.configure_from_key_name("t_annotation_parenthesis_open: parenthesis_open");
-            t_annotation_parenthesis_close_rule_node.configure_from_key_name("t_annotation_parenthesis_close<ignore>: parenthesis_close");
-            t_annotation_parenthesis_close_1_rule_node.configure_from_key_name("t_annotation_parenthesis_close_1: parenthesis_close");
-            t_method_or_attribute_or_class_1_rule_node.configure_from_key_name("t_method_or_attribute_or_class_1: " +
+            ro_method_or_attribute_or_class_1_rule_node.configure_from_key_name("ro_method_or_attribute_or_class_1<optional><repeat>: " +
+                    "[to_method_or_attribute_or_class_1|ra_annotation]");
+            ra_annotation_rule_node.configure_from_key_name("ra_annotation: to_annotation ra_annotation_begin_end<optional>");
+            to_annotation_rule_node.configure_from_key_name("to_annotation: annotation");
+            ra_annotation_begin_end_rule_node.configure_from_key_name("ra_annotation_begin_end<optional>: to_annotation_parenthesis_open to_annotation_parenthesis_close<ignore> to_annotation_parenthesis_close_1");
+            to_annotation_parenthesis_open_rule_node.configure_from_key_name("to_annotation_parenthesis_open: parenthesis_open");
+            to_annotation_parenthesis_close_rule_node.configure_from_key_name("to_annotation_parenthesis_close<ignore>: parenthesis_close");
+            to_annotation_parenthesis_close_1_rule_node.configure_from_key_name("to_annotation_parenthesis_close_1: parenthesis_close");
+            to_method_or_attribute_or_class_1_rule_node.configure_from_key_name("to_method_or_attribute_or_class_1: " +
                     "[public|protected|private" +
                     "|static|volatile|final" +
                     "|strictfp|transient]");
-            o_method_or_attribute_or_class_rule_node.configure_from_key_name("o_method_or_attribute_or_class: " +
-                    "[r_method_or_attribute" +
-                    "|r_class]");
-            r_method_or_attribute_rule_node.configure_from_key_name("r_method_or_attribute: " +
-                    "r_template<optional> o_identifier_type t_identifier o_parenthesis_open_or_semicolon");
-            r_class_rule_node.configure_from_key_name("r_class: t_class t_class_identifier");
-            t_class_rule_node.configure_from_key_name("t_class: [class|interface|enum|record]");
-            t_class_identifier_rule_node.configure_from_key_name("t_class_identifier: identifier");
-            r_template_rule_node.configure_from_key_name("r_template<optional>: t_sign_less t_sign_bigger<ignore> ");
-            t_template_sign_less_rule_node.configure_from_key_name("t_sign_less: sign_less");
-            t_template_sign_bigger_rule_node.configure_from_key_name("t_sign_bigger<ignore>: sign_bigger");
-            o_identifier_type_rule_node.configure_from_key_name("o_identifier_type: [t_identifier_type|r_identifier_class]");
-            r_identifier_class_rule_node.configure_from_key_name("r_identifier_class: " +
-                    "t_identifier_type_class r_dot_identifier<optional><repeat>");
-            r_dot_identifier_rule_node.configure_from_key_name("r_dot_identifier<optional><repeat>: " +
-                    "t_dot r_annotation_in_identifier<optional><repeat> t_identifier_type_class");
-            t_dot_rule_node.configure_from_key_name("t_dot: dot");
-            r_annotation_in_identifier_rule_node.configure_from_key_name("r_annotation_in_identifier<optional><repeat>: " +
-                    "r_annotation");
-            t_identifier_type_rule_node.configure_from_key_name("t_identifier_type: " +
+            ro_method_or_attribute_or_class_rule_node.configure_from_key_name("ro_method_or_attribute_or_class: " +
+                    "[ra_method_or_attribute" +
+                    "|ra_class]");
+            ra_method_or_attribute_rule_node.configure_from_key_name("ra_method_or_attribute: " +
+                    "ra_template<optional> ro_identifier_type to_identifier ro_parenthesis_open_or_semicolon");
+            ra_class_rule_node.configure_from_key_name("ra_class: to_class to_class_identifier");
+            to_class_rule_node.configure_from_key_name("to_class: [class|interface|enum|record]");
+            to_class_identifier_rule_node.configure_from_key_name("to_class_identifier: identifier");
+            ra_template_rule_node.configure_from_key_name("ra_template<optional>: to_sign_less to_sign_bigger<ignore> ");
+            to_template_sign_less_rule_node.configure_from_key_name("to_sign_less: sign_less");
+            to_template_sign_biggera_rule_node.configure_from_key_name("to_sign_bigger<ignore>: sign_bigger");
+            ro_identifier_type_rule_node.configure_from_key_name("ro_identifier_type: [to_identifier_type|ra_identifier_class]");
+            ra_identifier_class_rule_node.configure_from_key_name("ra_identifier_class: " +
+                    "to_identifier_type_class ra_doto_identifier<optional><repeat>");
+            ra_doto_identifier_rule_node.configure_from_key_name("ra_doto_identifier<optional><repeat>: " +
+                    "to_dot ra_annotation_in_identifier<optional><repeat> to_identifier_type_class");
+            to_doto_rule_node.configure_from_key_name("to_dot: dot");
+            ra_annotation_in_identifier_rule_node.configure_from_key_name("ra_annotation_in_identifier<optional><repeat>: " +
+                    "ra_annotation");
+            to_identifier_type_rule_node.configure_from_key_name("to_identifier_type: " +
                     "[void|boolean|byte|char|short|int|long|float|double]");
-            t_identifier_type_class_rule_node.configure_from_key_name("t_identifier_type_class: identifier");
-            t_identifier_rule_node.configure_from_key_name("t_identifier: identifier");
-            o_parenthesis_open_or_semicolon_rule_node.configure_from_key_name("o_parenthesis_open_or_semicolon: [t_parenthesis_open|t_semicolon<ignore>]");
-            r_parenthesis_rule_node.configure_from_key_name("r_parenthesis: t_parenthesis_open t_parenthesis_close<ignore>");
-            t_parenthesis_open_rule_node.configure_from_key_name("t_parenthesis_open: parenthesis_open");
-            t_parenthesis_close_rule_node.configure_from_key_name("t_parenthesis_close<ignore>: parenthesis_close");
-            t_semicolon_rule_node.configure_from_key_name("t_semicolon<ignore>: semi_colon");
-            /* "t_class: [class|interface|enum|record]" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_rule_node_supplier = () -> {
+            to_identifier_type_class_rule_node.configure_from_key_name("to_identifier_type_class: identifier");
+            to_identifier_rule_node.configure_from_key_name("to_identifier: identifier");
+            ro_parenthesis_open_or_semicolon_rule_node.configure_from_key_name("ro_parenthesis_open_or_semicolon: [to_parenthesis_open|to_semicolon<ignore>]");
+//            ra_parenthesis_rule_node.configure_from_key_name("ra_parenthesis: to_parenthesis_open to_parenthesis_close<ignore>");
+            to_parenthesis_open_rule_node.configure_from_key_name("to_parenthesis_open: parenthesis_open");
+//            to_parenthesis_close_rule_node.configure_from_key_name("to_parenthesis_close<ignore>: parenthesis_close");
+            to_semicolon_rule_node.configure_from_key_name("to_semicolon<ignore>: semi_colon");
+            /* "to_class: [class|interface|enum|record]" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_class_rule_node_supplier = () -> {
                 try {
-                    t_class_rule_node.clear_add_new_list();
-                    t_class_rule_node.add_new(token_class.name());
-                    t_class_rule_node.add_new(token_interface.name());
-                    t_class_rule_node.add_new(token_enum.name());
-                    t_class_rule_node.add_new(token_record.name());
+                    to_class_rule_node.clear_add_new_list();
+                    to_class_rule_node.add_new(token_class.name());
+                    to_class_rule_node.add_new(token_interface.name());
+                    to_class_rule_node.add_new(token_enum.name());
+                    to_class_rule_node.add_new(token_record.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return t_class_rule_node;
+                return to_class_rule_node;
             };
-            /* "t_class_identifier: identifier" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_class_identifier_rule_node_supplier = () -> {
+            /* "to_class_identifier: identifier" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_class_identifier_rule_node_supplier = () -> {
                 try {
-                    t_class_identifier_rule_node.clear_add_new_list();
-                    t_class_identifier_rule_node.add_new(identifier.name());
+                    to_class_identifier_rule_node.clear_add_new_list();
+                    to_class_identifier_rule_node.add_new(identifier.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return t_class_identifier_rule_node;
+                return to_class_identifier_rule_node;
             };
-            /* "r_class: t_class t_class_identifier" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_class_rule_node_supplier = () -> {
+            /* "ra_class: to_class to_class_identifier" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_class_rule_node_supplier = () -> {
                 try {
-                    r_class_rule_node.clear_add_new_list();
-                    r_class_rule_node.add_new(t_class_rule_node_supplier);
-                    r_class_rule_node.add_new(t_class_identifier_rule_node_supplier);
+                    ra_class_rule_node.clear_add_new_list();
+                    ra_class_rule_node.add_new(to_class_rule_node_supplier);
+                    ra_class_rule_node.add_new(to_class_identifier_rule_node_supplier);
                 } catch (Exception e) {
                     return null;
                 }
-                return r_class_rule_node;
+                return ra_class_rule_node;
             };
-            /* "t_method_or_attribute_or_class<ignore>: [public|protected|private" +
+            /* "to_method_or_attribute_or_class<ignore>: [public|protected|private" +
                     "|static|volatile|final" +
                     "|identifier|void|boolean|byte|char|short|int|long|float|double" +
                     "|sign_less" +
                     "|abstract|sealed|class|interface|enum|record]" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_method_or_attribute_or_class_rule_node_supplier = () -> {
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_method_or_attribute_or_class_rule_node_supplier = () -> {
                 try {
-                    t_method_or_attribute_or_class_rule_node.clear_add_new_list();
-                    t_method_or_attribute_or_class_rule_node.add_new(token_public.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_protected.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_private.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_static.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_volatile.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_final.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_strictfp.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_transient.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(identifier.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_void.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_boolean.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_byte.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_char.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_short.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_int.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_long.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_float.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(type_double.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(sign_less.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_abstract.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_sealed.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_class.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_interface.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_enum.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(token_record.name());
-                    t_method_or_attribute_or_class_rule_node.add_new(annotation.name());
-                    t_method_or_attribute_or_class_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
+                    to_method_or_attribute_or_class_rule_node.clear_add_new_list();
+                    to_method_or_attribute_or_class_rule_node.add_new(token_public.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_protected.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_private.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_static.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_volatile.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_final.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_strictfp.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_transient.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(identifier.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_void.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_boolean.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_byte.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_char.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_short.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_int.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_long.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_float.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(type_double.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(sign_less.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_abstract.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_sealed.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_class.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_interface.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_enum.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(token_record.name());
+                    to_method_or_attribute_or_class_rule_node.add_new(annotation.name());
+                    to_method_or_attribute_or_class_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {
                     return null;
                 }
-                return t_method_or_attribute_or_class_rule_node;
+                return to_method_or_attribute_or_class_rule_node;
             };
-            /* t_method_or_attribute_or_class_1<optional><repeat>: " +
+            /* to_method_or_attribute_or_class_1<optional><repeat>: " +
                     "[public|protected|private" +
                     "|static]" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_method_or_attribute_or_class_1_rule_node_supplier = () -> {
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_method_or_attribute_or_class_1_rule_node_supplier = () -> {
                 try {
-                    t_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_public.name());
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_protected.name());
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_private.name());
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_static.name());
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_volatile.name());
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_final.name());
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_strictfp.name());
-                    t_method_or_attribute_or_class_1_rule_node.add_new(token_transient.name());
-                    t_method_or_attribute_or_class_1_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_public.name());
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_protected.name());
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_private.name());
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_static.name());
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_volatile.name());
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_final.name());
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_strictfp.name());
+                    to_method_or_attribute_or_class_1_rule_node.add_new(token_transient.name());
+                    to_method_or_attribute_or_class_1_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 identifiers_table.new_identifier.properties_list.add(new Scanner_rules.Basic_tokens(_basic_token.token_type
                                         , _basic_token.token_tex));
@@ -744,197 +743,139 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_method_or_attribute_or_class_1_rule_node;
+                return to_method_or_attribute_or_class_1_rule_node;
             };
-            /* "t_annotation: annotation" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_rule_node_supplier = () -> {
+            /* "to_annotation: annotation" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_annotation_rule_node_supplier = () -> {
                 try {
-                    t_annotation_rule_node.clear_add_new_list();
-                    t_annotation_rule_node.add_new(annotation.name());
+                    to_annotation_rule_node.clear_add_new_list();
+                    to_annotation_rule_node.add_new(annotation.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return t_annotation_rule_node;
+                return to_annotation_rule_node;
             };
-            /* "t_annotation_parenthesis_open: parenthesis_open" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_parenthesis_open_rule_node_supplier = () -> {
+            /* "to_annotation_parenthesis_open: parenthesis_open" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_annotation_parenthesis_open_rule_node_supplier = () -> {
                 try {
-                    t_annotation_parenthesis_open_rule_node.clear_add_new_list();
-                    t_annotation_parenthesis_open_rule_node.add_new(parenthesis_open.name());
+                    to_annotation_parenthesis_open_rule_node.clear_add_new_list();
+                    to_annotation_parenthesis_open_rule_node.add_new(parenthesis_open.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return t_annotation_parenthesis_open_rule_node;
+                return to_annotation_parenthesis_open_rule_node;
             };
-            /* "t_annotation_parenthesis_close<ignore>: parenthesis_close" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_parenthesis_close_rule_node_supplier = () -> {
+            /* "to_annotation_parenthesis_close<ignore>: parenthesis_close" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_annotation_parenthesis_close_rule_node_supplier = () -> {
                 try {
-                    t_annotation_parenthesis_close_rule_node.clear_add_new_list();
-                    t_annotation_parenthesis_close_rule_node.add_new(parenthesis_close.name());
-                    t_annotation_parenthesis_close_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
+                    to_annotation_parenthesis_close_rule_node.clear_add_new_list();
+                    to_annotation_parenthesis_close_rule_node.add_new(parenthesis_close.name());
+                    to_annotation_parenthesis_close_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {
                     return null;
                 }
-                return t_annotation_parenthesis_close_rule_node;
+                return to_annotation_parenthesis_close_rule_node;
             };
-            /* "t_annotation_parenthesis_close_1: parenthesis_close" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_annotation_parenthesis_close_1_rule_node_supplier = () -> {
+            /* "to_annotation_parenthesis_close_1: parenthesis_close" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_annotation_parenthesis_close_1_rule_node_supplier = () -> {
                 try {
-                    t_annotation_parenthesis_close_1_rule_node.clear_add_new_list();
-                    t_annotation_parenthesis_close_1_rule_node.add_new(parenthesis_close.name());
+                    to_annotation_parenthesis_close_1_rule_node.clear_add_new_list();
+                    to_annotation_parenthesis_close_1_rule_node.add_new(parenthesis_close.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return t_annotation_parenthesis_close_1_rule_node;
+                return to_annotation_parenthesis_close_1_rule_node;
             };
-            /* "r_annotation_begin_end<optional>: t_annotation_parenthesis_open t_annotation_parenthesis_close<ignore>" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_annotation_begin_end_rule_node_supplier = () -> {
+            /* "ra_annotation_begin_end<optional>: to_annotation_parenthesis_open to_annotation_parenthesis_close<ignore>" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_annotation_begin_end_rule_node_supplier = () -> {
                 try {
-                    r_annotation_begin_end_rule_node.clear_add_new_list();
-                    r_annotation_begin_end_rule_node.add_new(t_annotation_parenthesis_open_rule_node_supplier);
-                    r_annotation_begin_end_rule_node.add_new(t_annotation_parenthesis_close_rule_node_supplier);
-                    r_annotation_begin_end_rule_node.add_new(t_annotation_parenthesis_close_1_rule_node_supplier);
-                    r_annotation_begin_end_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
+                    ra_annotation_begin_end_rule_node.clear_add_new_list();
+                    ra_annotation_begin_end_rule_node.add_new(to_annotation_parenthesis_open_rule_node_supplier);
+                    ra_annotation_begin_end_rule_node.add_new(to_annotation_parenthesis_close_rule_node_supplier);
+                    ra_annotation_begin_end_rule_node.add_new(to_annotation_parenthesis_close_1_rule_node_supplier);
+                    ra_annotation_begin_end_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_annotation_begin_end_rule_node;
+                return ra_annotation_begin_end_rule_node;
             };
-            /* "r_annotation: t_annotation r_annotation_begin_end<optional>" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_annotation_rule_node_supplier = () -> {
+            /* "ra_annotation: to_annotation ra_annotation_begin_end<optional>" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_annotation_rule_node_supplier = () -> {
                 try {
-                    r_annotation_rule_node.clear_add_new_list();
-                    r_annotation_rule_node.add_new(t_annotation_rule_node_supplier);
-                    r_annotation_rule_node.add_new(r_annotation_begin_end_rule_node_supplier);
+                    ra_annotation_rule_node.clear_add_new_list();
+                    ra_annotation_rule_node.add_new(to_annotation_rule_node_supplier);
+                    ra_annotation_rule_node.add_new(ra_annotation_begin_end_rule_node_supplier);
                 } catch (Exception e) {
                     return null;
                 }
-                return r_annotation_rule_node;
+                return ra_annotation_rule_node;
             };
-            /* "o_method_or_attribute_or_class_1<optional><repeat>: " +
-                    "[t_method_or_attribute_or_class_1|r_annotation" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_method_or_attribute_or_class_1_rule_node_supplier = () -> {
+            /* "ro_method_or_attribute_or_class_1<optional><repeat>: " +
+                    "[to_method_or_attribute_or_class_1|ra_annotation" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ro_method_or_attribute_or_class_1_rule_node_supplier = () -> {
                 try {
-                    o_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
-                    o_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
-                    o_method_or_attribute_or_class_1_rule_node.add_new(t_method_or_attribute_or_class_1_rule_node_supplier);
-                    o_method_or_attribute_or_class_1_rule_node.add_new(r_annotation_rule_node_supplier);
-                    o_method_or_attribute_or_class_1_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
-                    o_method_or_attribute_or_class_1_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
+                    ro_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
+                    ro_method_or_attribute_or_class_1_rule_node.clear_add_new_list();
+                    ro_method_or_attribute_or_class_1_rule_node.add_new(to_method_or_attribute_or_class_1_rule_node_supplier);
+                    ro_method_or_attribute_or_class_1_rule_node.add_new(ra_annotation_rule_node_supplier);
+                    ro_method_or_attribute_or_class_1_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
+                    ro_method_or_attribute_or_class_1_rule_node.defined_repeat_mode = Analyzer_rules.Repeat_mode.repeat_while_success;
                 } catch (Exception e) {
                     return null;
                 }
-                return o_method_or_attribute_or_class_1_rule_node;
+                return ro_method_or_attribute_or_class_1_rule_node;
             };
-            /* "t_sign_less: sign_less" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_template_sign_less_rule_node_supplier = () -> {
+            /* "to_sign_less: sign_less" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_template_sign_less_rule_node_supplier = () -> {
                 try {
-                    t_template_sign_less_rule_node.clear_add_new_list();
-                    t_template_sign_less_rule_node.clear_add_new_list();
-                    t_template_sign_less_rule_node.add_new(sign_less.name());
+                    to_template_sign_less_rule_node.clear_add_new_list();
+                    to_template_sign_less_rule_node.clear_add_new_list();
+                    to_template_sign_less_rule_node.add_new(sign_less.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return t_template_sign_less_rule_node;
+                return to_template_sign_less_rule_node;
             };
-            /* "t_sign_bigger<ignore>: sign_bigger" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_template_sign_bigger_rule_node_supplier = () -> {
+            /* "to_sign_bigger<ignore>: sign_bigger" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_template_sign_biggera_rule_node_supplier = () -> {
                 try {
-                    t_template_sign_bigger_rule_node.clear_add_new_list();
-                    t_template_sign_bigger_rule_node.clear_add_new_list();
-                    t_template_sign_bigger_rule_node.add_new(sign_bigger.name());
-                    t_template_sign_bigger_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
+                    to_template_sign_biggera_rule_node.clear_add_new_list();
+                    to_template_sign_biggera_rule_node.clear_add_new_list();
+                    to_template_sign_biggera_rule_node.add_new(sign_bigger.name());
+                    to_template_sign_biggera_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.ignore_until_matches;
                 } catch (Exception e) {
                     return null;
                 }
-                return t_template_sign_bigger_rule_node;
+                return to_template_sign_biggera_rule_node;
             };
-            /* "r_template<optional>: t_sign_less t_sign_bigger<ignore> t_sign_bigger_1" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_template_rule_node_supplier = () -> {
+            /* "ra_template<optional>: to_sign_less to_sign_bigger<ignore> to_sign_biggera_1" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_template_rule_node_supplier = () -> {
                 try {
-                    r_template_rule_node.clear_add_new_list();
-                    r_template_rule_node.clear_add_new_list();
-                    r_template_rule_node.add_new(t_template_sign_less_rule_node_supplier);
-                    r_template_rule_node.add_new(t_template_sign_bigger_rule_node_supplier);
-                    r_template_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
+                    ra_template_rule_node.clear_add_new_list();
+                    ra_template_rule_node.clear_add_new_list();
+                    ra_template_rule_node.add_new(to_template_sign_less_rule_node_supplier);
+                    ra_template_rule_node.add_new(to_template_sign_biggera_rule_node_supplier);
+                    ra_template_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_template_rule_node;
+                return ra_template_rule_node;
             };
-            /* "t_identifier_type: " +
+            /* "to_identifier_type: " +
                     "[void|boolean|byte|char|short|int|long|float|double]" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_type_rule_node_supplier = () -> {
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_identifier_type_rule_node_supplier = () -> {
                 try {
-                    t_identifier_type_rule_node.clear_add_new_list();
-                    t_identifier_type_rule_node.add_new(type_void.name());
-                    t_identifier_type_rule_node.add_new(type_boolean.name());
-                    t_identifier_type_rule_node.add_new(type_byte.name());
-                    t_identifier_type_rule_node.add_new(type_char.name());
-                    t_identifier_type_rule_node.add_new(type_short.name());
-                    t_identifier_type_rule_node.add_new(type_int.name());
-                    t_identifier_type_rule_node.add_new(type_long.name());
-                    t_identifier_type_rule_node.add_new(type_float.name());
-                    t_identifier_type_rule_node.add_new(type_double.name());
-                    t_identifier_type_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_basic_token, _ok, _extras_array) -> {
-                                if (identifiers_table.new_identifier.return_class.isEmpty()) {
-                                    identifiers_table.new_identifier.return_class = _basic_token.token_tex;
-                                } else {
-                                    identifiers_table.new_identifier.return_class = _basic_token.token_tex
-                                            + "." + _basic_token.token_tex;
-                                }
-                            }
-                    );
-                } catch (Exception e) {
-                    return null;
-                }
-                return t_identifier_type_rule_node;
-            };
-            /* "t_identifier: identifier" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_rule_node_supplier = () -> {
-                try {
-                    t_identifier_rule_node.clear_add_new_list();
-                    t_identifier_rule_node.add_new(identifier.name());
-                    t_identifier_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
-                            (_basic_token, _ok, _extras_array) -> {
-                                identifiers_table.new_identifier.name = _basic_token.token_tex;
-                            }
-                    );
-                } catch (Exception e) {
-                    return null;
-                }
-                return t_identifier_rule_node;
-            };
-            /* "t_dot: dot" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_dot_rule_node_supplier = () -> {
-                try {
-                    t_dot_rule_node.clear_add_new_list();
-                    t_dot_rule_node.add_new(dot.name());
-                } catch (Exception e) {
-                    return null;
-                }
-                return t_dot_rule_node;
-            };
-            /* "r_annotation_in_identifier<optional><repeat>: " +
-                    "r_annotation" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_annotation_in_identifier_rule_node_supplier = () -> {
-                try {
-                    r_annotation_in_identifier_rule_node.clear_add_new_list();
-                    r_annotation_in_identifier_rule_node.add_new(r_annotation_rule_node_supplier);
-                    r_annotation_in_identifier_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
-                    r_annotation_in_identifier_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
-                } catch (Exception e) {
-                    return null;
-                }
-                return r_annotation_in_identifier_rule_node;
-            };
-            /* "t_identifier_type_class: identifier" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_identifier_type_class_rule_node_supplier = () -> {
-                try {
-                    t_identifier_type_class_rule_node.clear_add_new_list();
-                    t_identifier_type_class_rule_node.add_new(identifier.name());
-                    t_identifier_type_class_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    to_identifier_type_rule_node.clear_add_new_list();
+                    to_identifier_type_rule_node.add_new(type_void.name());
+                    to_identifier_type_rule_node.add_new(type_boolean.name());
+                    to_identifier_type_rule_node.add_new(type_byte.name());
+                    to_identifier_type_rule_node.add_new(type_char.name());
+                    to_identifier_type_rule_node.add_new(type_short.name());
+                    to_identifier_type_rule_node.add_new(type_int.name());
+                    to_identifier_type_rule_node.add_new(type_long.name());
+                    to_identifier_type_rule_node.add_new(type_float.name());
+                    to_identifier_type_rule_node.add_new(type_double.name());
+                    to_identifier_type_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 if (identifiers_table.new_identifier.return_class.isEmpty()) {
                                     identifiers_table.new_identifier.return_class = _basic_token.token_tex;
@@ -947,75 +888,154 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return t_identifier_type_class_rule_node;
+                return to_identifier_type_rule_node;
             };
-            /* "r_dot_identifier<optional><repeat>: " +
-                    "t_dot r_annotation_in_identifier<optional> t_identifier_extra" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_dot_identifier_rule_node_supplier = () -> {
+            /* "to_identifier: identifier" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_identifier_rule_node_supplier = () -> {
                 try {
-                    r_dot_identifier_rule_node.clear_add_new_list();
-                    r_dot_identifier_rule_node.add_new(t_dot_rule_node_supplier);
-                    r_dot_identifier_rule_node.add_new(r_annotation_in_identifier_rule_node_supplier);
-                    r_dot_identifier_rule_node.add_new(t_identifier_type_class_rule_node_supplier);
-                    r_dot_identifier_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.optional;
-                    r_dot_identifier_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
+                    to_identifier_rule_node.clear_add_new_list();
+                    to_identifier_rule_node.add_new(identifier.name());
+                    to_identifier_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
+                            (_basic_token, _ok, _extras_array) -> {
+                                identifiers_table.new_identifier.name = _basic_token.token_tex;
+                            }
+                    );
                 } catch (Exception e) {
                     return null;
                 }
-                return r_dot_identifier_rule_node;
+                return to_identifier_rule_node;
             };
-            /* "r_identifier_class: " +
-                    "t_identifier_type_class r_dot_identifier<optional><repeat>" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_identifier_class_rule_node_supplier = () -> {
+            /* "to_dot: dot" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_doto_rule_node_supplier = () -> {
                 try {
-                    r_identifier_class_rule_node.clear_add_new_list();
-                    r_identifier_class_rule_node.add_new(t_identifier_type_class_rule_node_supplier);
-                    r_identifier_class_rule_node.add_new(r_dot_identifier_rule_node_supplier);
+                    to_doto_rule_node.clear_add_new_list();
+                    to_doto_rule_node.add_new(dot.name());
                 } catch (Exception e) {
                     return null;
                 }
-                return r_identifier_class_rule_node;
+                return to_doto_rule_node;
             };
-            /* "o_identifier_type: [t_identifier_type|r_identifier_class]" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_identifier_type_rule_node_supplier = () -> {
+            /* "ra_annotation_in_identifier<optional><repeat>: " +
+                    "ra_annotation" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_annotation_in_identifier_rule_node_supplier = () -> {
                 try {
-                    o_identifier_type_rule_node.clear_add_new_list();
-                    o_identifier_type_rule_node.add_new(t_identifier_type_rule_node_supplier);
-                    o_identifier_type_rule_node.add_new(r_identifier_class_rule_node_supplier);
+                    ra_annotation_in_identifier_rule_node.clear_add_new_list();
+                    ra_annotation_in_identifier_rule_node.add_new(ra_annotation_rule_node_supplier);
+                    ra_annotation_in_identifier_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
+                    ra_annotation_in_identifier_rule_node.defined_repeat_mode = Analyzer_rules.Repeat_mode.repeat_while_success;
                 } catch (Exception e) {
                     return null;
                 }
-                return o_identifier_type_rule_node;
+                return ra_annotation_in_identifier_rule_node;
             };
-            /* "r_parenthesis: t_parenthesis_open t_parenthesis_close<ignore>" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_parenthesis_rule_node_supplier = () -> {
+            /* "to_identifier_type_class: identifier" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_identifier_type_class_rule_node_supplier = () -> {
                 try {
-                    r_parenthesis_rule_node.clear_add_new_list();
-                    r_parenthesis_rule_node.add_new(t_annotation_parenthesis_open_rule_node_supplier);
-                    r_parenthesis_rule_node.add_new(t_annotation_parenthesis_close_rule_node_supplier);
+                    to_identifier_type_class_rule_node.clear_add_new_list();
+                    to_identifier_type_class_rule_node.add_new(identifier.name());
+                    to_identifier_type_class_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
+                            (_basic_token, _ok, _extras_array) -> {
+                                if (identifiers_table.new_identifier.return_class.isEmpty()) {
+                                    identifiers_table.new_identifier.return_class = _basic_token.token_tex;
+                                } else {
+                                    identifiers_table.new_identifier.return_class = identifiers_table.new_identifier.return_class
+                                            + "." + _basic_token.token_tex;
+                                }
+                            }
+                    );
                 } catch (Exception e) {
                     return null;
                 }
-                return r_parenthesis_rule_node;
+                return to_identifier_type_class_rule_node;
             };
-            /* "t_semicolon<ignore>: semi_colon" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_semicolon_rule_node_supplier = () -> {
+            /* "ra_doto_identifier<optional><repeat>: " +
+                    "to_dot ra_annotation_in_identifier<optional> to_identifier_extra" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_doto_identifier_rule_node_supplier = () -> {
                 try {
-                    t_semicolon_rule_node.clear_add_new_list();
-                    t_semicolon_rule_node.add_new(semi_colon.name());
-                    t_semicolon_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
+                    ra_doto_identifier_rule_node.clear_add_new_list();
+                    ra_doto_identifier_rule_node.add_new(to_doto_rule_node_supplier);
+                    ra_doto_identifier_rule_node.add_new(ra_annotation_in_identifier_rule_node_supplier);
+                    ra_doto_identifier_rule_node.add_new(to_identifier_type_class_rule_node_supplier);
+                    ra_doto_identifier_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.optional;
+                    ra_doto_identifier_rule_node.defined_repeat_mode = Analyzer_rules.Repeat_mode.repeat_while_success;
                 } catch (Exception e) {
                     return null;
                 }
-                return t_semicolon_rule_node;
+                return ra_doto_identifier_rule_node;
             };
-            /* "o_parenthesis_open_or_semicolon: [t_parenthesis_open|t_semicolon<ignore>]" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_parenthesis_open_or_semicolon_rule_node_supplier = () -> {
+            /* "ra_identifier_class: " +
+                    "to_identifier_type_class ra_doto_identifier<optional><repeat>" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_identifier_class_rule_node_supplier = () -> {
                 try {
-                    o_parenthesis_open_or_semicolon_rule_node.clear_add_new_list();
-                    o_parenthesis_open_or_semicolon_rule_node.add_new(r_parenthesis_rule_node_supplier);
-                    o_parenthesis_open_or_semicolon_rule_node.add_new(t_semicolon_rule_node_supplier);
-                    o_parenthesis_open_or_semicolon_rule_node.defined_rule_success = new Analizer_rules.Rule_success(
+                    ra_identifier_class_rule_node.clear_add_new_list();
+                    ra_identifier_class_rule_node.add_new(to_identifier_type_class_rule_node_supplier);
+                    ra_identifier_class_rule_node.add_new(ra_doto_identifier_rule_node_supplier);
+                } catch (Exception e) {
+                    return null;
+                }
+                return ra_identifier_class_rule_node;
+            };
+            /* "ro_identifier_type: [to_identifier_type|ra_identifier_class]" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ro_identifier_type_rule_node_supplier = () -> {
+                try {
+                    ro_identifier_type_rule_node.clear_add_new_list();
+                    ro_identifier_type_rule_node.add_new(to_identifier_type_rule_node_supplier);
+                    ro_identifier_type_rule_node.add_new(ra_identifier_class_rule_node_supplier);
+                } catch (Exception e) {
+                    return null;
+                }
+                return ro_identifier_type_rule_node;
+            };
+            /* "to_parenthesis_close<ignore>: parenthesis_close" */
+//            final Analizera_rules.Rule_nodes.Rule_creator_suppliers to_parenthesis_close_rule_node_supplier = () -> {
+//                try {
+//                    to_parenthesis_close_rule_node.clear_add_new_list();
+//                    to_parenthesis_close_rule_node.add_new(parenthesis_close.name());
+//                    to_parenthesis_close_rule_node.defined_optional_mode = Analizera_rules.Optional_mode.ignore_until_matches;
+//                } catch (Exception e) {
+//                    return null;
+//                }
+//                return to_parenthesis_close_rule_node;
+//            };
+            /* "to_parenthesis_open: parenthesis_open" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_parenthesis_open_rule_node_supplier = () -> {
+                try {
+                    to_parenthesis_open_rule_node.clear_add_new_list();
+                    to_parenthesis_open_rule_node.add_new(parenthesis_open.name());
+                } catch (Exception e) {
+                    return null;
+                }
+                return to_parenthesis_open_rule_node;
+            };
+            /* "ra_parenthesis: to_parenthesis_open to_parenthesis_close<ignore>" */
+//            final Analizera_rules.Rule_nodes.Rule_creator_suppliers ra_parenthesis_rule_node_supplier = () -> {
+//                try {
+//                    ra_parenthesis_rule_node.clear_add_new_list();
+//                    ra_parenthesis_rule_node.add_new(to_parenthesis_open_rule_node_supplier);
+//                    ra_parenthesis_rule_node.add_new(to_parenthesis_close_rule_node_supplier);
+//                } catch (Exception e) {
+//                    return null;
+//                }
+//                return ra_parenthesis_rule_node;
+//            };
+            /* "to_semicolon<ignore>: semi_colon" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers to_semicolon_rule_node_supplier = () -> {
+                try {
+                    to_semicolon_rule_node.clear_add_new_list();
+                    to_semicolon_rule_node.add_new(semi_colon.name());
+                    to_semicolon_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.ignore_until_matches;
+                } catch (Exception e) {
+                    return null;
+                }
+                return to_semicolon_rule_node;
+            };
+            /* "ro_parenthesis_open_or_semicolon: [to_parenthesis_open|to_semicolon<ignore>]" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ro_parenthesis_open_or_semicolon_rule_node_supplier = () -> {
+                try {
+                    ro_parenthesis_open_or_semicolon_rule_node.clear_add_new_list();
+                    ro_parenthesis_open_or_semicolon_rule_node.add_new(to_parenthesis_open_rule_node_supplier);
+                    ro_parenthesis_open_or_semicolon_rule_node.add_new(to_semicolon_rule_node_supplier);
+                    ro_parenthesis_open_or_semicolon_rule_node.defined_rule_success = new Analyzer_rules.Rule_success(
                             (_basic_token, _ok, _extras_array) -> {
                                 if (next_block_identifier != null) {
                                     Identifiers_tables.Temporary_identifiers_tables temporary_identifiers_table
@@ -1036,74 +1056,53 @@ public class Identifiers_table_rules extends innui.code_processor.Identifiers_ta
                 } catch (Exception e) {
                     return null;
                 }
-                return o_parenthesis_open_or_semicolon_rule_node;
+                return ro_parenthesis_open_or_semicolon_rule_node;
             };
-            /* r_method_or_attribute_rule_node: " +
-                    "t_volatile_or_final<optional><repeat> r_template<optional> t_identifier_type t_identifier t_parenthesis_open_or_semicolon<ignore>" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_method_or_attribute_rule_node_supplier = () -> {
+            /* ra_method_or_attribute_rule_node: " +
+                    "to_volatile_or_final<optional><repeat> ra_template<optional> to_identifier_type to_identifier to_parenthesis_open_or_semicolon<ignore>" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_method_or_attribute_rule_node_supplier = () -> {
                 try {
-                    r_method_or_attribute_rule_node.clear_add_new_list();
-                    r_method_or_attribute_rule_node.add_new(r_template_rule_node_supplier);
-                    r_method_or_attribute_rule_node.add_new(o_identifier_type_rule_node_supplier);
-                    r_method_or_attribute_rule_node.add_new(t_identifier_rule_node_supplier);
-                    r_method_or_attribute_rule_node.add_new(o_parenthesis_open_or_semicolon_rule_node_supplier);
+                    ra_method_or_attribute_rule_node.clear_add_new_list();
+                    ra_method_or_attribute_rule_node.add_new(ra_template_rule_node_supplier);
+                    ra_method_or_attribute_rule_node.add_new(ro_identifier_type_rule_node_supplier);
+                    ra_method_or_attribute_rule_node.add_new(to_identifier_rule_node_supplier);
+                    ra_method_or_attribute_rule_node.add_new(ro_parenthesis_open_or_semicolon_rule_node_supplier);
                 } catch (Exception e) {
                     return null;
                 }
-                return r_method_or_attribute_rule_node;
+                return ra_method_or_attribute_rule_node;
             };
-            /* "o_method_or_attribute_or_class: " +
-                    "[r_method_or_attribute" +
-                    "|r_class]" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers o_method_or_attribute_or_class_rule_node_supplier = () -> {
+            /* "ro_method_or_attribute_or_class: " +
+                    "[ra_method_or_attribute" +
+                    "|ra_class]" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ro_method_or_attribute_or_class_rule_node_supplier = () -> {
                 try {
-                    o_method_or_attribute_or_class_rule_node.clear_add_new_list();
-                    o_method_or_attribute_or_class_rule_node.add_new(r_method_or_attribute_rule_node_supplier);
-                    o_method_or_attribute_or_class_rule_node.add_new(r_class_rule_node_supplier);
+                    ro_method_or_attribute_or_class_rule_node.clear_add_new_list();
+                    ro_method_or_attribute_or_class_rule_node.add_new(ra_method_or_attribute_rule_node_supplier);
+                    ro_method_or_attribute_or_class_rule_node.add_new(ra_class_rule_node_supplier);
                 } catch (Exception e) {
                     return null;
                 }
-                return o_method_or_attribute_or_class_rule_node;
+                return ro_method_or_attribute_or_class_rule_node;
             };
-            /* "r_method_or_attribute_or_class<ignore><repeat><call>: " +
-                    "t_method_or_attribute_or_class<ignore> t_method_or_attribute_or_class_1" +
-                    "o_method_or_attribute_or_class" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers r_method_or_attribute_or_class_rule_node_supplier = () -> {
+            /* "ra_method_or_attribute_or_class<ignore><repeat><call>: " +
+                    "to_method_or_attribute_or_class<ignore> to_method_or_attribute_or_class_1" +
+                    "ro_method_or_attribute_or_class" */
+            final Analyzer_rules.Rule_nodes.Rule_creator_suppliers ra_method_or_attribute_or_class_rule_node_supplier = () -> {
                 try {
-                    r_method_or_attribute_or_class_rule_node.clear_add_new_list();
-                    r_method_or_attribute_or_class_rule_node.add_new(t_method_or_attribute_or_class_rule_node_supplier);
-                    r_method_or_attribute_or_class_rule_node.add_new(o_method_or_attribute_or_class_1_rule_node_supplier);
-                    r_method_or_attribute_or_class_rule_node.add_new(o_method_or_attribute_or_class_rule_node_supplier);
-                    r_method_or_attribute_or_class_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
-                    r_method_or_attribute_or_class_rule_node.defined_repeat_mode = Analizer_rules.Repeat_mode.repeat_while_success;
-                    r_method_or_attribute_or_class_rule_node.defined_call_the_success_rules_list_if_success = true;
+                    ra_method_or_attribute_or_class_rule_node.clear_add_new_list();
+                    ra_method_or_attribute_or_class_rule_node.add_new(to_method_or_attribute_or_class_rule_node_supplier);
+                    ra_method_or_attribute_or_class_rule_node.add_new(ro_method_or_attribute_or_class_1_rule_node_supplier);
+                    ra_method_or_attribute_or_class_rule_node.add_new(ro_method_or_attribute_or_class_rule_node_supplier);
+                    ra_method_or_attribute_or_class_rule_node.defined_optional_mode = Analyzer_rules.Optional_mode.ignore_until_matches;
+                    ra_method_or_attribute_or_class_rule_node.defined_repeat_mode = Analyzer_rules.Repeat_mode.repeat_while_success;
+                    ra_method_or_attribute_or_class_rule_node.defined_call_the_success_rules_list_if_success = true;
                 } catch (Exception e) {
                     return null;
                 }
-                return r_method_or_attribute_or_class_rule_node;
+                return ra_method_or_attribute_or_class_rule_node;
             };
-            /* "t_parenthesis_open: parenthesis_open" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_parenthesis_open_rule_node_supplier = () -> {
-                try {
-                    t_parenthesis_open_rule_node.clear_add_new_list();
-                    t_parenthesis_open_rule_node.add_new(parenthesis_open.name());
-                } catch (Exception e) {
-                    return null;
-                }
-                return t_parenthesis_open_rule_node;
-            };
-            /* "t_parenthesis_close<ignore>: parenthesis_close" */
-            final Analizer_rules.Rule_nodes.Rule_creator_suppliers t_parenthesis_close_rule_node_supplier = () -> {
-                try {
-                    t_parenthesis_close_rule_node.clear_add_new_list();
-                    t_parenthesis_close_rule_node.add_new(parenthesis_close.name());
-                    t_parenthesis_close_rule_node.defined_optional_mode = Analizer_rules.Optional_mode.ignore_until_matches;
-                } catch (Exception e) {
-                    return null;
-                }
-                return t_parenthesis_close_rule_node;
-            };
-            retorno = r_method_or_attribute_or_class_rule_node_supplier.get();
+            retorno = ra_method_or_attribute_or_class_rule_node_supplier.get();
         } catch (Exception e) {
             ok.setTex(e);
             return null;

@@ -1,5 +1,6 @@
 package innui.code_processor;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import innui.Bases;
 import innui.modelos.configurations.ResourceBundles;
@@ -15,7 +16,7 @@ import java.util.*;
 
 
 @SuppressFBWarnings({"MS_SHOULD_BE_FINAL", "MS_PKGPROTECT", "PA_PUBLIC_PRIMITIVE_ATTRIBUTE"})
-public class Analizer_rules extends Bases {
+public class Analyzer_rules extends Bases {
     // Properties file for translactions
     private static final long serialVersionUID;
     public static @Fenum("file_path") String k_in_route;
@@ -23,7 +24,7 @@ public class Analizer_rules extends Bases {
         serialVersionUID = getSerial_version_uid();
         String paquete_tex = null;
         try {
-            paquete_tex = Oks.valide(Analizer_rules.class.getPackage()).getName();
+            paquete_tex = Oks.valide(Analyzer_rules.class.getPackage()).getName();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -32,7 +33,7 @@ public class Analizer_rules extends Bases {
         } else {
             paquete_tex = paquete_tex.replace(".", File.separator);
         }
-        Analizer_rules.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
+        Analyzer_rules.k_in_route = Oks.no_fenum_cast("in/" + paquete_tex + "/in");
     }
 
     public enum Return_status {
@@ -54,25 +55,26 @@ public class Analizer_rules extends Bases {
         no_repeat
         , repeat_while_success
     }
-    public static @Fenum("repeat_mode") String k_repeat_tex = (@Fenum("repeat_mode") String) "<optional>";
+    public static @Fenum("repeat_mode") String k_repeat_tex = (@Fenum("repeat_mode") String) "<repeat>";
     public static @Fenum("call_mode") String k_call_tex = (@Fenum("call_mode") String) "<call>";
-
-    @FunctionalInterface
-    public interface After_success_calls extends Serializable {
-        void call(Scanner_rules.Basic_tokens basic_token, Oks ok, Object ... extras_array) throws Exception;
-    }
 
     public static class Rule_success implements Serializable {
         private static final long serialVersionUID = getSerial_version_uid();
         public Scanner_rules.@Nullable Basic_tokens basic_token = null;
         public Integer first_token_pos = -1;
-        public After_success_calls after_success;
+        public Identifiers_table_after_successes.After_success_calls after_success;
 
-        public Rule_success(After_success_calls after_success) {
+        public Rule_success(Identifiers_table_after_successes.After_success_calls after_success) {
             this.after_success = after_success;
         }
     }
 
+    public static class Name_based_rule_nodes implements Serializable {
+        private static final long serialVersionUID = getSerial_version_uid();
+        public String _defined_name = "";
+        public List<String> name_based_rule_nodes_list = new ArrayList<>();
+
+    }
     public static abstract class Rule_nodes implements Serializable {
         @FunctionalInterface
         public interface Rule_creator_calls extends Serializable {
@@ -83,12 +85,17 @@ public class Analizer_rules extends Bases {
             @Nullable Rule_nodes get() throws Exception;
         }
         private static final long serialVersionUID = getSerial_version_uid();
+        public static @Fenum("key_name_separator") String k_key_name_token_separator = (@Fenum("key_name_separator") String) "-'";
+        public static @Fenum("key_name_separator") String k_key_name_and_separator = (@Fenum("key_name_separator") String) " -> ";
+        public static @Fenum("key_name_separator") String k_key_name_or_separator = (@Fenum("key_name_separator") String) " | ";
+        public static @Fenum("key_name_separator") String k_key_name_or_begin_separator = (@Fenum("key_name_separator") String) "[ ";
+        public static @Fenum("key_name_separator") String k_key_name_or_end_separator = (@Fenum("key_name_separator") String) " ]";
         public String _defined_key_name = "";
         public String _defined_name = "";
         public Optional_mode defined_optional_mode = Optional_mode.no_optional;
         public Repeat_mode defined_repeat_mode = Repeat_mode.no_repeat;
         public boolean defined_call_the_success_rules_list_if_success = false;
-        public Analizer_rules _defined_analizer_rules;
+        public Analyzer_rules _defined_analizer_rules;
         public @Nullable Rule_success defined_rule_success = null;
         public boolean _is_already_evaluated = false;
         public @Nullable Integer _first_token_pos = null;
@@ -96,7 +103,7 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings({"nullness:method.invocation", "nullness:initialization.fields.uninitialized"})
-        public Rule_nodes(Analizer_rules analizer_rules) throws Exception {
+        public Rule_nodes(Analyzer_rules analizer_rules) throws Exception {
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
                 init(analizer_rules, ok);
@@ -129,7 +136,7 @@ public class Analizer_rules extends Bases {
          * @param extras_array
          * @throws Exception
          */
-        public void init(Analizer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
+        public void init(Analyzer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             ResourceBundle in = null;
@@ -427,8 +434,8 @@ public class Analizer_rules extends Bases {
          * @param basic_token
          * @return
          */
-        public String create_token_name(Scanner_rules.Basic_tokens basic_token) {
-            return create_token_name(basic_token.token_type, basic_token.token_tex);
+        public String create_key_name(Scanner_rules.Basic_tokens basic_token) {
+            return create_key_name(basic_token.token_type, basic_token.token_tex);
         }
 
         /**
@@ -437,8 +444,21 @@ public class Analizer_rules extends Bases {
          * @param token_tex
          * @return
          */
-        public String create_token_name(String token_type, String token_tex) {
-            return token_type + "-" + token_tex;
+        public String create_key_name(String token_type, String token_tex) {
+            String key_name;
+            key_name = token_type + Oks.no_fenum_cast(k_key_name_token_separator) + token_tex + "'";
+            if (defined_optional_mode.equals(Optional_mode.optional)) {
+                key_name = key_name + k_optional_tex;
+            } else if (defined_optional_mode.equals(Optional_mode.ignore_until_matches)) {
+                key_name = key_name + k_ignore_tex;
+            }
+            if (defined_repeat_mode.equals(Repeat_mode.repeat_while_success)) {
+                key_name = key_name + k_repeat_tex;
+            }
+            if (defined_call_the_success_rules_list_if_success == true) {
+                key_name = key_name + k_call_tex;
+            }
+            return Oks.no_fenum_cast(key_name);
         }
 
         /**
@@ -446,9 +466,39 @@ public class Analizer_rules extends Bases {
          * @param token_type
          * @return
          */
-        public String create_token_name(String token_type) {
-            return token_type + "-";
+        public String create_key_name(String token_type) {
+            return create_key_name(token_type, "");
         }
+
+        /**
+         * Normalizes the key name existing and returns the new one
+         * @return the new one
+         */
+        public String normalize_key_name() {
+            String new_key_name;
+            int pos = _defined_key_name.indexOf('<');
+            if (pos >= 0) {
+                new_key_name = create_key_name("", "");
+                int new_pos = new_key_name.indexOf('<');
+                if (new_pos >= 0) {
+                    new_key_name = new_key_name.substring(new_pos);
+                } else {
+                    new_key_name = "";
+                }
+                new_key_name = _defined_key_name.substring(0, pos).trim()
+                    + new_key_name;
+            } else {
+                new_key_name = _defined_key_name.trim();
+            }
+            _defined_key_name = new_key_name;
+            return new_key_name;
+        }
+
+        /**
+         * Normalizes the name (long name) of the rule.
+         * @return
+         */
+        public abstract String normalize_name();
 
         /**
          * Set name, key_name and other attributes of the object
@@ -457,12 +507,12 @@ public class Analizer_rules extends Bases {
         public void configure_from_key_name(String rule_name_with_attributes) {
             try {
                 String old_defined_key_name = _defined_key_name;
-                this._defined_name = rule_name_with_attributes;
+                this._defined_name = rule_name_with_attributes.trim();
                 int pos = rule_name_with_attributes.indexOf(":");
                 if (pos >= 0) {
-                    _defined_key_name = rule_name_with_attributes.substring(0, pos);
+                    _defined_key_name = rule_name_with_attributes.substring(0, pos).trim();
                 } else {
-                    _defined_key_name = rule_name_with_attributes;
+                    _defined_key_name = rule_name_with_attributes.trim();
                 }
                 pos = _defined_key_name.indexOf("<");
                 if (pos >= 0) {
@@ -489,6 +539,7 @@ public class Analizer_rules extends Bases {
                     }
                     _defined_key_name = Oks.no_fenum_cast(new_name);
                 }
+                normalize_key_name();
                 Rule_nodes rule_node = find_by_key_name(old_defined_key_name);
                 if (rule_node != null) {
                     _defined_analizer_rules.rule_nodes_map.remove(_defined_key_name);
@@ -499,6 +550,34 @@ public class Analizer_rules extends Bases {
             }
         }
 
+        /**
+         *
+         * @param key_names_list
+         * @param ok
+         * @param extras_array
+         * @throws Exception
+         */
+        public void add_new(List<String> key_names_list, Oks ok, Object ... extras_array) throws Exception {
+            new Test_methods(ok, ok, extras_array, this);
+            if (ok.is == false) return;
+            try {
+                Rule_nodes rule_node;
+                for (var item: key_names_list) {
+                    if (item.contains(Oks.no_fenum_cast(k_key_name_token_separator)) == false) {
+                        rule_node = ok.allow_null(find_by_key_name(item));
+                        if (rule_node == null) {
+                            ok.setTex(Tr.in(k_in_route, "Rule not stored yet in the repository: ")
+                                    + item);
+                            break;
+                        } else {
+                            add_new(rule_node);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                ok.setTex(e);
+            }
+        }
         /**
          *
          * @param rule_node_supplier
@@ -614,46 +693,6 @@ public class Analizer_rules extends Bases {
 
         /**
          *
-         * @return true if it has success
-         * @throws Exception
-         */
-        public abstract boolean clear_add_new_list() throws Exception;
-
-        /**
-         *
-         * @param rule_node
-         * @throws Exception
-         */
-        public abstract Rule_nodes _add_new(Rule_nodes rule_node) throws Exception;
-
-        /**
-         *
-         * @param basic_token
-         */
-        public abstract Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception;
-
-        /**
-         *
-         * @param token_type_tex
-         * @throws Exception
-         */
-        public Rule_nodes _add_new(String token_type_tex) throws Exception {
-            return _add_new(new Scanner_rules.Basic_tokens(token_type_tex));
-        }
-
-        /**
-         * 
-         * @param token_type_tex
-         * @param token_tex
-         * @return
-         * @throws Exception
-         */
-        public Rule_nodes _add_new(String token_type_tex, String token_tex) throws Exception {
-            return _add_new(new Scanner_rules.Basic_tokens(token_type_tex, token_tex));
-        }
-
-        /**
-         *
          * @param basic_tokens_list
          * @throws Exception
          */
@@ -673,6 +712,48 @@ public class Analizer_rules extends Bases {
             }
         }
 
+        /**
+         *
+         * @return true if it has success
+         * @throws Exception
+         */
+        public abstract boolean clear_add_new_list() throws Exception;
+
+        /**
+         *
+         * @param token_type_tex
+         * @throws Exception
+         */
+        public Rule_nodes _add_new(String token_type_tex) throws Exception {
+            return _add_new(new Scanner_rules.Basic_tokens(token_type_tex));
+        }
+
+        /**
+         *
+         * @param token_type_tex
+         * @param token_tex
+         * @return
+         * @throws Exception
+         */
+        public Rule_nodes _add_new(String token_type_tex, String token_tex) throws Exception {
+            return _add_new(new Scanner_rules.Basic_tokens(token_type_tex, token_tex));
+        }
+
+        /**
+         *
+         * @param rule_node
+         * @throws Exception
+         */
+        public abstract Rule_nodes _add_new(Rule_nodes rule_node) throws Exception;
+
+        /**
+         *
+         * @param basic_token
+         */
+        public abstract Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception;
+
+        public abstract List<String> get_add_new_key_names_list(Oks ok, Object ... extras_array) throws Exception;
+
     }
 
     public static class Rules_and_rule_nodes extends Rule_nodes {
@@ -681,7 +762,7 @@ public class Analizer_rules extends Bases {
         public Integer _rule_part_num = 0;
         public Integer _defined_rule_part_tam = -1;
 
-        public Rules_and_rule_nodes(Analizer_rules analizer_rules) throws Exception {
+        public Rules_and_rule_nodes(Analyzer_rules analizer_rules) throws Exception {
             super(analizer_rules);
         }
 
@@ -692,7 +773,7 @@ public class Analizer_rules extends Bases {
          * @param extras_array
          * @throws Exception
          */
-        public void init(Analizer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
+        public void init(Analyzer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             ResourceBundle in = null;
@@ -725,7 +806,6 @@ public class Analizer_rules extends Bases {
         public void init_to_reuse_or_repeat(boolean is_reuse, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
-            ResourceBundle in = null;
             try {
                 super.init_to_reuse_or_repeat(is_reuse, ok, extras_array);
                 if (ok.is == false) return;
@@ -808,6 +888,28 @@ public class Analizer_rules extends Bases {
                 ok.setTex(e);
             }
             return Return_status.error;
+        }
+
+        @Override
+        public String normalize_key_name() {
+            super.normalize_key_name();
+            if (_defined_key_name.startsWith("ra_") == false) {
+                _defined_key_name = "ra_" + _defined_key_name;
+            }
+            return _defined_key_name;
+        }
+
+        @Override
+        public String normalize_name() {
+            String new_name = normalize_key_name();
+            String long_name = "";
+            for (var item: _defined_rule_nodes_and_list) {
+                long_name = long_name
+                        + Oks.no_fenum_cast(k_key_name_and_separator)
+                        + item.normalize_key_name();
+            }
+            _defined_name = new_name + ":" + long_name;
+            return _defined_name;
         }
 
         @Override
@@ -954,12 +1056,12 @@ public class Analizer_rules extends Bases {
 
         @Override
         public Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception {
-            Rule_nodes rule_node = Oks.allow_nulle(find_by_key_name(create_token_name(basic_token)));
+            Rule_nodes rule_node = Oks.allow_nulle(find_by_key_name(create_key_name(basic_token)));
             Tokens_or_rule_nodes tokens_or_rule_node;
             if (rule_node == null) {
                 // Create Tokens_or_rule_nodes for only one token
                 tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-                tokens_or_rule_node.configure_from_key_name(create_token_name(basic_token));
+                tokens_or_rule_node.configure_from_key_name(create_key_name(basic_token));
                 tokens_or_rule_node.add_new(basic_token);
                 _defined_rule_nodes_and_list.add(tokens_or_rule_node);
             } else {
@@ -967,7 +1069,7 @@ public class Analizer_rules extends Bases {
                     tokens_or_rule_node = new Tokens_or_rule_nodes((Tokens_or_rule_nodes) rule_node);
                     if (tokens_or_rule_node._defined_tokens_or_list.contains(basic_token) == false) {
                         throw new Exception(Tr.in(k_in_route, "Rule node found does not contain token: ")
-                            + create_token_name(basic_token));
+                            + create_key_name(basic_token));
                     }
                     _defined_rule_nodes_and_list.add(tokens_or_rule_node);
                 } else {
@@ -975,6 +1077,24 @@ public class Analizer_rules extends Bases {
                 }
             }
             return tokens_or_rule_node;
+        }
+
+        @Override
+        public List<String> get_add_new_key_names_list(Oks ok, Object... extras_array) throws Exception {
+            List<String> retorno_list = new ArrayList<>();
+            if (ok.is == false) return retorno_list;
+            Oks noted_ok = ok.valid(ok.create_new(extras_array));
+            for (var item: _defined_rule_nodes_and_list) {
+                if (_defined_analizer_rules.rule_nodes_map.containsKey(item.get_key_name()) == false) {
+                    ok.addTex(Tr.in(k_in_route, "Rule not found: ") + item.get_key_name());
+                    noted_ok.init();
+                }
+                retorno_list.add(item.get_key_name());
+            }
+            if (ok.is == false) {
+                retorno_list.clear();
+            }
+            return retorno_list;
         }
 
     }
@@ -985,7 +1105,7 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
-        public Tokens_or_rule_nodes(Analizer_rules analizer_rules) throws Exception {
+        public Tokens_or_rule_nodes(Analyzer_rules analizer_rules) throws Exception {
             super(analizer_rules);
             Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
             try {
@@ -1014,7 +1134,7 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
-        public void init(Analizer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
+        public void init(Analyzer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             ResourceBundle in = null;
@@ -1089,6 +1209,36 @@ public class Analizer_rules extends Bases {
             return retorno;
         }
 
+        @Override
+        public String normalize_key_name() {
+            super.normalize_key_name();
+            if (_defined_key_name.startsWith("to_") == false) {
+                _defined_key_name =  "to_" + _defined_key_name;
+            }
+            return _defined_key_name;
+        }
+
+        @Override
+        public String normalize_name() {
+            String new_name = normalize_key_name();
+            String long_name = "";
+            for (var item: _defined_tokens_or_list) {
+                if (long_name.isEmpty()) {
+                    if (_defined_tokens_or_list.size() > 1) {
+                        long_name = Oks.no_fenum_cast(k_key_name_or_begin_separator);
+                    }
+                } else {
+                    long_name = long_name + Oks.no_fenum_cast(k_key_name_or_separator);
+                }
+                long_name = long_name + create_key_name(item);
+            }
+            if (_defined_tokens_or_list.size() > 1) {
+                long_name = long_name + Oks.no_fenum_cast(k_key_name_or_end_separator);
+            }
+            _defined_name = new_name + ": " + long_name;
+            return _defined_name;
+        }
+
         /**
          *
          * @param basic_token
@@ -1141,6 +1291,16 @@ public class Analizer_rules extends Bases {
             return this;
         }
 
+        @Override
+        public List<String> get_add_new_key_names_list(Oks ok, Object... extras_array) throws Exception {
+            List<String> retorno_list = new ArrayList<>();
+            if (ok.is == false) return retorno_list;
+            for (var item: _defined_tokens_or_list) {
+                retorno_list.add(create_key_name(item));
+            }
+            return retorno_list;
+        }
+
     }
 
     public static class Rules_or_rule_nodes extends Rule_nodes {
@@ -1149,7 +1309,7 @@ public class Analizer_rules extends Bases {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         @SuppressWarnings("nullness:method.invocation")
-        public Rules_or_rule_nodes(Analizer_rules analizer_rules) throws Exception {
+        public Rules_or_rule_nodes(Analyzer_rules analizer_rules) throws Exception {
             super(analizer_rules);
         }
 
@@ -1169,7 +1329,7 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
-        public void init(Analizer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
+        public void init(Analyzer_rules analizer_rules, Oks ok, Object... extras_array) throws Exception {
             new Test_methods(ok, ok, extras_array, this);
             if (ok.is == false) return;
             try {
@@ -1278,6 +1438,36 @@ public class Analizer_rules extends Bases {
         }
 
         @Override
+        public String normalize_key_name() {
+            super.normalize_key_name();
+            if (_defined_key_name.startsWith("ro_") == false) {
+                _defined_key_name =  "ro_" + _defined_key_name;
+            }
+            return _defined_key_name;
+        }
+
+        @Override
+        public String normalize_name() {
+            String new_name = normalize_key_name();
+            String long_name = "";
+            for (var item: _defined_rule_nodes_or_list) {
+                if (long_name.isEmpty()) {
+                    if (_defined_rule_nodes_or_list.size() > 1) {
+                        long_name = Oks.no_fenum_cast(k_key_name_or_begin_separator);
+                    }
+                } else {
+                    long_name = long_name + Oks.no_fenum_cast(k_key_name_or_separator);
+                }
+                long_name = long_name + item.normalize_key_name();
+            }
+            if (_defined_rule_nodes_or_list.size() > 1) {
+                long_name = long_name + Oks.no_fenum_cast(k_key_name_or_end_separator);
+            }
+            _defined_name = new_name + ": " + long_name;
+            return _defined_name;
+        }
+
+        @Override
         public boolean clear_add_new_list() throws Exception {
             _defined_rule_nodes_or_list.clear();
             return true;
@@ -1294,11 +1484,11 @@ public class Analizer_rules extends Bases {
         @Override
         public Rule_nodes _add_new(Scanner_rules.Basic_tokens basic_token) throws Exception {
             Tokens_or_rule_nodes tokens_or_rule_node;
-            Rule_nodes rule_node = Oks.allow_nulle(find_by_key_name(create_token_name(basic_token)));
+            Rule_nodes rule_node = Oks.allow_nulle(find_by_key_name(create_key_name(basic_token)));
             if (rule_node == null) {
                 // Create Tokens_or_rule_nodes for only one token
                 tokens_or_rule_node = new Tokens_or_rule_nodes(_defined_analizer_rules);
-                tokens_or_rule_node.configure_from_key_name(create_token_name(basic_token));
+                tokens_or_rule_node.configure_from_key_name(create_key_name(basic_token));
                 tokens_or_rule_node.add_new(basic_token);
                 _defined_rule_nodes_or_list.add(tokens_or_rule_node);
             } else {
@@ -1306,7 +1496,7 @@ public class Analizer_rules extends Bases {
                     tokens_or_rule_node = new Tokens_or_rule_nodes((Tokens_or_rule_nodes) rule_node);
                     if (tokens_or_rule_node._defined_tokens_or_list.contains(basic_token) == false) {
                         throw new Exception(Tr.in(k_in_route, "Rule node found does not contain token: ")
-                                + create_token_name(basic_token));
+                                + create_key_name(basic_token));
                     }
                     _defined_rule_nodes_or_list.add(tokens_or_rule_node);
                 } else {
@@ -1316,6 +1506,24 @@ public class Analizer_rules extends Bases {
             return tokens_or_rule_node;
         }
 
+        @Override
+        public List<String> get_add_new_key_names_list(Oks ok, Object... extras_array) throws Exception {
+            List<String> retorno_list = new ArrayList<>();
+            if (ok.is == false) return retorno_list;
+            Oks noted_ok = ok.valid(ok.create_new(extras_array));
+            for (var item: _defined_rule_nodes_or_list) {
+                if (_defined_analizer_rules.rule_nodes_map.containsKey(item.get_key_name()) == false) {
+                    ok.addTex(Tr.in(k_in_route, "Rule not found: ") + item.get_key_name());
+                    noted_ok.init();
+                }
+                retorno_list.add(item.get_key_name());
+            }
+            if (ok.is == true) {
+                retorno_list.clear();
+            }
+            return retorno_list;
+        }
+
     }
 
     public @Nullable Rule_nodes start_rule_node = null;
@@ -1323,7 +1531,7 @@ public class Analizer_rules extends Bases {
     public Deque<Rule_success> success_rules_list = new LinkedList<>();
     public Map<String, Rule_nodes> rule_nodes_map = new HashMap<>();
 
-    public Analizer_rules(I_code_scanners i_code_scanner) {
+    public Analyzer_rules(I_code_scanners i_code_scanner) {
         this.i_code_scanner = i_code_scanner;
     }
 
@@ -1386,4 +1594,99 @@ public class Analizer_rules extends Bases {
             ok.setTex(e);
         }
     }
+
+    /**
+     *
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception
+     */
+    public Map <String, Name_based_rule_nodes> get_rules_list_yaml(Oks ok, Object ... extras_array) throws Exception {
+        Map <String, Name_based_rule_nodes> name_based_rule_nodes_map = new HashMap<>();
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return name_based_rule_nodes_map;
+        try {
+            Name_based_rule_nodes name_based_rule_node;
+            String key_name;
+            String name;
+            List<String> add_new_key_names_list;
+            for (var entry: rule_nodes_map.entrySet()) {
+                name_based_rule_node = new Name_based_rule_nodes();
+                key_name = entry.getValue().normalize_key_name();
+                name = entry.getValue().normalize_name();
+                name_based_rule_node._defined_name = name;
+                add_new_key_names_list = entry.getValue().get_add_new_key_names_list(ok, extras_array);
+                if (ok.is == false) return name_based_rule_nodes_map;
+                name_based_rule_node.name_based_rule_nodes_list.addAll(add_new_key_names_list);
+                name_based_rule_nodes_map.put(key_name, name_based_rule_node);
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return name_based_rule_nodes_map;
+    }
+
+    /**
+     *
+     * @param file
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
+    public void get_rules_list_yaml(File file, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return;
+        try {
+            Map <String, Name_based_rule_nodes> name_based_rule_nodes_map = get_rules_list_yaml(ok, extras_array);
+            if (ok.is == false) return;
+            Yamls yaml = new Yamls();
+            yaml.init(ok, extras_array);
+            if (ok.is == false) return;
+            yaml.open_and_write_file(file, name_based_rule_nodes_map, ok, extras_array);
+            if (ok.is == false) return;
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+    }
+
+    /**
+     *
+     * @param file
+     * @param ok
+     * @param extras_array
+     * @throws Exception
+     */
+    public void set_rules_list_yaml(File file, Oks ok, Object ... extras_array) throws Exception {
+        new Test_methods(ok, ok, extras_array, this);
+        if (ok.is == false) return;
+        try {
+            Map <String, Name_based_rule_nodes> name_based_rule_nodes_map = new HashMap<>();
+            Yamls yaml = new Yamls();
+            yaml.init(ok, extras_array);
+            if (ok.is == false) return;
+            byte []  bytes_array = ok.valid(yaml.open_and_read_file(file, ok, extras_array));
+            if (ok.is == false) return;
+            name_based_rule_nodes_map = ok.valid(yaml.objectMapper).readValue(bytes_array
+                    , new TypeReference<Map<String, Name_based_rule_nodes>>() {});
+            Rule_nodes rule_node;
+            for (var entry: name_based_rule_nodes_map.entrySet()) {
+                if (entry.getValue()._defined_name.contains(Oks.no_fenum_cast(Rule_nodes.k_key_name_token_separator))) {
+                    rule_node = new Tokens_or_rule_nodes(this);
+                } else if (entry.getValue()._defined_name.contains(Oks.no_fenum_cast(Rule_nodes.k_key_name_and_separator))) {
+                    rule_node = new Rules_and_rule_nodes(this);
+                } else {
+                    rule_node = new Rules_or_rule_nodes(this);
+                }
+                rule_node.configure_from_key_name(entry.getKey());
+                rule_node.add_new(entry.getValue().name_based_rule_nodes_list, ok, extras_array);
+                if (ok.is == false) return;
+                rule_nodes_map.put(entry.getKey(), rule_node);
+            }
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        return;
+    }
+
 }

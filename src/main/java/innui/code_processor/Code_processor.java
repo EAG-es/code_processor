@@ -50,7 +50,28 @@ public class Code_processor extends Initials {
     @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     public transient CommandLineParser parser = new DefaultParser();
     public org.apache.commons.cli.@Nullable Option analyse_file = null;
+    public org.apache.commons.cli.@Nullable Option analyse_rules_download = null;
+    public org.apache.commons.cli.@Nullable Option analyse_rules_upload = null;
     public @Nullable Option get_identifiers_table = null;
+    public Code_scanners code_scanner;
+    public Identifiers_table_rules identifiers_table_rule;
+    public Identifiers_table_processors identifiers_table_processor;
+
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    public Code_processor() throws Exception {
+        Oks ok = (Oks) Bases.objects_map.create_new(Oks.class);
+        try {
+            code_scanner = new Code_scanners();
+            identifiers_table_rule = new Identifiers_table_rules(code_scanner);
+            identifiers_table_processor = new Identifiers_table_processors(identifiers_table_rule);
+            identifiers_table_processor.load_identifiers_table_rule(ok);
+        } catch (Exception e) {
+            ok.setTex(e);
+        }
+        if (ok.is == false) {
+            throw new Exception(ok.getTex());
+        }
+    }
 
     /**
      * Creates the CLUI options
@@ -74,6 +95,23 @@ public class Code_processor extends Initials {
                     .argName(in(in, "File_name"))
                     .build();
             options.addOption(analyse_file);
+            analyse_rules_download = Option.builder("ard")
+                    .longOpt("analyse_rules_download")
+                    .desc(in(in, "Download the rules use by the Analyser in YAML format"))
+                    .hasArg()
+                    .numberOfArgs(1)
+                    .argName(in(in, "Download_file_name"))
+                    .build();
+            options.addOption(analyse_rules_download);
+            analyse_rules_upload = Option.builder("aru")
+                    .longOpt("analyse_rules_upload")
+                    .desc(in(in, "Upload the rules to be used by the Analyser in YAML format"))
+                    .hasArg()
+                    .optionalArg(true)
+                    .numberOfArgs(2)
+                    .argName(in(in, "Upload_file_name [Canonical name of a Identifiers_table_after_successes derived class] "))
+                    .build();
+            options.addOption(analyse_rules_upload);
             // G
             get_identifiers_table = Option.builder("gitam")
                     .longOpt("get_identifiers_table_attributes_methods")
@@ -213,7 +251,6 @@ public class Code_processor extends Initials {
                 write_line("--" + option.getLongOpt(), ok);
                 if (ok.is == false) return false;
                 String file_tex = commandLine.getOptionValues(ok.valid(analyse_file))[0];
-                Code_scanners code_scanner = new Code_scanners();
                 code_scanner.load_file(file_tex, ok, extras_array);
                 code_scanner.start_scanner(ok, extras_array);
                 ok.valid(this.write_line(Tr.in(in, "Analyse file done. "), ok));
@@ -226,16 +263,35 @@ public class Code_processor extends Initials {
                     content = content + token.token_tex;
                 }
                 ok.valid(this.write_line(content, ok));
+            } if (option.getOpt().equals(ok.valid(analyse_rules_download).getOpt())) {
+                write_line("--" + option.getLongOpt(), ok);
+                if (ok.is == false) return false;
+                String file_tex = commandLine.getOptionValues(ok.valid(analyse_rules_download))[0];
+                File file = new File(file_tex);
+                identifiers_table_processor.identifiers_table_rule.analyizer_rule.get_rules_list_yaml(file, ok, extras_array);
+                if (ok.is == false) return false;
+                write_line(Tr.in(in, "Analyze rules downloaded: ") + file_tex, ok);
+            } if (option.getOpt().equals(ok.valid(analyse_rules_upload).getOpt())) {
+                write_line("--" + option.getLongOpt(), ok);
+                if (ok.is == false) return false;
+                String file_tex = commandLine.getOptionValues(ok.valid(analyse_rules_upload))[0];
+                String canonical_class_name_tex = null;
+                if (commandLine.getOptionValues(ok.valid(analyse_rules_upload)).length > 1) {
+                    canonical_class_name_tex = commandLine.getOptionValues(ok.valid(analyse_rules_upload))[1];
+                }
+                File file = new File(file_tex);
+                identifiers_table_processor.identifiers_table_rule.set_rules_list_yaml(file, ok, extras_array);
+                if (ok.is == false) return false;
+                if (canonical_class_name_tex != null) {
+                    identifiers_table_processor.identifiers_table_rule.set_after_success_calls(canonical_class_name_tex, ok, extras_array);
+                    if (ok.is == false) return false;
+                }
+                write_line(Tr.in(in, "Analyze rules uploaded: ") + file_tex, ok);
             } else if (option.getOpt().equals(ok.valid(get_identifiers_table).getOpt())) {
                 write_line("--" + option.getLongOpt(), ok);
                 if (ok.is == false) return false;
                 String file_tex = commandLine.getOptionValues(ok.valid(get_identifiers_table))[0];
-                Code_scanners code_scanner = new Code_scanners();
                 code_scanner.load_file(file_tex, ok, extras_array);
-                if (ok.is == false) return false;
-                Identifiers_table_rules identifiers_table_rule = new Identifiers_table_rules(code_scanner);
-                Identifiers_table_processors identifiers_table_processor = new Identifiers_table_processors(identifiers_table_rule);
-                identifiers_table_processor.load_identifiers_table_rule(null, ok, extras_array);
                 if (ok.is == false) return false;
                 identifiers_table_processor.start(ok, extras_array);
                 if (ok.is == false) return false;

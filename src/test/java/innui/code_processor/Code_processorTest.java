@@ -33,10 +33,31 @@ public class Code_processorTest {
 
     @Test
     public void testMain_get_identifiers_table() {
-        System.out.println("main analyse file");
+        System.out.println("main get identifiers table");
         String[] args = {
-                "-git",
+                "-gitam",
                 "/home/emilio/proyectos/java/code_processor/src/main/java/innui/code_processor/Code_processor.java"
+        };
+        Code_processor.main(args);
+    }
+
+    @Test
+    public void testMain_analize_rules_download() {
+        System.out.println("main analyze rules download");
+        String[] args = {
+                "-ard",
+                "/home/emilio/proyectos/java/code_processor/src/main/resources/analyze_rules_download.yaml"
+        };
+        Code_processor.main(args);
+    }
+
+    @Test
+    public void testMain_analize_rules_upload() {
+        System.out.println("main analyze rules upload");
+        String[] args = {
+                "-aru",
+                "/home/emilio/proyectos/java/code_processor/src/main/resources/analyze_rules_download.yaml",
+                "innui.code_processor.java.Identifiers_table_after_sucesses"
         };
         Code_processor.main(args);
     }

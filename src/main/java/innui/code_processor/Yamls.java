@@ -152,10 +152,7 @@ public class Yamls extends Bases {
                 _default_builder(ok);
                 if (!ok.is) { return false; }
             }
-            if (!file.exists()) {
-                ok.setTex(Tr.in(ok.valid(in), "File does not exists: ")
-                  + file.getCanonicalPath());
-            } else {
+            if (file.exists()) {
                 if (!file.canWrite()) {
                     ok.addTex(Tr.in(ok.valid(in), "File does not have write permit: ")
                       + file.getCanonicalPath());
